@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语世界 · English World</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="logo">🌍 英语世界 <span class="logo-en">English World</span></div>
+  <div class="hud">
+    <div class="hud-item coins">🪙 <b id="coinCount">0</b></div>
+    <div class="hud-item words">📖 <b id="wordCount">0</b> 词</div>
+    <button class="btn btn-ghost" id="btnBook">📚 词汇册</button>
+    <button class="btn btn-ghost" id="btnMap">🗺️ 地图</button>
+  </div>
+</header>
+
+<main id="app">
+  <!-- 场景选择地图 -->
+  <section id="mapView" class="view">
+    <h1 class="map-title">去哪儿玩？</h1>
+    <p class="map-sub">Pick a place. Tap anything. Learn for free.</p>
+    <div class="scene-grid" id="sceneGrid"></div>
+  </section>
+
+  <!-- 场景内 -->
+  <section id="sceneView" class="view hidden">
+    <div class="scene-topbar">
+      <button class="btn btn-ghost" id="btnBack">⬅ 返回地图</button>
+      <div class="scene-title" id="sceneTitle"></div>
+      <button class="btn btn-primary" id="btnGame">🎮 开始挑战</button>
+    </div>
+    <div class="stage" id="stage"></div>
+  </section>
+</main>
+
+<!-- 词卡弹窗 -->
+<div class="overlay hidden" id="wordOverlay">
+  <div class="word-card" id="wordCard"></div>
+</div>
+
+<!-- 词汇册弹窗 -->
+<div class="overlay hidden" id="bookOverlay">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>📖 我的词汇册</h2>
+      <button class="btn btn-ghost" id="btnCloseBook">✕</button>
+    </div>
+    <div class="book-grid" id="bookGrid"></div>
+  </div>
+</div>
+
+<!-- 小游戏弹窗 -->
+<div class="overlay hidden" id="gameOverlay">
+  <div class="panel game-panel" id="gamePanel"></div>
+</div>
+
+<!-- toast -->
+<div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
