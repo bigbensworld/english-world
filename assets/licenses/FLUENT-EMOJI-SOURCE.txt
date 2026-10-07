@@ -1,0 +1,5 @@
+Fluent Emoji 3D icons
+Source: github.com/microsoft/fluentui-emoji
+Commit: 1ffb34c752ecf5d402f04cfb4b392c77f57c54bc (2026-08-24)
+License: MIT (c) Microsoft Corporation — see FLUENT-EMOJI-LICENSE.txt
+Downloaded: 2026-10-07 via GitHub Contents API
