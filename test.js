@@ -55,6 +55,7 @@ ok(SCENES.every(s => s.steps.every(st => st.options.filter(o => o.ok).length ===
 ok(SCENES.every(s => s.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "每步店员台词有 2+ 个随机变体");
 ok(SCENES.every(s => s.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "每步都有语块 phrase");
 ok(SCENES[0].steps.filter(st => st.adds).length >= 6, "咖啡店至少 6 步有订单素材");
+ok(Object.keys(state.npcLastLines).length === 0, "初始没有店员台词历史");
 
 console.log("== 2. 咖啡店剧情全流程 ==");
 enterScene("cafe");
@@ -153,6 +154,9 @@ state.progress.cafe = SCENES[0].steps.length;
 startAdventure({ restart: true });
 ok(state.adventure.step === 0, "再玩一次从第 0 步重新开始");
 ok(state.adventure.order.length === 0, "再玩一次订单托盘重新开始");
+const firstReplayLineKey = "cafe:0";
+const firstReplayLine = state.npcLastLines[firstReplayLineKey];
+ok(typeof firstReplayLine === "string", "再玩一次生成并记录店员台词");
 
 console.log("== 9. 持久化 ==");
 state.progress.cafe = 10;

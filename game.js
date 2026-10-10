@@ -6,6 +6,7 @@ const $ = (id) => document.getElementById(id);
 const state = {
   collected: {},        // wordId -> true
   phrases: {},          // sceneId:stepIdx -> phrase（语块收集）
+  npcLastLines: {},     // sceneId:stepIdx -> 上次使用的店员台词
   progress: {},         // sceneId -> 已完成的步骤数
   currentScene: null,
   adventure: null,      // 当前冒险会话 { scene, step, lock, order }
@@ -15,7 +16,10 @@ const state = {
 // ---------- 持久化（换新 key，避免旧数据干扰）----------
 function save() {
   localStorage.setItem("englishWorldV2", JSON.stringify({
-    collected: state.collected, phrases: state.phrases, progress: state.progress,
+    collected: state.collected,
+    phrases: state.phrases,
+    npcLastLines: state.npcLastLines,
+    progress: state.progress,
   }));
 }
 function load() {
@@ -24,6 +28,7 @@ function load() {
     if (d) {
       state.collected = d.collected || {};
       state.phrases = d.phrases || {};
+      state.npcLastLines = d.npcLastLines || {};
       state.progress = d.progress || {};
     }
   } catch (e) { /* fresh start */ }
@@ -292,9 +297,15 @@ function nextStep() {
   // 店员先显示打字中…，再出正式台词（随机变体）
   state.advHistory.push({ role: "npc-typing", scene: sc });
   renderChat();
-  const npcText = (step.npcLines && step.npcLines.length
-    ? step.npcLines[Math.floor(Math.random() * step.npcLines.length)]
-    : step.npc);
+  const lineKey = sc.id + ":" + adv.step;
+  const lines = step.npcLines && step.npcLines.length ? step.npcLines : [step.npc];
+  const previousLine = state.npcLastLines[lineKey];
+  const candidates = lines.length > 1
+    ? lines.filter((line) => line !== previousLine)
+    : lines;
+  const npcText = candidates[Math.floor(Math.random() * candidates.length)];
+  state.npcLastLines[lineKey] = npcText;
+  save();
   setTimeout(() => {
     if (state.adventure !== adv) return; // 已被重置
     state.advHistory[state.advHistory.length - 1] = { role: "npc", text: npcText, zh: step.npcZh, scene: sc };
