@@ -181,10 +181,10 @@ function renderVlogSetsInto(container) {
 function initHomeTabs() {
   const tabs = $("homeTabs");
   if (!tabs) return;
-  // 恢复上次选择的 tab（默认场景）
-  let active = "scenes";
-  try { active = sessionStorage.getItem("ewHomeTab") || "scenes"; } catch (e) {}
-  if (active !== "vlog" && active !== "scenes") active = "scenes";
+  // 恢复上次选择的 tab（新访客默认「慢速生活」：先听懂，再开口）
+  let active = "vlog";
+  try { active = sessionStorage.getItem("ewHomeTab") || "vlog"; } catch (e) {}
+  if (active !== "vlog" && active !== "scenes") active = "vlog";
   function switchTo(tab) {
     active = tab;
     try { sessionStorage.setItem("ewHomeTab", tab); } catch (e) {}
@@ -198,6 +198,9 @@ function initHomeTabs() {
   tabs.querySelectorAll(".home-tab").forEach((b) => {
     b.onclick = () => switchTo(b.dataset.tab);
   });
+  // vlog 面板底部 CTA：引导进入场景冒险（输出练习）
+  const gotoScenes = $("gotoScenes");
+  if (gotoScenes) gotoScenes.onclick = () => switchTo("scenes");
   switchTo(active);
 }
 

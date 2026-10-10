@@ -486,7 +486,7 @@ function chooseOption(opt, el, optsBox, step) {
     setTimeout(nextStep, 2400);
   } else {
     setMascotState("sad", 700);
-    // 高亮正确答案，让用户再选一次
+    // 答错教学反馈：标注错在哪 + 高亮正确答案，让用户再选一次
     setTimeout(() => {
       const right = [...optsBox.children].find((b) =>
         step.options.find((o) => o.ok && b.textContent.includes(o.text))
@@ -494,8 +494,16 @@ function chooseOption(opt, el, optsBox, step) {
       if (right) right.classList.add("reveal");
       const retry = document.createElement("div");
       retry.className = "retry-hint";
-      retry.textContent = "🤔 再试一次吧！绿色的是正确说法";
+      // 拼出教学说明：错选原因 + 正确句子的讲法
+      const why = opt.tip ? `💡 ${opt.tip}。` : "💡 这句不太自然。";
+      const rightOpt = step.options.find((o) => o.ok);
+      const better = rightOpt
+        ? `更自然的说法是：<b>${rightOpt.text}</b>${rightOpt.tip ? " — " + rightOpt.tip : ""}`
+        : "";
+      retry.innerHTML = `🤔 再试一次！绿色的是正确说法<div class="retry-teach">${why}<br>${better}</div>`;
       optsBox.appendChild(retry);
+      // 朗读正确答案，强化听感
+      if (rightOpt) speak(rightOpt.text);
       adv.lock = false; // 解锁允许重选
       optsBox.querySelectorAll(".adv-opt").forEach((b) => (b.disabled = false));
       el.disabled = true; // 错的选项保持禁用

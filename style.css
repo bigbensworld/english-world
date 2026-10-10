@@ -309,6 +309,13 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 .adv-opt .opt-text { flex: 1; }
 .adv-opt .opt-play { font-size: 14px; opacity: .6; flex-shrink: 0; }
 .retry-hint { text-align: center; font-size: 13px; color: var(--amber); font-weight: 600; animation: bounceIn .3s var(--bounce); }
+.retry-teach {
+  margin-top: 6px; font-weight: 500; color: var(--text-secondary);
+  line-height: 1.6; text-align: left;
+  background: var(--amber-soft); border: 1px solid #f0d9ac;
+  border-radius: 10px; padding: 8px 12px;
+}
+.retry-teach b { color: var(--brand-green); }
 .resume-note { text-align: center; font-size: 13px; color: var(--muted); margin-top: 8px; }
 .adv-start { align-self: center; margin-top: 6px; }
 
@@ -723,3 +730,29 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
   text-align: center; font-size: 13px; color: #7c5cbf; font-weight: 600;
   padding: 8px 0 2px; animation: bounceIn .3s var(--bounce);
 }
+
+/* ---------- 学习路径（首屏 vlog 面板） ---------- */
+.learn-path {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  flex-wrap: wrap; margin: 0 auto 22px;
+}
+.lp-step {
+  font-size: 13px; font-weight: 700; color: var(--muted);
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 999px; padding: 6px 14px;
+}
+.lp-step.lp-current {
+  color: #fff; background: #7c5cbf; border-color: #7c5cbf;
+  box-shadow: 0 3px 10px rgba(124,92,191,.3);
+}
+.lp-arrow { color: var(--muted); font-size: 13px; font-weight: 700; }
+
+.path-next {
+  margin-top: 26px; padding: 18px 16px;
+  border: 1.5px dashed var(--border); border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--brand-green-soft) 45%, white);
+  text-align: center;
+  animation: bounceIn .45s var(--bounce) .15s backwards;
+}
+.path-next-text { font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+.path-next-text b { color: var(--brand-green); }
