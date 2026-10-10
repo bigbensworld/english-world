@@ -101,7 +101,17 @@ ok(state.collected["cafe:latte"] === true && state.collected["cafe:croissant"] =
 ok(Object.keys(state.phrases).filter(k => k.startsWith("cafe:")).length === 10, "咖啡店 10 条语块全部入册");
 ok(state.collected["cafe:barista"] === true, "奖励词汇 barista 已收集");
 
-console.log("== 3. 答错重试机制 ==");
+console.log("== 3. 断点续玩 ==");
+// 模拟离开：当前已保存 cafe=10，先设置一个中途进度并重新进入场景
+state.progress.cafe = 3;
+save();
+enterScene("cafe");
+startAdventure();
+ok(state.adventure.step === 3, "再次进入从已保存的第 3 步开始");
+ok(state.adventure.order.length === SCENES[0].steps.slice(0, 3).reduce((n, st) => n + (st.adds || []).length, 0), "续玩时恢复已完成订单素材");
+
+console.log("== 4. 答错重试机制 ==");
+state.progress.cafe = 0;
 startAdventure();
 const step0 = SCENES[0].steps[0];
 const wrong = step0.options.find(o => !o.ok);
@@ -109,14 +119,14 @@ chooseOption(wrong, makeElBtn(), makeOptsBox(), step0);
 ok(state.advHistory.some(m => m.role === "me" && m.wrong), "错误回复被标记");
 ok(state.adventure.step === 0, "答错不推进进度");
 
-console.log("== 4. 超市场景 ==");
+console.log("== 5. 超市场景 ==");
 enterScene("market");
 ok(state.currentScene.id === "market", "直接进入超市（无需解锁）");
 startAdventure();
 chooseOption(SCENES[1].steps[0].options.find(o => o.ok), makeElBtn(), makeOptsBox(), SCENES[1].steps[0]);
 ok(state.adventure.step === 1, "超市第 1 步答对推进");
 
-console.log("== 5. 自由探索 ==");
+console.log("== 6. 自由探索 ==");
 enterScene("market");
 // 桩中 exploreGrid 为全局共享，取本次进入场景新追加的那批（最后 12 个中的第 1 个）
 const allSpots = $("exploreGrid").children;
@@ -124,13 +134,14 @@ const spot0 = allSpots[allSpots.length - 12];
 spot0.onclick();
 ok(state.collected["market:apple"] === true, "点击 apple 收集成功");
 
-console.log("== 6. 词汇册 ==");
+console.log("== 7. 词汇册 ==");
 openBook();
 const bookCount = Object.keys(state.collected).length;
 ok(bookCount >= 2, "词汇册至少含 2 词（实际 " + bookCount + "）");
 ok($("bookGrid").innerHTML.includes("常用表达") || Object.keys(state.phrases).length > 0, "词汇册含常用表达区");
 
-console.log("== 7. 持久化 ==");
+console.log("== 8. 持久化 ==");
+state.progress.cafe = 10;
 save();
 const saved = JSON.parse(localStorage.getItem("englishWorldV2"));
 ok(saved.progress.cafe === 10, "进度已保存");

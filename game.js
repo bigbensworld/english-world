@@ -209,11 +209,19 @@ function startAdventure() {
   const sc = state.currentScene;
   if (!sc) return;
   setMascotState("thinking");
-  state.adventure = { scene: sc, step: 0, lock: false, order: [] };
+  const savedStep = Math.max(0, Math.min(state.progress[sc.id] || 0, sc.steps.length));
+  const isResume = savedStep > 0 && savedStep < sc.steps.length;
+  state.adventure = { scene: sc, step: savedStep, lock: false, order: [] };
+  if (isResume) {
+    // 续玩时恢复已完成步骤对应的订单素材，避免托盘从空白开始。
+    state.adventure.order = sc.steps
+      .slice(0, savedStep)
+      .flatMap((step) => step.adds || []);
+  }
   state.advHistory = [];
   $("advActions").innerHTML = "";
   renderChat();
-  renderOrder(sc, []);
+  renderOrder(sc, state.adventure.order);
   nextStep();
 }
 
