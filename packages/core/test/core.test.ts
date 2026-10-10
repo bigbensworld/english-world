@@ -23,7 +23,7 @@ function scene(id: string): Scene {
 }
 
 console.log("== 1. 数据完整性（迁移自 test.js 断言） ==");
-ok(SCENES.length === 5, "共 5 个场景");
+ok(SCENES.length === 6, "共 6 个场景");
 ok(VLOGS.length === 3, "早晨三部曲 3 集 vlog");
 ok(VLOGS.every(v => v.cards.filter(c => !c.type).length >= 6), "每集至少 6 张动作卡");
 ok(VLOGS.every(v => v.cards.every(c => c.en && c.zh && c.words)), "每张卡都有英文/中文/关键词");
@@ -47,6 +47,11 @@ ok(hotelVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).lengt
 ok(hotelVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "酒店每步都有语块 phrase");
 ok(["reservation", "luggage", "keycard", "elevator", "lobby", "receptionist", "checkout", "bill", "minibar", "deposit", "ac", "towel", "noisy", "upgrade", "apology"].every(id => scene("hotel").items.some(it => it.id === id)), "酒店 15 个词条全部入库");
 
+const hospVisits = sceneVisits(scene("hospital"));
+ok(hospVisits.length === 3, "医院有 3 轮光顾");
+ok(hospVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "医院每步恰好 1 个正确选项");
+ok(hospVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "医院每步都有语块 phrase");
+ok(["appointment", "fever", "sorethroat", "cough", "prescription", "medicine", "checkup", "recovered"].every(id => scene("hospital").items.some(it => it.id === id)), "医院核心词条全部入库");
 const restVisits = sceneVisits(scene("restaurant"));
 ok(restVisits.length === 4, "餐厅有 4 轮光顾");
 ok(scene("restaurant").items.length >= 30, "餐厅词汇量 30+");

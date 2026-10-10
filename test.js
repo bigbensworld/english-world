@@ -48,7 +48,7 @@ function ok(cond, name) {
 
 console.log("== 1. 初始状态 ==");
 ok(state.coins === undefined, "金币体系已移除");
-ok(SCENES.length === 5, "共 5 个场景");
+ok(SCENES.length === 6, "共 6 个场景");
 ok(SCENES.some(s => s.id === "restaurant"), "餐厅场景已加入");
 ok(SCENES.some(s => s.id === "hotel"), "酒店场景已加入");
 ok(SCENES.some(s => s.id === "airport"), "机场场景已加入");
@@ -73,6 +73,14 @@ ok(["reservation", "luggage", "keycard", "elevator", "lobby", "receptionist", "c
 const restVisits = sceneVisits(SCENES.find(s => s.id === "restaurant"));
 ok(restVisits.length === 4, "餐厅有 4 轮光顾");
 ok(SCENES.find(s => s.id === "restaurant").items.length >= 30, "餐厅词汇量 30+");
+const hospVisits = sceneVisits(SCENES.find(s => s.id === "hospital"));
+ok(hospVisits.length === 3, "医院有 3 轮光顾");
+ok(hospVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "医院每步恰好 1 个正确选项");
+ok(hospVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "医院每步店员台词有 2+ 个随机变体");
+ok(hospVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "医院每步都有语块 phrase");
+ok(hospVisits.every(v => v.steps.every(st => (st.adds || []).every(a => !a.wordId || SCENES.find(s => s.id === "hospital").items.find(it => it.id === a.wordId)))), "医院订单素材 wordId 全部能对上词条");
+ok(hospVisits.every(v => v.reward && v.reward.en && SCENES.find(s => s.id === "hospital").items.find(it => it.en === v.reward.en)), "医院每轮奖励词在 items 里");
+ok(["appointment", "reception", "symptom", "fever", "sorethroat", "cough", "doctor", "insurance", "pharmacy", "prescription", "medicine", "dosage", "checkup", "bloodpressure", "recovered"].every(id => SCENES.find(s => s.id === "hospital").items.some(it => it.id === id)), "医院 15 个核心词条全部入库");
 ok(SCENES.every(s => s.unlockCost === undefined), "无解锁成本字段");
 const cafeVisits = sceneVisits(SCENES[0]);
 ok(cafeVisits.length === 8, "咖啡店有 8 轮光顾");

@@ -3144,6 +3144,420 @@ const SCENES = [
       },
     ],
   },
+
+  // 医院/药房 第 1 轮：挂号问诊（8 步）
+{
+  id: "hospital",
+  name: "医院",
+  nameEn: "Hospital",
+  emoji: "🏥",
+  iconId: "hospital",
+  cover: "🏥💊🩺",
+  theme: "hospital",
+  accent: "#4a7f9e",
+  accentSoft: "#dceaf2",
+  deco: "✨",
+  deco2: "🫧",
+  intro: "你不舒服需要看医生。从挂号到描述症状，完成一次完整的英文就诊！",
+  orderLabel: "🩺 就诊进度",
+  items: [
+    { id: "appointment", en: "appointment", zh: "预约", phon: "/əˈpɔɪntmənt/", emoji: "📅", sent: "I'd like to make an appointment." },
+    { id: "reception",   en: "reception",   zh: "挂号处/前台", phon: "/rɪˈsepʃn/", emoji: "🛎️", sent: "Please register at reception first." },
+    { id: "symptom",     en: "symptom",     zh: "症状", phon: "/ˈsɪmptəm/", emoji: "🤒", sent: "Describe your symptoms to the doctor." },
+    { id: "fever",       en: "fever",       zh: "发烧", phon: "/ˈfiːvə(r)/", emoji: "🌡️", sent: "I have a fever and a headache." },
+    { id: "sorethroat",  en: "sore throat", zh: "喉咙痛", phon: "/sɔː θrəʊt/", emoji: "😷", sent: "My sore throat makes it hard to swallow." },
+    { id: "cough",       en: "cough",       zh: "咳嗽", phon: "/kɒf/", emoji: "💨", sent: "I've had a cough for three days." },
+    { id: "doctor",      en: "doctor",      zh: "医生", phon: "/ˈdɒktə(r)/", emoji: "🧑‍⚕️", sent: "The doctor will see you now." },
+    { id: "insurance",   en: "insurance",   zh: "保险", phon: "/ɪnˈʃʊərəns/", emoji: "🪪", sent: "Do you have medical insurance?" },
+    { id: "waitingroom", en: "waiting room", zh: "候诊室", phon: "/ˈweɪtɪŋ ruːm/", emoji: "🪑", sent: "Please wait in the waiting room." },
+    { id: "form",        en: "form",        zh: "表格", phon: "/fɔːm/", emoji: "📋", sent: "Please fill in this form." },
+    // 第 2 轮（药房）新词
+    { id: "pharmacy",    en: "pharmacy",    zh: "药房", phon: "/ˈfɑːməsi/", emoji: "💊", sent: "Take this prescription to the pharmacy." },
+    { id: "prescription",en: "prescription",zh: "处方", phon: "/prɪˈskrɪpʃn/", emoji: "📝", sent: "The doctor wrote me a prescription." },
+    { id: "medicine",    en: "medicine",    zh: "药", phon: "/ˈmedsn/", emoji: "💊", sent: "Take this medicine twice a day." },
+    { id: "pill",        en: "pill",        zh: "药片", phon: "/pɪl/", emoji: "⚪", sent: "Take one pill after meals." },
+    { id: "dosage",      en: "dosage",      zh: "剂量", phon: "/ˈdəʊsɪdʒ/", emoji: "⏱️", sent: "What's the recommended dosage?" },
+    // 第 3 轮（复诊）新词
+    { id: "checkup",     en: "check-up",    zh: "复查", phon: "/ˈtʃekʌp/", emoji: "🔁", sent: "I'm here for a follow-up check-up." },
+    { id: "better",      en: "better",      zh: "好转", phon: "/ˈbetə(r)/", emoji: "😊", sent: "I feel much better than last week." },
+    { id: "bloodpressure", en: "blood pressure", zh: "血压", phon: "/ˈblʌd preʃə(r)/", emoji: "🩸", sent: "Your blood pressure is normal." },
+    { id: "allergic",    en: "allergic",    zh: "过敏的", phon: "/əˈlɜːdʒɪk/", emoji: "⚠️", sent: "Are you allergic to any medicine?" },
+    { id: "recovered",   en: "recovered",   zh: "康复", phon: "/rɪˈkʌvəd/", emoji: "🎉", sent: "You have fully recovered. Well done!" },
+  ],
+  visits: [
+    {
+      id: "v1",
+      title: "第 1 次光顾 · 挂号问诊",
+      titleEn: "Seeing a Doctor",
+      emoji: "🩺",
+      desc: "你发烧了还咳嗽。挂号、等叫号、向医生描述症状——第一次用英文看病。",
+      reward: { en: "doctor", zh: "你用英文完成了一次完整的问诊！🩺" },
+      steps: [
+        {
+          npcLines: [
+            "Good morning! Welcome to City Clinic. How can I help you today?",
+            "Good morning! Do you have an appointment, or is this a walk-in?",
+            "Hello there! What brings you to the clinic today?",
+          ],
+          npcZh: "早上好！欢迎来到城市诊所。今天有什么可以帮您？",
+          task: "说明想看医生",
+          options: [
+            { text: "Hi, I'd like to see a doctor, please.", ok: true,  tip: "I'd like to see a doctor——最通用的挂号开口句" },
+            { text: "I want doctor now sick.",               ok: false, tip: "说 I'd like to see a doctor" },
+            { text: "Doctor me look at.",                    ok: false, tip: "更自然：I'd like to see a doctor" },
+          ],
+          phrase: { en: "I'd like to see a doctor.", zh: "我想看医生", note: "诊所/医院前台的第一句，礼貌万能" },
+        },
+        {
+          npcLines: [
+            "Of course. May I see your ID or passport, please?",
+            "Sure thing! Could I see some identification?",
+            "No problem. I'll just need your ID or passport first.",
+          ],
+          npcZh: "当然可以。请出示您的身份证件好吗？",
+          task: "递上证件",
+          options: [
+            { text: "Sure, here you are.", ok: true,  tip: "Here you are——递东西给对方的标准句" },
+            { text: "Take this my card.", ok: false, tip: "说 Here you are 或 Here it is" },
+            { text: "You look card yes.", ok: false, tip: "更自然：Sure, here you are" },
+          ],
+          phrase: { en: "Here you are.", zh: "给您", note: "递证件/物品万能句，也可说 Here it is" },
+        },
+        {
+          npcLines: [
+            "Thank you. Could you fill in this form? We need your name, address, and phone number.",
+            "Great, thanks! Please fill out this registration form — name, address, and contact number.",
+            "Got it. Just this quick form to fill in: your details and a contact number.",
+          ],
+          npcZh: "谢谢。请填一下这张表格：姓名、住址和电话。",
+          task: "回应填表请求",
+          options: [
+            { text: "No problem. Where do I sign?", ok: true,  tip: "痛快答应 + Where do I sign 追问签字处，自然又高效" },
+            { text: "I no write English.",          ok: false, tip: "可以请求帮助：Could you help me with the form?" },
+            { text: "Form is too much many.",       ok: false, tip: "更自然：No problem. Where do I sign?" },
+          ],
+          phrase: { en: "Where do I sign?", zh: "我在哪里签字？", note: "填表的实用追问，sign 也可换 write" },
+          adds: [ { emoji: "📋", label: "Filled Form", wordId: "form" } ],
+        },
+        {
+          npcLines: [
+            "Perfect. Do you have medical insurance?",
+            "All done! And do you have insurance coverage?",
+            "Great. Last thing — are you insured?",
+          ],
+          npcZh: "完美。您有医疗保险吗？",
+          task: "说明有保险并出示保险卡",
+          options: [
+            { text: "Yes, I have insurance. Here's my card.", ok: true,  tip: "出示证件用 Here's my card，简洁明确" },
+            { text: "Insurance have yes card.",               ok: false, tip: "说 Yes, I have insurance" },
+            { text: "My card you take it.",                   ok: false, tip: "更自然：Here's my insurance card" },
+          ],
+          phrase: { en: "Here's my card.", zh: "这是我的卡", note: "递卡/证件的万能句，比 give you 更礼貌" },
+          adds: [ { emoji: "🪪", label: "Insurance", wordId: "insurance" } ],
+        },
+        {
+          npcLines: [
+            "Great, you're all registered. Please have a seat in the waiting room — the doctor will call your name.",
+            "You're all set! Take a seat in the waiting room and the doctor will call you shortly.",
+            "All registered! Please wait in the waiting room; it shouldn't be long.",
+          ],
+          npcZh: "好了，挂号完成。请在候诊室就座，医生会叫您的名字。",
+          task: "表示明白并找到座位",
+          options: [
+            { text: "Thank you. Which way is the waiting room?", ok: true,  tip: "Which way is...——问地点方向的标准句" },
+            { text: "Where I sit find place?",                  ok: false, tip: "说 Which way is the waiting room?" },
+            { text: "Room wait where at?",                      ok: false, tip: "更自然：Which way is the waiting room?" },
+          ],
+          phrase: { en: "Which way is ___?", zh: "……往哪边走？", note: "问路/问方向，比 Where is 更具体" },
+          adds: [ { emoji: "🪑", label: "Waiting", wordId: "waitingroom" } ],
+        },
+        {
+          npcLines: [
+            "Alex? The doctor will see you now. Room 3, please.",
+            "Alex! You're up — the doctor is ready for you in Room 3.",
+            "Alex, the doctor can see you now. This way to Room 3, please.",
+          ],
+          npcZh: "Alex？医生现在可以看诊了，请到 3 号诊室。",
+          task: "进入诊室并和医生打招呼",
+          options: [
+            { text: "Good morning, doctor.", ok: true,  tip: "称呼医生用 doctor，简洁礼貌" },
+            { text: "Hello medicine man.",  ok: false, tip: "医生就是 doctor，不用 medicine man" },
+            { text: "Hi hospital person.",  ok: false, tip: "更自然：Good morning, doctor" },
+          ],
+          phrase: { en: "Good morning, doctor.", zh: "早上好，医生", note: "见医生第一句，直接称呼 doctor" },
+        },
+        {
+          npcLines: [
+            "Good morning, I'm Dr. Lee. So, what seems to be the problem?",
+            "Hello, I'm Dr. Lee. Tell me — what's troubling you today?",
+            "Good morning, Alex. What brings you in today?",
+          ],
+          npcZh: "早上好，我是李医生。说说看，哪里不舒服？",
+          task: "描述症状：发烧、喉咙痛、咳嗽三天",
+          options: [
+            { text: "I have a fever, a sore throat, and I've had a cough for three days.", ok: true,  tip: "I have a... + I've had a... for + 时间——描述症状的标准结构" },
+            { text: "I am hot and throat pain cough three day.",                          ok: false, tip: "发烧说 have a fever，不说 I am hot" },
+            { text: "Body bad feeling since some days sick.",                              ok: false, tip: "更自然：I have a fever and a sore throat" },
+          ],
+          phrase: { en: "I have a ___ and I've had a ___ for ___.", zh: "我有……症状，……持续了……", note: "描述症状万能句型：have + 症状，for + 持续时间" },
+          adds: [ { emoji: "🌡️", label: "Fever", wordId: "fever" }, { emoji: "😷", label: "Sore Throat", wordId: "sorethroat" }, { emoji: "💨", label: "Cough", wordId: "cough" } ],
+        },
+        {
+          npcLines: [
+            "I see. Let me take a look... It looks like a mild infection. I'll prescribe some medicine for you.",
+            "Okay, let's check... It seems to be a throat infection. Nothing serious — I'll write you a prescription.",
+            "Hmm, your throat is a bit red. It's a mild infection, easily treated with medicine.",
+          ],
+          npcZh: "我看看……是轻微感染。我给你开点药。",
+          task: "询问药怎么吃",
+          options: [
+            { text: "Thank you. How should I take the medicine?", ok: true,  tip: "How should I take...——问服药方法的标准句" },
+            { text: "Medicine how eat when?",                    ok: false, tip: "吃药用 take medicine，不用 eat" },
+            { text: "I eat the pill how many time?",             ok: false, tip: "更自然：How should I take the medicine?" },
+          ],
+          phrase: { en: "How should I take the medicine?", zh: "这药我怎么吃？", note: "take medicine 是固定搭配，问药用 how" },
+        },
+      ],
+    },
+
+{
+  id: "v2",
+  title: "第 2 次光顾 · 药房取药",
+  titleEn: "At the Pharmacy",
+  emoji: "💊",
+  desc: "拿着处方去药房。递处方、听用法用量、问注意事项——学会买药必备英语。",
+  reward: { en: "prescription", zh: "你用英文顺利取到了药！💊" },
+  steps: [
+    {
+      npcLines: [
+        "Hi there! How can I help you today?",
+        "Hello! What can I do for you?",
+        "Hi, welcome to the pharmacy. What do you need?",
+      ],
+      npcZh: "你好！今天有什么可以帮您？",
+      task: "出示处方取药",
+      options: [
+        { text: "Hi, I'd like to pick up my prescription, please.", ok: true,  tip: "pick up + 处方——取药的标准说法" },
+        { text: "I want buy my paper medicine.",                    ok: false, tip: "取药说 pick up my prescription" },
+        { text: "Doctor give paper you read.",                      ok: false, tip: "更自然：I'd like to pick up my prescription" },
+      ],
+      phrase: { en: "I'd like to pick up my prescription.", zh: "我来取药（处方）", note: "pick up 表示\"取\"，药店/前台通用" },
+      adds: [ { emoji: "📝", label: "Prescription", wordId: "prescription" } ],
+    },
+    {
+      npcLines: [
+        "Sure, let me check... Ah yes, Alex, right? One moment while I get it ready.",
+        "Of course! Alex, is it? Give me a minute to prepare your order.",
+        "Got it, Alex! I'll have your medicine ready in just a moment.",
+      ],
+      npcZh: "好的，我查一下……是 Alex 对吧？稍等，我去取药。",
+      task: "回应并耐心等待",
+      options: [
+        { text: "Yes, that's me. Take your time.", ok: true,  tip: "Yes, that's me 确认身份 + Take your time 礼貌表示不急" },
+        { text: "Yes me fast fast please.",        ok: false, tip: "催促可以说 No rush / Take your time 更礼貌" },
+        { text: "Me hurry up medicine now.",       ok: false, tip: "更自然：Yes, that's me. Take your time." },
+      ],
+      phrase: { en: "Yes, that's me.", zh: "是的，是我", note: "被叫到名字时确认身份，配合 Take your time 更礼貌" },
+    },
+    {
+      npcLines: [
+        "Here you go. Take one pill three times a day, after meals, with plenty of water.",
+        "All ready! One pill, three times daily — after food, and drink lots of water.",
+        "Here's your medicine. One pill three times a day, after meals, OK?",
+      ],
+      npcZh: "给您。一天三次，一次一片，饭后服用，多喝水。",
+      task: "确认听懂了用法用量",
+      options: [
+        { text: "Got it. One pill, three times a day, after meals.", ok: true,  tip: "复述一遍关键信息——用药安全好习惯，Got it 表示听懂了" },
+        { text: "Okay I understand some word.",                      ok: false, tip: "复述具体信息更保险：One pill, three times a day" },
+        { text: "Yes yes thank you bye.",                            ok: false, tip: "更安全：Got it. One pill, three times a day, after meals." },
+      ],
+      phrase: { en: "Got it. One ___, three times a day.", zh: "明白了。……一天三次", note: "复述确认用法，避免吃错药" },
+      adds: [ { emoji: "💊", label: "Medicine", wordId: "medicine" }, { emoji: "⏱️", label: "3x daily", wordId: "dosage" } ],
+    },
+    {
+      npcLines: [
+        "Exactly right! Now, a quick question — are you allergic to any medicine?",
+        "Perfect! Before you go: any medicine allergies I should know about?",
+        "You got it. One thing though — are you allergic to anything?",
+      ],
+      npcZh: "完全正确！再问一下——您对什么药过敏吗？",
+      task: "说明药物过敏情况",
+      options: [
+        { text: "Not that I know of, but I'm allergic to peanuts.", ok: true,  tip: "Not that I know of——\"据我所知没有\"，地道表达" },
+        { text: "No allergy me body good.",                         ok: false, tip: "说 Not that I know of 更准确自然" },
+        { text: "Allergic no never maybe yes.",                     ok: false, tip: "更自然：Not that I know of" },
+      ],
+      phrase: { en: "Not that I know of.", zh: "据我所知没有", note: "表示\"不太确定但没有\"的地道说法" },
+    },
+    {
+      npcLines: [
+        "Good to know — these pills are safe for you then. Avoid cold drinks while taking them.",
+        "Noted! This medicine is fine with a peanut allergy. Just avoid iced drinks for a few days.",
+        "Okay! No problem with peanuts. But skip the cold drinks while you're on this medicine.",
+      ],
+      npcZh: "好的，那这药对您是安全的。服药期间避免冷饮。",
+      task: "询问还有什么注意事项",
+      options: [
+        { text: "I see. Anything else I should know?", ok: true,  tip: "Anything else...——追问信息的万能句" },
+        { text: "More thing tell me what?",            ok: false, tip: "说 Anything else I should know?" },
+        { text: "What other problem is?",              ok: false, tip: "更自然：Anything else I should know?" },
+      ],
+      phrase: { en: "Anything else I should know?", zh: "还有什么我需要知道的吗？", note: "咨询收尾万能句，药店/机场/酒店都能用" },
+    },
+    {
+      npcLines: [
+        "Just finish all the pills, even if you feel better. And come back if the fever lasts more than three days.",
+        "Take the full course — don't stop early! And see a doctor again if the fever doesn't break in three days.",
+        "Finish the whole pack, even when you feel fine. If the fever stays past three days, come see us.",
+      ],
+      npcZh: "吃完整个疗程，即使感觉好转也别停药。如果三天后还发烧，再来看医生。",
+      task: "表示会照做并询问总费用",
+      options: [
+        { text: "Understood. How much is it altogether?", ok: true,  tip: "How much is it altogether——问总价，altogether 强调\"一共\"" },
+        { text: "Money how many I give you?",             ok: false, tip: "说 How much is it altogether?" },
+        { text: "Price is what number total?",            ok: false, tip: "更自然：How much is it altogether?" },
+      ],
+      phrase: { en: "How much is it altogether?", zh: "一共多少钱？", note: "altogether = 总共，结账问价万能句" },
+    },
+    {
+      npcLines: [
+        "That'll be twelve dollars. Insurance covered most of it!",
+        "Twelve dollars, please — your insurance took care of the rest.",
+        "Just twelve dollars! The insurance covered the bigger part.",
+      ],
+      npcZh: "一共 12 美元，保险已经覆盖了大部分！",
+      task: "付款并道谢",
+      options: [
+        { text: "Here you go. Thank you so much for your help!", ok: true,  tip: "Here you go 递钱 + 感谢收尾，完整礼貌" },
+        { text: "Money give take medicine bye.",                ok: false, tip: "说 Here you go. Thank you!" },
+        { text: "Yes paying now here done.",                    ok: false, tip: "更自然：Here you go. Thank you so much!" },
+      ],
+      phrase: { en: "Here you go. Thank you so much!", zh: "给您，非常感谢！", note: "付钱+道谢的收尾组合句" },
+      adds: [ { emoji: "💵", label: "Paid $12" } ],
+    },
+  ],
+},
+
+{
+  id: "v3",
+  title: "第 3 次光顾 · 复诊复查",
+  titleEn: "Follow-up Visit",
+  emoji: "🔁",
+  desc: "三天后复诊。汇报恢复情况、量血压、听医嘱——把\"病好了\"用英文说清楚。",
+  reward: { en: "recovered", zh: "你完全康复，还学会了英文复诊！🎉" },
+  steps: [
+    {
+      npcLines: [
+        "Good morning! Welcome back. How are you feeling today?",
+        "Hello again! Good to see you — how are you doing now?",
+        "Morning! You're back for the follow-up, right? How do you feel?",
+      ],
+      npcZh: "早上好！欢迎回来。今天感觉怎么样？",
+      task: "说明来意：复诊",
+      options: [
+        { text: "Much better, thanks! I'm here for my follow-up.", ok: true,  tip: "follow-up = 复诊/后续跟进，看病常用词" },
+        { text: "I come again check body.",                       ok: false, tip: "复诊说 follow-up 或 check-up" },
+        { text: "Back again doctor look me.",                     ok: false, tip: "更自然：I'm here for my follow-up" },
+      ],
+      phrase: { en: "I'm here for my follow-up.", zh: "我来复诊", note: "follow-up 复诊；check-up 体检，看病高频词" },
+    },
+    {
+      npcLines: [
+        "Great to hear! How's the fever? And the sore throat?",
+        "Glad you're better! Is the fever gone? What about the throat?",
+        "Nice! So — no more fever? How does your throat feel?",
+      ],
+      npcZh: "很高兴听你这么说！烧退了吗？喉咙还痛吗？",
+      task: "汇报恢复情况：不烧了，喉咙还有点痛",
+      options: [
+        { text: "The fever is gone, but my throat still hurts a little.", ok: true,  tip: "The fever is gone + still hurts a little——汇报\"好转但没痊愈\"的标准说法" },
+        { text: "Hot is finish throat still pain small.",                ok: false, tip: "说 The fever is gone" },
+        { text: "No more fire in body, throat a bit ouch.",              ok: false, tip: "更自然：The fever is gone, but my throat still hurts a little." },
+      ],
+      phrase: { en: "The ___ is gone, but ___ still hurts a little.", zh: "……好了，但……还有点痛", note: "汇报病情变化的对比句型" },
+    },
+    {
+      npcLines: [
+        "Good progress! Let me check your throat... Say \"aah\" for me.",
+        "You're getting there! Open up and say \"aah\", let me take a look.",
+        "Much better than before! Now say \"aah\" so I can see your throat.",
+      ],
+      npcZh: "恢复得不错！我看看喉咙……说\"啊——\"",
+      task: "配合检查",
+      options: [
+        { text: "Aah... How does it look, doctor?", ok: true,  tip: "配合检查后主动询问结果，How does it look 自然得体" },
+        { text: "Aaaah you look good my mouth?",    ok: false, tip: "说 How does it look, doctor?" },
+        { text: "Aah mouth is okay or not?",        ok: false, tip: "更自然：How does it look, doctor?" },
+      ],
+      phrase: { en: "How does it look?", zh: "看起来怎么样？", note: "请医生判断结果的问句" },
+    },
+    {
+      npcLines: [
+        "Almost healed! Let's also check your blood pressure. Please roll up your sleeve.",
+        "Nearly there! Now let's do your blood pressure — arm out, please.",
+        "Looking good! Just a quick blood pressure check. Sleeve up, please.",
+      ],
+      npcZh: "快好了！再量个血压，请把袖子卷起来。",
+      task: "配合量血压并询问结果",
+      options: [
+        { text: "Sure. Is my blood pressure normal?", ok: true,  tip: "Is my ___ normal——询问指标是否正常的标准句" },
+        { text: "Okay my blood is normal yes?",       ok: false, tip: "血压说 blood pressure，问法 Is it normal?" },
+        { text: "Arm ready what number good?",        ok: false, tip: "更自然：Is my blood pressure normal?" },
+      ],
+      phrase: { en: "Is my ___ normal?", zh: "我的……正常吗？", note: "问体检指标万能句：blood pressure / heart rate / temperature" },
+      adds: [ { emoji: "🩸", label: "BP Normal", wordId: "bloodpressure" } ],
+    },
+    {
+      npcLines: [
+        "One-twenty over eighty — perfectly normal! You're almost fully recovered.",
+        "120 over 80, textbook perfect! You've nearly made a full recovery.",
+        "Great numbers — 120 over 80. Just about fully recovered!",
+      ],
+      npcZh: "120/80，非常正常！你基本康复了。",
+      task: "询问是否需要继续吃药",
+      options: [
+        { text: "That's great! Should I keep taking the medicine?", ok: true,  tip: "keep taking...——\"继续吃（药）\"的固定搭配" },
+        { text: "I continue eat the pill more days?",              ok: false, tip: "吃药用 take，说 keep taking the medicine" },
+        { text: "Medicine still need or finish already?",          ok: false, tip: "更自然：Should I keep taking the medicine?" },
+      ],
+      phrase: { en: "Should I keep taking the medicine?", zh: "我要继续吃药吗？", note: "keep + doing = 继续做某事" },
+    },
+    {
+      npcLines: [
+        "Finish this last pack, then you can stop. Drink warm water and get plenty of rest this week.",
+        "Just finish the current pack and you're done. Warm drinks and good sleep this week, okay?",
+        "One last pack and then stop. Keep it easy this week — warm water, early nights.",
+      ],
+      npcZh: "把最后一盒吃完就可以停了。这周多喝温水、好好休息。",
+      task: "确认医嘱并表示感谢",
+      options: [
+        { text: "I will. Thank you so much for everything, doctor!", ok: true,  tip: "I will 简短承诺会照做，感谢收尾" },
+        { text: "Okay bye doctor see you never.",                   ok: false, tip: "感谢更真诚些：Thank you so much for everything" },
+        { text: "Yes I do it maybe probably.",                       ok: false, tip: "更自然：I will. Thank you so much!" },
+      ],
+      phrase: { en: "I will. Thank you for everything.", zh: "我会的。谢谢您做的一切", note: "I will 承诺 + 致谢，就诊完美收尾" },
+      adds: [ { emoji: "🎉", label: "Recovered", wordId: "recovered" } ],
+    },
+    {
+      npcLines: [
+        "You're very welcome! Take care of yourself, and stay healthy!",
+        "My pleasure! Look after yourself — hope to never see you in here again!",
+        "Anytime! Take care, and here's to good health!",
+      ],
+      npcZh: "不客气！照顾好自己，保持健康！",
+      task: "礼貌告别",
+      options: [
+        { text: "Thank you! Have a great day. Goodbye!", ok: true,  tip: "Have a great day——告别万能句，任何场合都适用" },
+        { text: "Bye bye hospital good day you too.",    ok: false, tip: "说 Have a great day. Goodbye!" },
+        { text: "Goodbye doctor person thanks bye.",     ok: false, tip: "更自然：Thank you! Have a great day. Goodbye!" },
+      ],
+      phrase: { en: "Have a great day!", zh: "祝您愉快！", note: "告别收尾万能句，正式与随意场合通用" },
+    },
+    ],
+  },
+    ],
+  },
 ];
 
 const VLOGS = [
