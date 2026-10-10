@@ -1,0 +1,6 @@
+{
+  "name": "english-world-taro",
+  "version": "0.1.0",
+  "private": true,
+  "description": "英语世界 monorepo（网站 + packages/core 内核 + packages/ui Taro UI）"
+}
