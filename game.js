@@ -3,12 +3,50 @@
 // 辅助玩法：自由探索点物品学词（可折叠）、词汇册、TTS 发音
 
 const $ = (id) => document.getElementById(id);
+
+// ---------- 多轮光顾访问层（兼容单轮 steps 与多轮 visits） ----------
+// sceneVisits(sc)：返回该场景的轮次数组 [{id, title, steps, ...}]
+// 单轮场景包装成一个虚拟轮次，保持旧逻辑完全兼容。
+function sceneVisits(sc) {
+  if (sc.visits && sc.visits.length) return sc.visits;
+  return [{
+    id: "v1",
+    title: "场景剧情 · " + sc.name,
+    titleEn: sc.nameEn,
+    emoji: sc.emoji,
+    desc: sc.intro,
+    steps: sc.steps,
+    reward: sc.reward,
+  }];
+}
+// visitKey(sc, visit)：进度等持久化用的轮次键
+function visitKey(sc, visit) {
+  return sc.visits && sc.visits.length > 1 ? sc.id + ":" + visit.id : sc.id;
+}
+// unlockedVisitIndex(sc)：当前已解锁到第几轮（0-based）
+function unlockedVisitIndex(sc) {
+  const visits = sceneVisits(sc);
+  const idx = state.unlockedVisits[sc.id] || 0;
+  return Math.max(0, Math.min(idx, visits.length - 1));
+}
+// finishedVisits(sc)：已完成轮次数
+function finishedVisits(sc) {
+  const visits = sceneVisits(sc);
+  let n = 0;
+  for (const v of visits) {
+    if ((state.progress[visitKey(sc, v)] || 0) >= v.steps.length) n++;
+  }
+  return n;
+}
+
 const state = {
   collected: {},        // wordId -> true
-  phrases: {},          // sceneId:stepIdx -> phrase（语块收集）
-  npcLastLines: {},     // sceneId:stepIdx -> 上次使用的店员台词
-  progress: {},         // sceneId -> 已完成的步骤数
+  phrases: {},          // sceneId(或 visitKey):stepIdx -> phrase（语块收集）
+  npcLastLines: {},     // sceneId(或 visitKey):stepIdx -> 上次使用的店员台词
+  progress: {},         // sceneId(或 visitKey) -> 已完成的步骤数
+  unlockedVisits: {},   // sceneId -> 已解锁轮次数（多轮场景用）
   currentScene: null,
+  currentVisit: null,   // 当前进行中的轮次
   adventure: null,      // 当前冒险会话 { scene, step, lock, order }
   advHistory: [],       // 当前场景的聊天记录（用于重渲染）
 };
@@ -20,6 +58,7 @@ function save() {
     phrases: state.phrases,
     npcLastLines: state.npcLastLines,
     progress: state.progress,
+    unlockedVisits: state.unlockedVisits,
   }));
 }
 function load() {
@@ -30,6 +69,7 @@ function load() {
       state.phrases = d.phrases || {};
       state.npcLastLines = d.npcLastLines || {};
       state.progress = d.progress || {};
+      state.unlockedVisits = d.unlockedVisits || {};
     }
   } catch (e) { /* fresh start */ }
 }
@@ -73,24 +113,39 @@ function renderMap() {
   const grid = $("sceneGrid");
   grid.innerHTML = "";
   SCENES.forEach((sc, i) => {
-    const done = state.progress[sc.id] || 0;
-    const finished = done >= sc.steps.length;
+    const visits = sceneVisits(sc);
+    const multi = visits.length > 1;
+    const finished = finishedVisits(sc);
+    const allDone = finished >= visits.length;
+    const unlockedIdx = unlockedVisitIndex(sc);
+    const curVisit = visits[unlockedIdx];
+    const curDone = state.progress[visitKey(sc, curVisit)] || 0;
+    const curFinished = curDone >= curVisit.steps.length;
     const learned = sc.items.filter((it) => state.collected[sc.id + ":" + it.id]).length;
     const card = document.createElement("button");
     card.type = "button";
     card.className = "scene-card";
     card.style.animationDelay = (i * 0.08) + "s";
+    const statusLine = multi
+      ? (allDone
+          ? `🏆 ${visits.length} 次光顾全部完成 · 可重玩`
+          : curFinished
+            ? `✨ 已完成 ${finished}/${visits.length} 轮 · 下一轮已解锁`
+            : curDone > 0
+              ? `📖 ${visits[unlockedIdx].emoji} ${visits[unlockedIdx].title} ${curDone}/${curVisit.steps.length} 步`
+              : `🎬 ${visits[unlockedIdx].emoji} ${visits[unlockedIdx].title}`)
+      : (allDone
+          ? "🏆 剧情已完成 · 可重玩"
+          : curDone > 0
+            ? `📖 剧情进行中 ${curDone}/${curVisit.steps.length} 步`
+            : `🎮 剧情 ${curVisit.steps.length} 步 · 已学 ${learned}/${sc.items.length} 词`);
     card.innerHTML = `
       <div class="scene-cover">${iconHtml({ id: sc.iconId || sc.id, emoji: sc.emoji }, "cover-img")}</div>
       <div class="scene-info">
         <div class="scene-name">${sc.name} · ${sc.nameEn}</div>
-        <div class="scene-words">${finished
-          ? "🏆 剧情已完成 · 可重玩"
-          : done > 0
-            ? `📖 剧情进行中 ${done}/${sc.steps.length} 步`
-            : `🎮 剧情 ${sc.steps.length} 步 · 已学 ${learned}/${sc.items.length} 词`}</div>
+        <div class="scene-words">${statusLine}</div>
       </div>
-      ${finished ? '<div class="done-badge">✓ 完成</div>' : ""}
+      ${allDone ? '<div class="done-badge">✓ 完成</div>' : ""}
     `;
     card.onclick = () => enterScene(sc.id);
     grid.appendChild(card);
@@ -98,9 +153,13 @@ function renderMap() {
 }
 
 // ---------- 场景 ----------
-function enterScene(id) {
+function enterScene(id, visitIndex) {
   const sc = SCENES.find((s) => s.id === id);
   state.currentScene = sc;
+  const visits = sceneVisits(sc);
+  const maxIdx = unlockedVisitIndex(sc);
+  const idx = typeof visitIndex === "number" ? Math.min(visitIndex, maxIdx) : maxIdx;
+  state.currentVisit = visits[idx];
   state.adventure = null;
   state.advHistory = [];
   $("sceneTitle").textContent = `${sc.emoji} ${sc.name} · ${sc.nameEn}`;
@@ -119,14 +178,33 @@ function enterScene(id) {
   // ---- 左列：剧情对话 ----
   const advBox = document.createElement("div");
   advBox.className = "adventure-box";
-  const done = state.progress[sc.id] || 0;
-  const finished = done >= sc.steps.length;
+
+  // 轮次切换条（多轮场景显示）
+  let visitTabsHtml = "";
+  if (visits.length > 1) {
+    visitTabsHtml = `
+      <div class="visit-tabs" id="visitTabs">
+        ${visits.map((v, i) => {
+          const locked = i > maxIdx;
+          const done = (state.progress[visitKey(sc, v)] || 0) >= v.steps.length;
+          return `<button type="button" class="visit-tab${i === idx ? " active" : ""}${locked ? " locked" : ""}${done ? " done" : ""}"
+            data-idx="${i}" ${locked ? "disabled" : ""} title="${locked ? "通关上一轮后解锁" : v.title}">
+            ${done ? "✓ " : ""}${v.emoji} ${v.title.replace(/^第 \d+ 次光顾 · /, "")}${locked ? " 🔒" : ""}
+          </button>`;
+        }).join("")}
+      </div>`;
+  }
+
+  const vk = visitKey(sc, state.currentVisit);
+  const done = state.progress[vk] || 0;
+  const finished = done >= state.currentVisit.steps.length;
   advBox.innerHTML = `
     <div class="adv-head">
-      <div class="adv-title">🎬 场景剧情 · ${sc.name}</div>
+      <div class="adv-title">${visits.length > 1 ? "🎬 " + state.currentVisit.title : "🎬 场景剧情 · " + sc.name}</div>
       <div class="adv-progress" id="advProgress"></div>
     </div>
-    <div class="adv-intro">${sc.intro}</div>
+    ${visitTabsHtml}
+    <div class="adv-intro">${state.currentVisit.desc || sc.intro}</div>
     <div class="chat" id="chatBox"></div>
     <div class="order-tray" id="orderTray"></div>
     <div class="adv-actions" id="advActions"></div>
@@ -185,7 +263,7 @@ function enterScene(id) {
   startBtn.type = "button";
   startBtn.className = "btn btn-big btn-primary adv-start";
   startBtn.innerHTML = finished
-    ? "🔄 重新开始剧情"
+    ? "🔄 重新开始本轮"
     : done > 0 ? "▶ 继续剧情" : "▶ 开始剧情";
   startBtn.onclick = startAdventure;
   $("advActions").appendChild(startBtn);
@@ -195,6 +273,17 @@ function enterScene(id) {
     resumeNote.className = "resume-note";
     resumeNote.textContent = `上次进行到第 ${done} 步，可以接着来！`;
     $("advActions").appendChild(resumeNote);
+  }
+
+  // 轮次切换事件（多轮场景）
+  const tabs = $("visitTabs");
+  if (tabs) {
+    tabs.querySelectorAll(".visit-tab").forEach((tab) => {
+      tab.onclick = () => {
+        const i = Number(tab.dataset.idx);
+        if (i !== idx) enterScene(sc.id, i);
+      };
+    });
   }
 
   $("mapView").classList.add("hidden");
@@ -212,17 +301,20 @@ function updateExploreCount(sc) {
 // ---------- 剧情对话引擎 ----------
 function startAdventure(options = {}) {
   const sc = state.currentScene;
-  if (!sc) return;
+  const visit = state.currentVisit || sceneVisits(sc)[0];
+  if (!sc || !visit) return;
+  state.currentVisit = visit;
+  const vk = visitKey(sc, visit);
   setMascotState("thinking");
   const forceRestart = options.restart === true;
   const savedStep = forceRestart
     ? 0
-    : Math.max(0, Math.min(state.progress[sc.id] || 0, sc.steps.length));
-  const isResume = savedStep > 0 && savedStep < sc.steps.length;
-  state.adventure = { scene: sc, step: savedStep, lock: false, order: [] };
+    : Math.max(0, Math.min(state.progress[vk] || 0, visit.steps.length));
+  const isResume = savedStep > 0 && savedStep < visit.steps.length;
+  state.adventure = { scene: sc, visit, step: savedStep, lock: false, order: [] };
   if (isResume) {
     // 续玩时恢复已完成步骤对应的订单素材，避免托盘从空白开始。
-    state.adventure.order = sc.steps
+    state.adventure.order = visit.steps
       .slice(0, savedStep)
       .flatMap((step) => step.adds || []);
   }
@@ -279,8 +371,9 @@ function nextStep() {
   const adv = state.adventure;
   if (!adv) return;
   const sc = adv.scene;
-  if (adv.step >= sc.steps.length) return finishAdventure();
-  const step = sc.steps[adv.step];
+  const visit = adv.visit;
+  if (adv.step >= visit.steps.length) return finishAdventure();
+  const step = visit.steps[adv.step];
   adv.lock = false;
 
   // 每一步都重新创建选项区，清除上一关遗留的 reveal / retry 状态。
@@ -297,7 +390,7 @@ function nextStep() {
   // 店员先显示打字中…，再出正式台词（随机变体）
   state.advHistory.push({ role: "npc-typing", scene: sc });
   renderChat();
-  const lineKey = sc.id + ":" + adv.step;
+  const lineKey = visitKey(sc, visit) + ":" + adv.step;
   const lines = step.npcLines && step.npcLines.length ? step.npcLines : [step.npc];
   const previousLine = state.npcLastLines[lineKey];
   const candidates = lines.length > 1
@@ -343,12 +436,13 @@ function chooseOption(opt, el, optsBox, step) {
     setMascotState("happy", 700);
     speak(opt.text);
     adv.step++;
-    state.progress[adv.scene.id] = adv.step;
+    const vk = visitKey(adv.scene, adv.visit);
+    state.progress[vk] = adv.step;
     save(); renderAdvProgress(adv.scene);
 
     // 语块入册 + 聊天流
     if (step.phrase) {
-      const pKey = adv.scene.id + ":" + (adv.step - 1);
+      const pKey = vk + ":" + (adv.step - 1);
       state.phrases[pKey] = step.phrase;
       state.advHistory.push({ role: "phrase", phrase: step.phrase });
       renderChat();
@@ -399,52 +493,74 @@ function renderOrder(sc, order) {
 function renderAdvProgress(sc) {
   const el = $("advProgress");
   if (!el) return;
-  const done = state.adventure ? state.adventure.step : (state.progress[sc.id] || 0);
-  el.innerHTML = sc.steps.map((_, i) =>
+  const visit = state.adventure
+    ? state.adventure.visit
+    : (state.currentVisit || sceneVisits(sc)[0]);
+  const vk = visitKey(sc, visit);
+  const done = state.adventure ? state.adventure.step : (state.progress[vk] || 0);
+  el.innerHTML = visit.steps.map((_, i) =>
     `<span class="dot ${i < done ? "on" : ""}"></span>`
   ).join("");
 }
 
 function finishAdventure() {
   const sc = state.currentScene;
+  const visit = state.currentVisit || (state.adventure && state.adventure.visit) || sceneVisits(sc)[0];
+  const visits = sceneVisits(sc);
   setMascotState("happy", 2000);
   speak("Congratulations! You did it!");
-  // 收集奖励词汇
-  if (sc.reward && sc.reward.en) {
-    const it = sc.items.find((i) => i.en === sc.reward.en);
+  // 本轮奖励词汇
+  if (visit.reward && visit.reward.en) {
+    const it = sc.items.find((i) => i.en === visit.reward.en);
     if (it) {
       state.collected[sc.id + ":" + it.id] = true;
       save(); renderHUD(); updateExploreCount(sc);
     }
   }
+  const vk = visitKey(sc, visit);
   const learned = sc.items.filter((it) => state.collected[sc.id + ":" + it.id]).length;
-  const phraseCount = sc.steps.filter((st, i) => state.phrases[sc.id + ":" + i]).length;
+  const phraseCount = visit.steps.filter((st, i) => state.phrases[vk + ":" + i]).length;
   const orderHtml = state.adventure && state.adventure.order && state.adventure.order.length
     ? `<div class="finish-order">${state.adventure.order.map((o) => `<span class="order-chip big${o.badge ? " badge" : ""}">${o.emoji} ${o.label}</span>`).join("")}</div>`
     : "";
-  state.advHistory.push({ role: "npc", text: "Congratulations! You completed the " + sc.nameEn + " challenge!", zh: sc.reward.zh, scene: sc });
+  state.advHistory.push({ role: "npc", text: "Congratulations! You completed the " + sc.nameEn + " challenge!", zh: visit.reward.zh, scene: sc });
   renderChat();
   renderAdvProgress(sc);
+
+  // 多轮场景：通关本轮 → 解锁下一轮
+  const curIdx = visits.findIndex((v) => v.id === visit.id);
+  const hasNext = curIdx >= 0 && curIdx < visits.length - 1;
+  if (hasNext && (state.unlockedVisits[sc.id] || 0) <= curIdx) {
+    state.unlockedVisits[sc.id] = curIdx + 1;
+    save();
+  }
+  const allDone = finishedVisits(sc) >= visits.length;
+
   $("advActions").innerHTML = `
     <div class="adv-finish">
       <div class="finish-big">🎉</div>
-      <h3>场景完成！</h3>
+      <h3>${visits.length > 1 ? visit.title + " 完成！" : "场景完成！"}</h3>
       ${orderHtml}
-      <p>${sc.reward.zh} 收集语块 ${phraseCount}/${sc.steps.length}，词汇 ${learned}/${sc.items.length}。</p>
+      <p>${visit.reward.zh} 收集语块 ${phraseCount}/${visit.steps.length}，词汇 ${learned}/${sc.items.length}。</p>
+      ${hasNext && !allDone ? `<div class="next-visit-note">✨ 已解锁下一轮：${visits[curIdx + 1].emoji} ${visits[curIdx + 1].title}</div>` : ""}
       <div class="finish-btns">
-        <button class="btn btn-big btn-primary" id="advAgain">🔄 再玩一次</button>
+        ${hasNext && !allDone ? `<button class="btn btn-big btn-primary" id="advNextVisit">➡️ 开始下一轮</button>` : ""}
+        <button class="btn btn-big ${hasNext ? "" : "btn-primary"}" id="advAgain">🔄 再玩本轮</button>
         <button class="btn btn-big" id="advDone">🗺️ 返回地图</button>
       </div>
     </div>
   `;
+  const nextBtn = $("advNextVisit");
+  if (nextBtn) nextBtn.onclick = () => enterScene(sc.id, curIdx + 1);
   $("advAgain").onclick = () => startAdventure({ restart: true });
   $("advDone").onclick = backToMap;
-  toast("🎉 剧情完成！");
+  toast("🎉 " + (visits.length > 1 ? visit.title : "剧情") + "完成！");
 }
 
 function backToMap() {
   setMascotState("idle");
   state.currentScene = null;
+  state.currentVisit = null;
   state.adventure = null;
   state.advHistory = [];
   $("sceneView").classList.add("hidden");
@@ -486,10 +602,23 @@ function openBook() {
     phHead.innerHTML = `💬 常用表达 · ${phraseKeys.length} 条`;
     grid.appendChild(phHead);
     phraseKeys.forEach((k) => {
-      const [sid, idx] = k.split(":");
-      const sc = SCENES.find((s) => s.id === sid);
-      const ph = state.phrases[k];
-      if (!ph || !sc) return;
+      // 多轮场景键形如 cafe:v1:0（visitKey:step），单轮形如 market:0
+      const parts = k.split(":");
+      let sid, ph;
+      const sc = SCENES.find((s) => s.id === parts[0]);
+      if (!sc) return;
+      if (sc.visits && sc.visits.length) {
+        // 多轮：cafe:v1:0 -> 找 visit 再找 step
+        const v = sc.visits.find((vv) => vv.id === parts[1]);
+        ph = state.phrases[k];
+        sid = sc;
+        var srcLabel = v ? v.title : "";
+      } else {
+        ph = state.phrases[k];
+        sid = sc;
+        var srcLabel = sc.name;
+      }
+      if (!ph) return;
       const el = document.createElement("button");
       el.type = "button";
       el.className = "phrase-item";
@@ -497,7 +626,7 @@ function openBook() {
         <div class="p-en">${ph.en} 🔊</div>
         <div class="p-zh">${ph.zh}</div>
         <div class="p-note">${ph.note}</div>
-        <div class="p-from">${sc.emoji} ${sc.name}</div>`;
+        <div class="p-from">${sc.emoji} ${srcLabel}</div>`;
       el.onclick = () => speak(ph.en.replace(/___/g, "..."));
       grid.appendChild(el);
     });

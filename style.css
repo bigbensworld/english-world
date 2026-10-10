@@ -312,6 +312,33 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 .resume-note { text-align: center; font-size: 13px; color: var(--muted); margin-top: 8px; }
 .adv-start { align-self: center; margin-top: 6px; }
 
+/* ---------- 轮次切换（多轮光顾） ---------- */
+.visit-tabs {
+  display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 4px;
+}
+.visit-tab {
+  border: 1.5px solid var(--border); border-radius: 999px;
+  background: var(--bg); color: var(--ink);
+  font: inherit; font-size: 13px; font-weight: 600;
+  padding: 7px 14px; cursor: pointer;
+  transition: border-color .15s, background .15s, transform .15s var(--bounce);
+}
+.visit-tab:hover:not(:disabled) { border-color: var(--scene-accent, var(--green)); transform: translateY(-1px); }
+.visit-tab.active {
+  border-color: var(--scene-accent, var(--green));
+  background: var(--scene-accent-soft, var(--green-soft));
+  color: var(--scene-accent, var(--green));
+}
+.visit-tab.done { border-color: var(--green); }
+.visit-tab.done::before { content: ""; }
+.visit-tab.locked { opacity: .5; cursor: not-allowed; }
+.next-visit-note {
+  margin: 6px 0 14px; padding: 10px 14px;
+  background: var(--green-soft); color: var(--green);
+  border-radius: 12px; font-size: 14px; font-weight: 600;
+  animation: bounceIn .4s var(--bounce);
+}
+
 .adv-finish { text-align: center; padding: 16px 0 6px; animation: bounceIn .4s var(--bounce); }
 .adv-finish .finish-big { font-size: 52px; animation: popStar .6s var(--bounce); }
 .adv-finish h3 { font-size: 20px; margin: 8px 0; }

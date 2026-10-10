@@ -1,5 +1,6 @@
 // 英语世界 - 场景与剧情对话数据
 // 核心玩法：真实场景连续对话，一步步完成整个任务链
+// 多轮光顾：每个场景由多次"光顾"（visits）组成，每轮一个剧情线，通关一轮解锁下一轮
 // 每步含：店员台词（多随机变体）+ 任务提示 + 3 选项 + 关键语块（phrase）+ 订单可视化素材（adds）
 
 const SCENES = [
@@ -30,167 +31,662 @@ const SCENES = [
       { id: "cup",      en: "cup",          zh: "杯子",   phon: "/kʌp/",     emoji: "🍵", sent: "My cup is empty." },
       { id: "menu",     en: "menu",         zh: "菜单",   phon: "/ˈmenjuː/", emoji: "📋", sent: "Can I see the menu?" },
       { id: "barista",  en: "barista",      zh: "咖啡师", phon: "/bəˈriːstə/",emoji: "🧑‍🍳", sent: "The barista makes great coffee." },
+      // 第 2 轮（下午茶）新词
+      { id: "friend",   en: "friend",       zh: "朋友",   phon: "/frend/",   emoji: "🧑‍🤝‍🧑", sent: "I'm here with my friend." },
+      { id: "plate",    en: "plate",        zh: "盘子",   phon: "/pleɪt/",   emoji: "🍽️", sent: "Can we get a plate to share?" },
+      { id: "fork",     en: "fork",         zh: "叉子",   phon: "/fɔːk/",    emoji: "🍴", sent: "Could I have a fork?" },
+      { id: "table",    en: "table",        zh: "桌子",   phon: "/ˈteɪbl/",  emoji: "🪑", sent: "A table for two, please." },
+      { id: "slice",    en: "slice",        zh: "一片",   phon: "/slaɪs/",   emoji: "🔪", sent: "A slice of chocolate cake." },
+      // 第 3 轮（赶时间早餐）新词
+      { id: "line",     en: "line",         zh: "队伍",   phon: "/laɪn/",    emoji: "🚶", sent: "The line is so long." },
+      { id: "order",    en: "order",        zh: "点单",   phon: "/ˈɔːdə/",   emoji: "📝", sent: "Can I order quickly?" },
+      { id: "rush",     en: "rush",         zh: "匆忙",   phon: "/rʌʃ/",     emoji: "🏃", sent: "I'm in a rush this morning." },
+      { id: "bagel",    en: "bagel",        zh: "贝果",   phon: "/ˈbeɪɡl/",  emoji: "🥯", sent: "A bagel with cream cheese." },
+      // 第 4 轮（特别定制）新词
+      { id: "syrup",    en: "syrup",        zh: "糖浆",   phon: "/ˈsɪrəp/",  emoji: "🍯", sent: "Less syrup, please." },
+      { id: "shot",     en: "shot",         zh: "一份浓缩", phon: "/ʃɒt/",   emoji: "⚡", sent: "Add an extra shot, please." },
+      { id: "sweet",    en: "sweet",        zh: "甜的",   phon: "/swiːt/",   emoji: "🍬", sent: "Not too sweet, please." },
+      { id: "iced",     en: "iced",         zh: "冰的",   phon: "/aɪst/",    emoji: "🧊", sent: "An iced latte sounds good." },
+      { id: "name",     en: "name",         zh: "名字",   phon: "/neɪm/",    emoji: "🏷️", sent: "Can I get a name for the cup?" },
     ],
-    steps: [
+    // 多轮光顾：每轮一个剧情线，通关一轮解锁下一轮
+    visits: [
       {
-        npcLines: [
-          "Good morning! Welcome to Sunny Café. How are you today?",
-          "Hi there, welcome in! How's it going today?",
-          "Morning! Welcome to Sunny Café — how are you doing?",
+        id: "v1",
+        title: "第 1 次光顾 · 经典点单",
+        titleEn: "Classic Order",
+        emoji: "☕",
+        desc: "第一次来！学最基础的问候和点单句式。",
+        reward: { en: "barista", zh: "你完成了一次完整的英文点单！☕" },
+        steps: [
+          {
+            npcLines: [
+              "Good morning! Welcome to Sunny Café. How are you today?",
+              "Hi there, welcome in! How's it going today?",
+              "Morning! Welcome to Sunny Café — how are you doing?",
+            ],
+            npcZh: "早上好！欢迎来到 Sunny 咖啡店。你今天怎么样？",
+            task: "先和店员打个招呼，礼貌地回应",
+            options: [
+              { text: "I'm good, thank you! How are you?", ok: true,  tip: "礼貌回应 + 回问对方，完美的寒暄！" },
+              { text: "Give me coffee.",                   ok: false, tip: "太直接啦，先友好问候会更有礼貌" },
+              { text: "I don't know.",                     ok: false, tip: "店员在问你今天如何，可以回答 I'm good" },
+            ],
+            phrase: { en: "I'm good, thank you. How are you?", zh: "我很好，谢谢。你呢？", note: "万能寒暄回应：回答+回问，一来一回最自然" },
+          },
+          {
+            npcLines: [
+              "I'm doing great, thanks! What can I get for you today?",
+              "Doing well, thanks! What'll it be today?",
+              "Glad to hear! So, what can I get started for you?",
+            ],
+            npcZh: "我很好，谢谢！今天想来点什么？",
+            task: "点一杯拿铁",
+            options: [
+              { text: "I'd like a latte, please.",    ok: true,  tip: "I'd like... 是最常用的礼貌点单句式！" },
+              { text: "I want eat latte.",            ok: false, tip: "喝的用 drink，latte 前不用 eat" },
+              { text: "Latte!!!",                     ok: false, tip: "加上 I'd like a ... please 更礼貌" },
+            ],
+            phrase: { en: "I'd like a ___, please.", zh: "我想要一个……", note: "点单万能句式：饮料食物都能套，比 I want 礼貌得多" },
+            adds: [{ emoji: "☕", label: "Latte", wordId: "latte" }],
+          },
+          {
+            npcLines: [
+              "Great choice! What size would you like? We have small, medium, and large.",
+              "Nice pick! What size — small, medium, or large?",
+              "Good taste! Which size can I get you? Small, medium, or large?",
+            ],
+            npcZh: "好选择！您要什么杯型？我们有小杯、中杯和大杯。",
+            task: "要一个大杯",
+            options: [
+              { text: "A large one, please.",       ok: true,  tip: "large = 大杯，small/medium = 小杯/中杯" },
+              { text: "A big big one.",             ok: false, tip: "杯型标准说法是 large，不是 big big" },
+              { text: "Give me the biggest cup!",   ok: false, tip: "店员提供的是 small / medium / large 三种" },
+            ],
+            phrase: { en: "A large one, please.", zh: "要大杯的", note: "large/medium/small 点单三连，加 one 指代饮品更地道" },
+            adds: [{ emoji: "📏", label: "Large", badge: true }],
+          },
+          {
+            npcLines: [
+              "Large latte, got it. Would you like that with whole milk, skim milk, or oat milk?",
+              "Large latte coming up! For the milk — whole, skim, or oat?",
+              "One large latte! And which milk would you like? We have whole, skim, and oat.",
+            ],
+            npcZh: "大杯拿铁，记下了。您要全脂奶、脱脂奶还是燕麦奶？",
+            task: "选燕麦奶",
+            options: [
+              { text: "Oat milk, please.",            ok: true,  tip: "oat milk 燕麦奶，现在很多咖啡店的流行选择" },
+              { text: "Milk of oat I want.",          ok: false, tip: "语序不对，直接说 oat milk 就好" },
+              { text: "I don't drink milk tea.",      ok: false, tip: "店员问的是选哪种奶，不是奶茶" },
+            ],
+            phrase: { en: "Oat milk, please.", zh: "要燕麦奶", note: "选奶直接说奶名+please：whole / skim / oat milk" },
+            adds: [{ emoji: "🌾", label: "Oat", badge: true }],
+          },
+          {
+            npcLines: [
+              "Oat milk it is. Would you like anything to eat? Our croissants are fresh out of the oven!",
+              "Oat milk, great! Anything to eat with that? The croissants just came out of the oven!",
+              "Nice! And can I tempt you with something to eat? Fresh croissants, just baked!",
+            ],
+            npcZh: "燕麦奶拿铁。要不要来点吃的？我们的牛角包刚出炉！",
+            task: "来一个牛角包",
+            options: [
+              { text: "A croissant sounds great, I'll take one.", ok: true,  tip: "I'll take one = 我要一个，地道说法" },
+              { text: "I want eat croissant one.",                ok: false, tip: "说 I'll take a croissant 就好" },
+              { text: "No hungry.",                               ok: false, tip: "想拒绝可以说 No, thanks. 但这次来一个吧" },
+            ],
+            phrase: { en: "I'll take one.", zh: "我要一个", note: "对方刚提过的东西，用 one 指代即可，简洁地道" },
+            adds: [{ emoji: "🥐", label: "Croissant", wordId: "croissant" }],
+          },
+          {
+            npcLines: [
+              "Excellent! So that's a large oat milk latte and a croissant. Anything else?",
+              "Perfect! So we've got a large oat milk latte and a croissant — anything else for you?",
+              "Great! That's a large oat latte plus a croissant. Can I get you anything else?",
+            ],
+            npcZh: "好嘞！一个大杯燕麦奶拿铁和一个牛角包。还需要别的吗？",
+            task: "确认不用了",
+            options: [
+              { text: "That's all, thank you.",   ok: true,  tip: "That's all = 就这些，点单收尾必备" },
+              { text: "Nothing nothing.",         ok: false, tip: "更自然的说法是 That's all / That's it" },
+              { text: "Give me everything.",      ok: false, tip: "哈哈那要花好多钱，说 That's all 即可" },
+            ],
+            phrase: { en: "That's all, thank you.", zh: "就这些，谢谢", note: "点单收尾句：店员问 Anything else? 的标准回答" },
+          },
+          {
+            npcLines: [
+              "Perfect. Your total is seven dollars fifty.",
+              "Alright, that'll be seven fifty.",
+              "Great! So your total comes to seven dollars fifty.",
+            ],
+            npcZh: "完美。您一共消费 7 美元 50 美分。",
+            task: "用卡付款",
+            options: [
+              { text: "Can I pay by card?",            ok: true,  tip: "pay by card 刷卡付款，也可以说 by credit card" },
+              { text: "I pay with my card money.",     ok: false, tip: "自然说法是 pay by card 或 with my card" },
+              { text: "Here is my card, take it!",     ok: false, tip: "可以说 Can I pay by card? 更礼貌清楚" },
+            ],
+            phrase: { en: "Can I pay by card?", zh: "可以刷卡吗？", note: "付款方式问法：by card / in cash / with my phone" },
+            adds: [{ emoji: "💳", label: "Paid $7.50", badge: true }],
+          },
+          {
+            npcLines: [
+              "Of course, card is fine... Approved! Here's your receipt. For here or to go?",
+              "Sure thing... approved! Here you go. Is that for here or to go?",
+              "No problem... all set! Receipt's in the bag. Are you staying in or taking it to go?",
+            ],
+            npcZh: "当然可以，刷卡没问题……扣款成功！这是您的小票。您在这儿吃还是带走？",
+            task: "选择带走",
+            options: [
+              { text: "To go, please.",            ok: true,  tip: "to go = 外带；堂食说 for here" },
+              { text: "I go with coffee.",         ok: false, tip: "外带的固定说法是 to go" },
+              { text: "Take it to my home.",       ok: false, tip: "店员问堂食还是外带，回答 to go 即可" },
+            ],
+            phrase: { en: "To go, please.", zh: "带走，谢谢", note: "咖啡店灵魂拷问 For here or to go? 的标准答案" },
+            adds: [{ emoji: "🥡", label: "To go", badge: true }],
+          },
+          {
+            npcLines: [
+              "No problem, I'll get that ready for you. Oh, would you like a cookie? It's on the house today!",
+              "You got it! Oh wait — would you like a free cookie? It's on the house today!",
+              "Sure thing! Hey, one more thing — can I offer you a cookie? On the house!",
+            ],
+            npcZh: "没问题，我帮您准备。对了，要来块曲奇吗？今天免费赠送！",
+            task: "开心地接受免费曲奇",
+            options: [
+              { text: "Wow, thank you so much!",   ok: true,  tip: "on the house = 店家免费赠送，接受并道谢" },
+              { text: "Free? Why?",                ok: false, tip: "这是店家的好意，开心说谢谢就好" },
+              { text: "I no want cookie.",         ok: false, tip: "免费的好意，Why not? Thank you! 更友好" },
+            ],
+            phrase: { en: "Thank you so much!", zh: "非常感谢！", note: "接受好意时的热情道谢，so much 加强感谢程度" },
+            adds: [{ emoji: "🍪", label: "Cookie 🆓", wordId: "cookie" }],
+          },
+          {
+            npcLines: [
+              "You're welcome! Here you go — one large oat milk latte, a croissant, and a cookie. Enjoy!",
+              "My pleasure! Here's everything — large oat latte, croissant, and a cookie. Enjoy your day!",
+              "Anytime! One large oat milk latte, one croissant, one cookie — all yours. Enjoy!",
+            ],
+            npcZh: "不客气！给您——大杯燕麦奶拿铁、牛角包和曲奇。请慢用！",
+            task: "接过餐点并感谢",
+            options: [
+              { text: "Thank you! Have a nice day!",  ok: true,  tip: "Have a nice day! 告别必备祝福语" },
+              { text: "Bye bye shop.",               ok: false, tip: "说 Have a nice day / See you 更自然" },
+              { text: "Money good bye.",             ok: false, tip: "哈哈，简单说 Thank you! Have a nice day!" },
+            ],
+            phrase: { en: "Have a nice day!", zh: "祝你有美好的一天！", note: "离店告别祝福，店员对你说的也可以回赠给他" },
+          },
         ],
-        npcZh: "早上好！欢迎来到 Sunny 咖啡店。你今天怎么样？",
-        task: "先和店员打个招呼，礼貌地回应",
-        options: [
-          { text: "I'm good, thank you! How are you?", ok: true,  tip: "礼貌回应 + 回问对方，完美的寒暄！" },
-          { text: "Give me coffee.",                   ok: false, tip: "太直接啦，先友好问候会更有礼貌" },
-          { text: "I don't know.",                     ok: false, tip: "店员在问你今天如何，可以回答 I'm good" },
-        ],
-        phrase: { en: "I'm good, thank you. How are you?", zh: "我很好，谢谢。你呢？", note: "万能寒暄回应：回答+回问，一来一回最自然" },
       },
       {
-        npcLines: [
-          "I'm doing great, thanks! What can I get for you today?",
-          "Doing well, thanks! What'll it be today?",
-          "Glad to hear! So, what can I get started for you?",
+        id: "v2",
+        title: "第 2 次光顾 · 下午茶",
+        titleEn: "Afternoon Tea",
+        emoji: "🍰",
+        desc: "带朋友来喝下午茶！学招待他人和堂食用语。",
+        reward: { en: "cake", zh: "你完成了一次愉快的英文下午茶！🍰" },
+        steps: [
+          {
+            npcLines: [
+              "Hey, welcome back! Nice to see you again. Who's this with you today?",
+              "Oh hi, welcome back! I see you brought someone along today!",
+              "Welcome back! And who's your friend here?",
+            ],
+            npcZh: "嗨，又见面啦！很高兴再见到你。今天这位是？",
+            task: "介绍一下你的朋友",
+            options: [
+              { text: "This is my friend, Lily. We're here for afternoon tea.", ok: true,  tip: "This is my friend... 介绍人的标准句式" },
+              { text: "She is friend person.",                                   ok: false, tip: "介绍人用 This is my friend + 名字" },
+              { text: "Look, friend!",                                           ok: false, tip: "更自然：This is my friend, Lily" },
+            ],
+            phrase: { en: "This is my friend, ___.", zh: "这是我的朋友……", note: "介绍人的万能句：This is + 名字，适用于任何场合" },
+            adds: [{ emoji: "🧑‍🤝‍🧑", label: "With Lily", badge: true }],
+          },
+          {
+            npcLines: [
+              "Hi Lily, welcome! A table for two then? We have a nice spot by the window.",
+              "Nice to meet you, Lily! A table for two? There's a lovely window seat open.",
+              "Welcome, Lily! Table for two, right? The window spot just freed up.",
+            ],
+            npcZh: "你好 Lily，欢迎！两位是吗？我们有个靠窗的好位置。",
+            task: "要一张两人桌",
+            options: [
+              { text: "Yes, a table for two, please. The window seat sounds great.", ok: true,  tip: "a table for two = 两人桌，用餐人数直接说" },
+              { text: "Two people table give.",                                     ok: false, tip: "说 a table for two, please" },
+              { text: "We sit where?",                                              ok: false, tip: "先礼貌要桌：a table for two, please" },
+            ],
+            phrase: { en: "A table for two, please.", zh: "请给我们一张两人桌", note: "for + 人数：for one / for three 都可以" },
+            adds: [{ emoji: "🪑", label: "Window Table", badge: true }],
+          },
+          {
+            npcLines: [
+              "Perfect, right this way. Here are the menus. Take your time — what can I start you off with?",
+              "Great choice! Follow me. Here's the menu — anything to drink first?",
+              "This way please! Menu's right here. What would you two like to drink?",
+            ],
+            npcZh: "完美，这边请。这是菜单。慢慢看——先来点什么喝的？",
+            task: "先看菜单，点一壶茶",
+            options: [
+              { text: "Could we look at the menu first? And a pot of tea for two, please.", ok: true,  tip: "a pot of tea = 一壶茶，下午茶经典" },
+              { text: "Menu me see.",                                                     ok: false, tip: "说 Could we see the menu, please?" },
+              { text: "Tea tea two.",                                                     ok: false, tip: "更自然：A pot of tea for two, please" },
+            ],
+            phrase: { en: "Could we see the menu, please?", zh: "我们可以看下菜单吗？", note: "Could we...? 比 Can we 更客气，用餐常用" },
+            adds: [{ emoji: "🍵", label: "Tea for Two", wordId: "tea" }],
+          },
+          {
+            npcLines: [
+              "A pot of tea coming up! Now, for treats — our chocolate cake and blueberry muffins are very popular today.",
+              "One pot of tea, got it! For something sweet, the chocolate cake and muffins are crowd favorites.",
+              "Great pick! And for treats? Today's stars are the chocolate cake and the blueberry muffins.",
+            ],
+            npcZh: "一壶茶马上来！甜点方面——我们的巧克力蛋糕和蓝莓玛芬今天很受欢迎。",
+            task: "点一块巧克力蛋糕和一个玛芬",
+            options: [
+              { text: "A slice of chocolate cake and a blueberry muffin, please.", ok: true,  tip: "a slice of cake = 一块蛋糕，slice 是切件的量词" },
+              { text: "One cake and one muffin thing.",                            ok: false, tip: "蛋糕用量词 slice：a slice of cake" },
+              { text: "Cake us two sweet.",                                        ok: false, tip: "说 A slice of chocolate cake, please" },
+            ],
+            phrase: { en: "A slice of ___, please.", zh: "请给我一块……", note: "蛋糕/披萨等切件食物都用 slice" },
+            adds: [{ emoji: "🍰", label: "Choco Cake", wordId: "cake" }, { emoji: "🧁", label: "Muffin", wordId: "muffin" }],
+          },
+          {
+            npcLines: [
+              "Excellent choices! Would you like that cake on a plate to share, or two separate plates?",
+              "Nice! Should I bring the cake on one plate to share, or put it on two plates?",
+              "Great taste! One plate to share, or two plates — what works for you two?",
+            ],
+            npcZh: "好选择！蛋糕要一个盘子分享，还是两个盘子分开？",
+            task: "要两个盘子分开装",
+            options: [
+              { text: "Two separate plates, please. And could we get a fork each?", ok: true,  tip: "separate = 分开的；a fork each = 每人一把叉子" },
+              { text: "Plate two make.",                                            ok: false, tip: "说 Two separate plates, please" },
+              { text: "One plate is enough, we eat hands.",                         ok: false, tip: "吃蛋糕还是用叉子吧：a fork each" },
+            ],
+            phrase: { en: "Two separate plates, please.", zh: "请给我们两个分开的盘子", note: "separate 表达\"分开的\"，分餐、分单都用它" },
+            adds: [{ emoji: "🍽️", label: "Plates ×2", wordId: "plate" }, { emoji: "🍴", label: "Forks ×2", wordId: "fork" }],
+          },
+          {
+            npcLines: [
+              "Of course! I'll bring those right over. Now, would you like anything else? Some fresh orange juice perhaps?",
+              "You got it, forks and plates coming right up! Anything else? The fresh-squeezed orange juice is lovely today.",
+              "No problem at all! I'll grab those. Can I tempt you with anything else? We have fresh orange juice.",
+            ],
+            npcZh: "当然！马上送来。还需要别的吗？来点鲜榨橙汁怎么样？",
+            task: "加一杯橙汁",
+            options: [
+              { text: "Sure, one orange juice for my friend, please.", ok: true,  tip: "for my friend 帮朋友点，贴心表达" },
+              { text: "Juice yes friend.",                            ok: false, tip: "说 One orange juice, please" },
+              { text: "No more water.",                               ok: false, tip: "店员推荐的是 juice，直接说要不要" },
+            ],
+            phrase: { en: "One ___ for my friend, please.", zh: "给我的朋友来一份……", note: "帮别人点单：for + 人，体贴又地道" },
+            adds: [{ emoji: "🧃", label: "OJ for Lily", wordId: "juice" }],
+          },
+          {
+            npcLines: [
+              "One orange juice it is! So that's a pot of tea, chocolate cake, a muffin, and an OJ. Anything else?",
+              "Great! So we've got the tea, cake, muffin, and juice. Can I get you anything more?",
+              "Perfect! Tea, cake, muffin, and orange juice — all set. Anything else for you two?",
+            ],
+            npcZh: "一杯橙汁！那么总共是一壶茶、巧克力蛋糕、一个玛芬和一杯橙汁。还要别的吗？",
+            task: "确认就这些",
+            options: [
+              { text: "That's everything, thank you!",  ok: true,  tip: "That's everything = 就这些了，确认收尾" },
+              { text: "All all done we.",              ok: false, tip: "自然说法：That's everything, thank you" },
+              { text: "Maybe yes maybe no.",           ok: false, tip: "确定一下就好：That's everything!" },
+            ],
+            phrase: { en: "That's everything, thank you.", zh: "就这些了，谢谢", note: "点单收尾第二式：everything 比 all 更常用" },
+          },
+          {
+            npcLines: [
+              "Wonderful! Your total is twelve dollars. How would you like to pay?",
+              "Great! That comes to twelve dollars altogether. Card or cash?",
+              "All set! Twelve dollars even — how are you paying today?",
+            ],
+            npcZh: "很好！您一共消费 12 美元。您想怎么付款？",
+            task: "这次用现金付款",
+            options: [
+              { text: "I'll pay in cash. Here you go.",  ok: true,  tip: "in cash 现金；Here you go 递钱时的经典说法" },
+              { text: "Money paper now.",                ok: false, tip: "说 I'll pay in cash" },
+              { text: "Card no have.",                   ok: false, tip: "直接说 I'll pay in cash 就好" },
+            ],
+            phrase: { en: "I'll pay in cash.", zh: "我付现金", note: "in cash 现金 / by card 刷卡，二选一" },
+            adds: [{ emoji: "💵", label: "Paid $12", badge: true }],
+          },
+          {
+            npcLines: [
+              "Thank you! I'll bring everything to your table in just a minute. Enjoy your afternoon tea!",
+              "Thanks so much! Everything will be at your table shortly. Enjoy, you two!",
+              "Perfect, thanks! Your order will be right out. Have a lovely afternoon!",
+            ],
+            npcZh: "谢谢！餐点马上送到你们桌上。祝你们下午茶愉快！",
+            task: "感谢并期待用餐",
+            options: [
+              { text: "Thank you so much! We're really looking forward to it.",  ok: true,  tip: "look forward to = 期待，表达愉快心情" },
+              { text: "Ok bye now.",                                            ok: false, tip: "店员会送餐到桌，说 Thank you 就好" },
+              { text: "Fast fast bring.",                                       ok: false, tip: "更礼貌：We're looking forward to it!" },
+            ],
+            phrase: { en: "We're looking forward to it.", zh: "我们很期待！", note: "look forward to + 名词，期待任何好事都能用" },
+          },
+          {
+            npcLines: [
+              "Enjoy your tea and cake, you two! Just wave if you need anything else. Have a lovely afternoon!",
+              "Hope you two enjoy everything! Wave me over if you need anything. Have a great afternoon!",
+              "It was lovely serving you both! Give me a shout if you need anything at all!",
+            ],
+            npcZh: "两位请慢慢享用！需要什么随时招呼我。祝你们下午愉快！",
+            task: "礼貌道别",
+            options: [
+              { text: "Thank you! You too, have a lovely afternoon!",  ok: true,  tip: "You too! 把祝福回赠给对方，超地道" },
+              { text: "Bye bye tea woman.",                           ok: false, tip: "说 Thank you! You too! 就很好" },
+              { text: "Go away now.",                                 ok: false, tip: "哈哈不礼貌啦，说 You too!" },
+            ],
+            phrase: { en: "You too!", zh: "你也是！", note: "收到祝福后原句回赠：Have a nice day! — You too!" },
+          },
         ],
-        npcZh: "我很好，谢谢！今天想来点什么？",
-        task: "点一杯拿铁",
-        options: [
-          { text: "I'd like a latte, please.",    ok: true,  tip: "I'd like... 是最常用的礼貌点单句式！" },
-          { text: "I want eat latte.",            ok: false, tip: "喝的用 drink，latte 前不用 eat" },
-          { text: "Latte!!!",                     ok: false, tip: "加上 I'd like a ... please 更礼貌" },
-        ],
-        phrase: { en: "I'd like a ___, please.", zh: "我想要一个……", note: "点单万能句式：饮料食物都能套，比 I want 礼貌得多" },
-        adds: [{ emoji: "☕", label: "Latte", wordId: "latte" }],
       },
       {
-        npcLines: [
-          "Great choice! What size would you like? We have small, medium, and large.",
-          "Nice pick! What size — small, medium, or large?",
-          "Good taste! Which size can I get you? Small, medium, or large?",
+        id: "v3",
+        title: "第 3 次光顾 · 赶时间早餐",
+        titleEn: "Morning Rush",
+        emoji: "🥯",
+        desc: "早上赶时间！学快节奏简化点单和排队用语。",
+        reward: { en: "sandwich", zh: "你在高峰期高效完成了英文点单！🏃" },
+        steps: [
+          {
+            npcLines: [
+              "Morning! Whoa, it's busy today — the line's out the door. What can I get you?",
+              "Good morning! Sorry about the wait, we're slammed this morning. What'll it be?",
+              "Morning morning! Busy rush today, huh? What can I get started for you?",
+            ],
+            npcZh: "早上好！哇今天人真多——队伍都排到门口了。您要什么？",
+            task: "理解排队情况，礼貌点单",
+            options: [
+              { text: "Good morning! I'm in a bit of a rush — can I order quickly?", ok: true,  tip: "in a rush = 赶时间，礼貌说明情况" },
+              { text: "Hurry up, I'm late!",                                         ok: false, tip: "对店员发脾气不礼貌，说明情况即可" },
+              { text: "Why so many people?",                                         ok: false, tip: "先说明自己赶时间：I'm in a rush" },
+            ],
+            phrase: { en: "I'm in a rush.", zh: "我赶时间", note: "礼貌告知赶时间，对方会加快或简化流程" },
+            adds: [{ emoji: "🏃", label: "In a Rush", badge: true }],
+          },
+          {
+            npcLines: [
+              "No worries, I've got you! Quick and easy — what can I get you?",
+              "You got it, let's make this fast! What'll it be?",
+              "Say no more! Quick order coming right up — what would you like?",
+            ],
+            npcZh: "没问题，包在我身上！快点来——您要什么？",
+            task: "快速点一杯咖啡",
+            options: [
+              { text: "Just a coffee, please. That's all.",  ok: true,  tip: "Just a coffee = 就一杯咖啡，简化点单第一式" },
+              { text: "Coffee coffee fast fast.",           ok: false, tip: "说 Just a coffee, please 就好" },
+              { text: "The everything breakfast.",           ok: false, tip: "赶时间就点简单的：Just a coffee" },
+            ],
+            phrase: { en: "Just a ___, please.", zh: "就一个……就好", note: "just 强调\"只要这个\"，快节奏点单神器" },
+            adds: [{ emoji: "☕", label: "Coffee", wordId: "coffee" }],
+          },
+          {
+            npcLines: [
+              "One coffee, easy! And for food — our breakfast sandwiches and bagels are grab-and-go. Interested?",
+              "Coffee it is! We've also got grab-and-go breakfast — sandwiches and bagels. Want one?",
+              "Great! And hey, our breakfast sandwiches and bagels are ready to grab. Anything for the road?",
+            ],
+            npcZh: "一杯咖啡，简单！吃的方面——我们的早餐三明治和贝果都是即拿即走的。来一个吗？",
+            task: "来一个贝果",
+            options: [
+              { text: "A bagel with cream cheese, please.",  ok: true,  tip: "bagel 贝果 + cream cheese 奶油奶酪，经典搭配" },
+              { text: "Bread circle one.",                   ok: false, tip: "那个圈圈面包叫 bagel" },
+              { text: "I no eat morning.",                   ok: false, tip: "早餐很重要！来一个 bagel 吧" },
+            ],
+            phrase: { en: "A bagel with ___, please.", zh: "一个配……的贝果", note: "with + 配料：点三明治/贝果的搭配表达" },
+            adds: [{ emoji: "🥯", label: "Bagel", wordId: "bagel" }],
+          },
+          {
+            npcLines: [
+              "Great choice! The bagels are right here by the register — you can grab one yourself. Which one?",
+              "Good pick! Bagels are self-serve right here. Which one would you like?",
+              "Nice! Bagel's are grab-and-go, right in front of you. Pick any one you like!",
+            ],
+            npcZh: "好选择！贝果就在收银台旁边——您可以自己拿。要哪个？",
+            task: "选一个贝果",
+            options: [
+              { text: "I'll take this sesame one, thank you!",  ok: true,  tip: "sesame 芝麻，指着自己要的那个说 this one" },
+              { text: "That one there yes.",                    ok: false, tip: "更完整：I'll take this one, thank you" },
+              { text: "You choose for me no.",                  ok: false, tip: "自己选一个，用 I'll take this one" },
+            ],
+            phrase: { en: "I'll take this one.", zh: "我要这个", note: "指着实物点单：this one / that one，快节奏必备" },
+            adds: [{ emoji: "🥯", label: "Sesame Bagel", badge: true }],
+          },
+          {
+            npcLines: [
+              "Sesame bagel, nice! So that's a coffee and a bagel — anything else, or is that it?",
+              "Great pick! One coffee, one sesame bagel. Anything else for you?",
+              "Got it, sesame bagel! Coffee plus bagel — that everything?",
+            ],
+            npcZh: "芝麻贝果，好！一杯咖啡加一个贝果——还要别的吗，就这些？",
+            task: "赶时间，确认就这些",
+            options: [
+              { text: "That's it, thanks! I'm in a rush, remember?",  ok: true,  tip: "That's it = 就这些，比 That's all 更简短随意" },
+              { text: "More thing maybe no yes.",                    ok: false, tip: "赶时间就果断：That's it, thanks!" },
+              { text: "Wait wait wait.",                             ok: false, tip: "想好了再点，现在说 That's it" },
+            ],
+            phrase: { en: "That's it, thanks.", zh: "就这些，谢谢", note: "That's it 比 That's all 更口语化，快节奏常用" },
+          },
+          {
+            npcLines: [
+              "Got it! That'll be five twenty-five. Card or cash — whichever's faster for you!",
+              "All set! Five twenty-five total. However you're paying, let's make it quick!",
+              "That's five twenty-five! And don't worry, we'll have you out of here in no time!",
+            ],
+            npcZh: "明白！一共 5 美元 25 美分。刷卡还是现金——哪个快用哪个！",
+            task: "快速付款",
+            options: [
+              { text: "Card, please. Here you go.",  ok: true,  tip: "赶时间时直接说 Card, please. 简洁有效" },
+              { text: "Money now fast.",             ok: false, tip: "说 Card, please 或 Cash, please" },
+              { text: "You take money later.",       ok: false, tip: "先付款哦：Card, please" },
+            ],
+            phrase: { en: "Card, please.", zh: "刷卡，谢谢", note: "快节奏简化版：付款方式 + please，一词搞定" },
+            adds: [{ emoji: "💳", label: "Paid $5.25", badge: true }],
+          },
+          {
+            npcLines: [
+              "All done! Your coffee will be ready at the end of the counter in just a sec. Grab-and-go!",
+              "Perfect! Coffee's coming right up at the pickup counter. Grab it and go!",
+              "You're all set! Coffee'll be at the end counter in a moment — grab and go!",
+            ],
+            npcZh: "搞定！您的咖啡马上在吧台末端备好。拿了就走！",
+            task: "取餐并告别",
+            options: [
+              { text: "Great, thank you so much! Have a good one!",  ok: true,  tip: "Have a good one! 美式随性告别语，超地道" },
+              { text: "Where coffee me wait?",                      ok: false, tip: "店员说了吧台末端，直接道谢取餐即可" },
+              { text: "Bye, no thank you.",                         ok: false, tip: "再忙也要说 thank you！" },
+            ],
+            phrase: { en: "Have a good one!", zh: "祝你愉快！", note: "美式口语告别：比 Have a nice day 更简短随性" },
+          },
+          {
+            npcLines: [
+              "You too! Oh — one more thing. Can I get a name for the cup? We call it out when it's ready!",
+              "Have a good one! Wait — can I grab a name for the cup? We'll call it when ready!",
+              "Same to you! Quick — what name for the cup? We'll shout it out in a sec!",
+            ],
+            npcZh: "你也是！对了——杯子上要写名字吗？好了我们会叫号！",
+            task: "告诉店员你的名字",
+            options: [
+              { text: "It's Alex. A-L-E-X. Thank you!",  ok: true,  tip: "报名字 + 拼一遍，咖啡店经典场景！" },
+              { text: "I am name yes.",                  ok: false, tip: "直接说 It's + 你的名字" },
+              { text: "No name needed bye.",             ok: false, tip: "配合一下嘛，说 It's Alex" },
+            ],
+            phrase: { en: "It's ___. (spelling it out)", zh: "是……（拼出名字）", note: "报名字用 It's + 名字，复杂的名字顺手拼一遍" },
+            adds: [{ emoji: "🏷️", label: "Cup: Alex", wordId: "name" }],
+          },
+          {
+            npcLines: [
+              "Alex, got it! We'll call you in just a moment. Thanks for stopping by — see you tomorrow?",
+              "Perfect, Alex! Give us one minute. Thanks for rushing in with us today!",
+              "Alex it is! We'll have that ready in no time. Thanks for bearing with the rush!",
+            ],
+            npcZh: "Alex，记下了！马上叫您。谢谢光顾——明天还来吗？",
+            task: "友好收尾",
+            options: [
+              { text: "See you tomorrow! Thanks again!",  ok: true,  tip: "常客式告别，简短友好" },
+              { text: "Maybe never know.",               ok: false, tip: "更友好：See you tomorrow!" },
+              { text: "Coffee now where.",               ok: false, tip: "稍等一下就好，先友好道别" },
+            ],
+            phrase: { en: "See you tomorrow!", zh: "明天见！", note: "常客式告别：固定光顾 + 熟络感满分" },
+          },
         ],
-        npcZh: "好选择！您要什么杯型？我们有小杯、中杯和大杯。",
-        task: "要一个大杯",
-        options: [
-          { text: "A large one, please.",       ok: true,  tip: "large = 大杯，small/medium = 小杯/中杯" },
-          { text: "A big big one.",             ok: false, tip: "杯型标准说法是 large，不是 big big" },
-          { text: "Give me the biggest cup!",   ok: false, tip: "店员提供的是 small / medium / large 三种" },
-        ],
-        phrase: { en: "A large one, please.", zh: "要大杯的", note: "large/medium/small 点单三连，加 one 指代饮品更地道" },
-        adds: [{ emoji: "📏", label: "Large", badge: true }],
       },
       {
-        npcLines: [
-          "Large latte, got it. Would you like that with whole milk, skim milk, or oat milk?",
-          "Large latte coming up! For the milk — whole, skim, or oat?",
-          "One large latte! And which milk would you like? We have whole, skim, and oat.",
+        id: "v4",
+        title: "第 4 次光顾 · 特别定制",
+        titleEn: "Custom Order",
+        emoji: "🧊",
+        desc: "成为熟客！学进阶定制：糖度、浓缩、冰饮。",
+        reward: { en: "iced", zh: "你已经是能流利定制咖啡的熟客了！🧊" },
+        steps: [
+          {
+            npcLines: [
+              "Well hello! Back again — you're becoming a regular! What can I make for you today?",
+              "Hey, look who's back! Our new regular! What's the order today?",
+              "Welcome back, friend! I should start memorizing your order at this point! What'll it be?",
+            ],
+            npcZh: "哟，又来啦！你都快成常客了！今天给您做点什么？",
+            task: "以熟客身份打招呼点单",
+            options: [
+              { text: "Hey! I'd like to try something different today — maybe an iced latte?", ok: true,  tip: "iced latte 冰拿铁，试试 something different 换换口味" },
+              { text: "Same old same old.",                                                     ok: false, tip: "这次换个新花样，试试 iced latte" },
+              { text: "You know what I want.",                                                  ok: false, tip: "店员会猜错哦，还是自己说吧" },
+            ],
+            phrase: { en: "I'd like to try something different.", zh: "我想试试不一样的", note: "try something different 换口味万能句" },
+          },
+          {
+            npcLines: [
+              "Ooh, switching it up! An iced latte it is. Now — any customizations? You strike me as someone who knows their coffee!",
+              "Nice change! One iced latte coming up. Any special requests? You look like a coffee pro!",
+              "Love it! Iced latte, great choice. So how do you like it — any customizations?",
+            ],
+            npcZh: "换口味啦！冰拿铁是吧。要定制吗？你看着就很懂咖啡！",
+            task: "要求少糖",
+            options: [
+              { text: "Yes — not too sweet, please. Just a little syrup.", ok: true,  tip: "not too sweet 少糖；syrup 糖浆" },
+              { text: "Sugar no sugar yes.",                             ok: false, tip: "说 Not too sweet, please" },
+              { text: "Sweet like candy.",                               ok: false, tip: "太甜啦，健康点：Not too sweet" },
+            ],
+            phrase: { en: "Not too sweet, please.", zh: "不要太甜", note: "not too + 形容词 = 适中要求：not too hot / not too cold" },
+            adds: [{ emoji: "🍬", label: "Less Sweet", badge: true, wordId: "sweet" }, { emoji: "🍯", label: "Light Syrup", wordId: "syrup" }],
+          },
+          {
+            npcLines: [
+              "Light syrup, got it! And how about the espresso — our standard is two shots, but we can adjust. More or less?",
+              "Noted, light syrup! For the espresso — standard is two shots. Want more or less kick?",
+              "You got it! Two shots is our usual. Should I add an extra shot, or keep it standard?",
+            ],
+            npcZh: "少糖，记下！浓缩咖啡方面——标准是两份，但可以调整。多加还是减少？",
+            task: "加一份浓缩",
+            options: [
+              { text: "Could you add an extra shot, please? I need the energy today.", ok: true,  tip: "a shot = 一份浓缩；extra shot 加一份" },
+              { text: "Coffee strong very much.",                                     ok: false, tip: "说 Add an extra shot, please" },
+              { text: "No coffee only milk.",                                          ok: false, tip: "拿铁里是有浓缩的，加一份更提神" },
+            ],
+            phrase: { en: "Could you add an extra shot?", zh: "能加一份浓缩吗？", note: "add an extra... 加量定制：extra shot / extra syrup 通用" },
+            adds: [{ emoji: "⚡", label: "+1 Shot", wordId: "shot" }],
+          },
+          {
+            npcLines: [
+              "Extra shot for the energy boost — bold choice! Anything else? Whipped cream, drizzle, extra ice?",
+              "One extra shot, coming up! Any other customizations? Whipped cream, caramel drizzle, extra ice?",
+              "Love it! Extra shot it is. What else can I do for you — whipped cream or extra ice, maybe?",
+            ],
+            npcZh: "加一份浓缩提提神——有魄力！还要别的吗？奶油、淋酱、多加冰？",
+            task: "要多加冰",
+            options: [
+              { text: "Extra ice, please. It's such a hot day!", ok: true,  tip: "extra ice 多加冰，冰饮定制常见" },
+              { text: "Ice ice many.",                          ok: false, tip: "说 Extra ice, please" },
+              { text: "Hot day yes me too.",                    ok: false, tip: "回应之后记得提要求：Extra ice, please" },
+            ],
+            phrase: { en: "Extra ice, please.", zh: "请多加冰", note: "extra + 配料 = 多加：extra ice / extra foam 咖啡定制通用" },
+            adds: [{ emoji: "🧊", label: "Extra Ice", wordId: "iced" }],
+          },
+          {
+            npcLines: [
+              "Extra ice it is! One iced latte, light syrup, three shots, extra ice. Shall I ring that up?",
+              "Perfect! So — iced latte, light on the syrup, triple shot, extra ice. Ready to check out?",
+              "Got it all! Iced latte, light syrup, extra shot, extra ice. Should I total that up for you?",
+            ],
+            npcZh: "多加冰！一杯冰拿铁、少糖、三份浓缩、多加冰。可以结账了吗？",
+            task: "确认订单",
+            options: [
+              { text: "That's perfect, yes please!",  ok: true,  tip: "确认定制订单无误，That's perfect 满分回答" },
+              { text: "Yes no maybe.",               ok: false, tip: "确认一下：That's perfect, yes!" },
+              { text: "Too much coffee.",            ok: false, tip: "刚定的单没错就好，说 That's perfect" },
+            ],
+            phrase: { en: "That's perfect, yes please!", zh: "完全正确，好的！", note: "复述订单后确认：perfect 表示\"完全符合\"" },
+          },
+          {
+            npcLines: [
+              "Alright, your total is six seventy-five. Paying with your usual card?",
+              "Great! Six seventy-five altogether. Same card as always?",
+              "All set — six seventy-five. The usual payment method?",
+            ],
+            npcZh: "好的，一共 6 美元 75 美分。还是用您常用的那张卡？",
+            task: "确认刷卡",
+            options: [
+              { text: "Yes, the usual, please. Thank you!",  ok: true,  tip: "the usual = 老样子，熟客专属表达！" },
+              { text: "Card card card.",                    ok: false, tip: "说 Yes, the usual, please" },
+              { text: "What is usual?",                     ok: false, tip: "店员记得你的习惯，回答 Yes, the usual" },
+            ],
+            phrase: { en: "The usual, please.", zh: "老样子，谢谢", note: "熟客暗号：the usual = 我常点/常用的那个" },
+            adds: [{ emoji: "💳", label: "Paid $6.75", badge: true }],
+          },
+          {
+            npcLines: [
+              "...Approved! And can I get the name for the cup? Alex, right? I remembered!",
+              "...All done! Name for the cup — it's Alex, isn't it? I've got a good memory for regulars!",
+              "...Perfect! Let me guess — Alex for the cup? I remember my regulars!",
+            ],
+            npcZh: "……扣款成功！杯子上的名字——是 Alex 对吧？我记得！",
+            task: "对店员的记性表示惊喜",
+            options: [
+              { text: "Wow, you remembered! Yes, it's Alex. Impressive!",  ok: true,  tip: "对店员的用心表示欣赏，good memory 表达" },
+              { text: "Yes Alex how you know.",                           ok: false, tip: "更热情：You remembered! Impressive!" },
+              { text: "Stalker!",                                        ok: false, tip: "哈哈不是啦，这是优质服务：You remembered!" },
+            ],
+            phrase: { en: "You remembered!", zh: "你居然记得！", note: "惊喜+欣赏：别人记得你的细节时的高情商回应" },
+            adds: [{ emoji: "🏷️", label: "Cup: Alex", wordId: "name" }],
+          },
+          {
+            npcLines: [
+              "Ha! I try! Your drink will be ready at the counter in a minute. Thanks for being such a great regular, Alex!",
+              "Haha, I do my best! One minute at the counter. We love having you as a regular, Alex!",
+              "Just part of the service! Drink's coming up shortly. You're one of our favorites, Alex!",
+            ],
+            npcZh: "哈！尽力而为！您的饮品一分钟内在吧台备好。谢谢你这样的好常客，Alex！",
+            task: "感谢并告别",
+            options: [
+              { text: "Thank you! It's always a pleasure coming here. See you soon!",  ok: true,  tip: "It's always a pleasure 表达对店铺的喜爱" },
+              { text: "Ok bye coffee place.",                                        ok: false, tip: "更热情：See you soon!" },
+              { text: "Whatever bye.",                                               ok: false, tip: "对好服务表达感谢：Thank you! See you soon!" },
+            ],
+            phrase: { en: "It's always a pleasure.", zh: "always 很开心（来这里）", note: "表达对商家的喜爱：熟客的高情商金句" },
+          },
+          {
+            npcLines: [
+              "Same here! See you soon, Alex — your iced latte's on the counter. Enjoy!",
+              "The pleasure's ours! See you around, Alex! Drink's up — enjoy your day!",
+              "Right back at you! Your drink's ready, Alex. Catch you next time!",
+            ],
+            npcZh: "我们也是！回头见，Alex——你的冰拿铁在吧台上了。慢走！",
+            task: "完成最后一轮光顾",
+            options: [
+              { text: "See you! Enjoy the rest of your day!",  ok: true,  tip: "完美收尾，四轮光顾全部完成！" },
+              { text: "Bye forever now.",                     ok: false, tip: "常客不说 forever，说 See you!" },
+              { text: "Coffee mine give.",                    ok: false, tip: "餐在吧台，道别后去取就好" },
+            ],
+            phrase: { en: "See you!", zh: "回头见！", note: "简短随性的告别，熟客之间最常用" },
+          },
         ],
-        npcZh: "大杯拿铁，记下了。您要全脂奶、脱脂奶还是燕麦奶？",
-        task: "选燕麦奶",
-        options: [
-          { text: "Oat milk, please.",            ok: true,  tip: "oat milk 燕麦奶，现在很多咖啡店的流行选择" },
-          { text: "Milk of oat I want.",          ok: false, tip: "语序不对，直接说 oat milk 就好" },
-          { text: "I don't drink milk tea.",      ok: false, tip: "店员问的是选哪种奶，不是奶茶" },
-        ],
-        phrase: { en: "Oat milk, please.", zh: "要燕麦奶", note: "选奶直接说奶名+please：whole / skim / oat milk" },
-        adds: [{ emoji: "🌾", label: "Oat", badge: true }],
-      },
-      {
-        npcLines: [
-          "Oat milk it is. Would you like anything to eat? Our croissants are fresh out of the oven!",
-          "Oat milk, great! Anything to eat with that? The croissants just came out of the oven!",
-          "Nice! And can I tempt you with something to eat? Fresh croissants, just baked!",
-        ],
-        npcZh: "燕麦奶拿铁。要不要来点吃的？我们的牛角包刚出炉！",
-        task: "来一个牛角包",
-        options: [
-          { text: "A croissant sounds great, I'll take one.", ok: true,  tip: "I'll take one = 我要一个，地道说法" },
-          { text: "I want eat croissant one.",                ok: false, tip: "说 I'll take a croissant 就好" },
-          { text: "No hungry.",                               ok: false, tip: "想拒绝可以说 No, thanks. 但这次来一个吧" },
-        ],
-        phrase: { en: "I'll take one.", zh: "我要一个", note: "对方刚提过的东西，用 one 指代即可，简洁地道" },
-        adds: [{ emoji: "🥐", label: "Croissant", wordId: "croissant" }],
-      },
-      {
-        npcLines: [
-          "Excellent! So that's a large oat milk latte and a croissant. Anything else?",
-          "Perfect! So we've got a large oat milk latte and a croissant — anything else for you?",
-          "Great! That's a large oat latte plus a croissant. Can I get you anything else?",
-        ],
-        npcZh: "好嘞！一个大杯燕麦奶拿铁和一个牛角包。还需要别的吗？",
-        task: "确认不用了",
-        options: [
-          { text: "That's all, thank you.",   ok: true,  tip: "That's all = 就这些，点单收尾必备" },
-          { text: "Nothing nothing.",         ok: false, tip: "更自然的说法是 That's all / That's it" },
-          { text: "Give me everything.",      ok: false, tip: "哈哈那要花好多钱，说 That's all 即可" },
-        ],
-        phrase: { en: "That's all, thank you.", zh: "就这些，谢谢", note: "点单收尾句：店员问 Anything else? 的标准回答" },
-      },
-      {
-        npcLines: [
-          "Perfect. Your total is seven dollars fifty.",
-          "Alright, that'll be seven fifty.",
-          "Great! So your total comes to seven dollars fifty.",
-        ],
-        npcZh: "完美。您一共消费 7 美元 50 美分。",
-        task: "用卡付款",
-        options: [
-          { text: "Can I pay by card?",            ok: true,  tip: "pay by card 刷卡付款，也可以说 by credit card" },
-          { text: "I pay with my card money.",     ok: false, tip: "自然说法是 pay by card 或 with my card" },
-          { text: "Here is my card, take it!",     ok: false, tip: "可以说 Can I pay by card? 更礼貌清楚" },
-        ],
-        phrase: { en: "Can I pay by card?", zh: "可以刷卡吗？", note: "付款方式问法：by card / in cash / with my phone" },
-        adds: [{ emoji: "💳", label: "Paid $7.50", badge: true }],
-      },
-      {
-        npcLines: [
-          "Of course, card is fine... Approved! Here's your receipt. For here or to go?",
-          "Sure thing... approved! Here you go. Is that for here or to go?",
-          "No problem... all set! Receipt's in the bag. Are you staying in or taking it to go?",
-        ],
-        npcZh: "当然可以，刷卡没问题……扣款成功！这是您的小票。您在这儿吃还是带走？",
-        task: "选择带走",
-        options: [
-          { text: "To go, please.",            ok: true,  tip: "to go = 外带；堂食说 for here" },
-          { text: "I go with coffee.",         ok: false, tip: "外带的固定说法是 to go" },
-          { text: "Take it to my home.",       ok: false, tip: "店员问堂食还是外带，回答 to go 即可" },
-        ],
-        phrase: { en: "To go, please.", zh: "带走，谢谢", note: "咖啡店灵魂拷问 For here or to go? 的标准答案" },
-        adds: [{ emoji: "🥡", label: "To go", badge: true }],
-      },
-      {
-        npcLines: [
-          "No problem, I'll get that ready for you. Oh, would you like a cookie? It's on the house today!",
-          "You got it! Oh wait — would you like a free cookie? It's on the house today!",
-          "Sure thing! Hey, one more thing — can I offer you a cookie? On the house!",
-        ],
-        npcZh: "没问题，我帮您准备。对了，要来块曲奇吗？今天免费赠送！",
-        task: "开心地接受免费曲奇",
-        options: [
-          { text: "Wow, thank you so much!",   ok: true,  tip: "on the house = 店家免费赠送，接受并道谢" },
-          { text: "Free? Why?",                ok: false, tip: "这是店家的好意，开心说谢谢就好" },
-          { text: "I no want cookie.",         ok: false, tip: "免费的好意，Why not? Thank you! 更友好" },
-        ],
-        phrase: { en: "Thank you so much!", zh: "非常感谢！", note: "接受好意时的热情道谢，so much 加强感谢程度" },
-        adds: [{ emoji: "🍪", label: "Cookie 🆓", wordId: "cookie" }]
-      },
-      {
-        npcLines: [
-          "You're welcome! Here you go — one large oat milk latte, a croissant, and a cookie. Enjoy!",
-          "My pleasure! Here's everything — large oat latte, croissant, and a cookie. Enjoy your day!",
-          "Anytime! One large oat milk latte, one croissant, one cookie — all yours. Enjoy!",
-        ],
-        npcZh: "不客气！给您——大杯燕麦奶拿铁、牛角包和曲奇。请慢用！",
-        task: "接过餐点并感谢",
-        options: [
-          { text: "Thank you! Have a nice day!",  ok: true,  tip: "Have a nice day! 告别必备祝福语" },
-          { text: "Bye bye shop.",               ok: false, tip: "说 Have a nice day / See you 更自然" },
-          { text: "Money good bye.",             ok: false, tip: "哈哈，简单说 Thank you! Have a nice day!" },
-        ],
-        phrase: { en: "Have a nice day!", zh: "祝你有美好的一天！", note: "离店告别祝福，店员对你说的也可以回赠给他" },
       },
     ],
-    reward: { en: "barista", zh: "你完成了一次完整的英文点单！☕" },
   },
   {
     id: "market",
@@ -220,6 +716,7 @@ const SCENES = [
       { id: "tomato", en: "tomato", zh: "番茄",   phon: "/təˈmɑːtəʊ/", emoji: "🍅", sent: "Is it a fruit or a vegetable?" },
       { id: "cart",   en: "cart",   zh: "购物车", phon: "/kɑːt/",  emoji: "🛒", sent: "Push the cart down the aisle." },
     ],
+    // 单轮结构（向后兼容字段 steps）
     steps: [
       {
         npcLines: [
@@ -266,7 +763,7 @@ const SCENES = [
           { text: "I want apple many.",    ok: false, tip: "说清楚数量：Six apples, please" },
         ],
         phrase: { en: "Six ___, please.", zh: "请给我六个……", note: "报数量直说：数字 + 名词复数 + please" },
-        adds: [{ emoji: "🍎", label: "Apples ×6" }],
+        adds: [{ emoji: "🍎", label: "Apples ×6", wordId: "apple" }],
       },
       {
         npcLines: [
@@ -282,7 +779,7 @@ const SCENES = [
           { text: "Bread yes give.",                ok: false, tip: "说 A loaf of bread, please" },
         ],
         phrase: { en: "A loaf of bread, please.", zh: "请给我一条面包", note: "loaf 是面包的量词，切片面包叫 a slice" },
-        adds: [{ emoji: "🍞", label: "Bread" }],
+        adds: [{ emoji: "🍞", label: "Bread", wordId: "bread" }],
       },
       {
         npcLines: [
@@ -298,7 +795,7 @@ const SCENES = [
           { text: "I need egg one.",             ok: false, tip: "一打鸡蛋说 a dozen eggs" },
         ],
         phrase: { en: "A dozen ___, please.", zh: "请给我一打……", note: "a dozen = 12 个，鸡蛋/甜甜圈等都这么数" },
-        adds: [{ emoji: "🥚", label: "Eggs ×12" }],
+        adds: [{ emoji: "🥚", label: "Eggs ×12", wordId: "egg" }],
       },
       {
         npcLines: [
@@ -329,7 +826,7 @@ const SCENES = [
           { text: "I buy cheap vegetable now.",                       ok: false, tip: "更自然：I'll take the broccoli" },
         ],
         phrase: { en: "It's a good deal!", zh: "真划算！", note: "deal = 交易，a good deal 买到就是赚到的感觉" },
-        adds: [{ emoji: "🥦", label: "Broccoli −20%" }],
+        adds: [{ emoji: "🥦", label: "Broccoli −20%", wordId: "broccoli" }],
       },
       {
         npcLines: [

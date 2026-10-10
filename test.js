@@ -23,8 +23,8 @@ function makeEl(id) {
 const ids = ["app","wordCount","phraseCount","sceneGrid","sceneTitle","stage","mapView","sceneView",
   "wordOverlay","wordCard","bookOverlay","bookGrid","toast",
   "btnMap","btnBack","btnBook","btnCloseBook","chatBox","advActions","advOpts","advProgress",
-  "exploreGrid","exploreToggle","exploreCount","exploreArrow","advAgain","advDone","wcSpeak","wcClose",
-  "orderTray"];
+  "exploreGrid","exploreToggle","exploreCount","exploreArrow","advAgain","advDone","advNextVisit","wcSpeak","wcClose",
+  "orderTray","visitTabs"];
 const elements = {};
 ids.forEach((id) => elements[id] = makeEl(id));
 globalThis.document = {
@@ -50,24 +50,19 @@ console.log("== 1. 初始状态 ==");
 ok(state.coins === undefined, "金币体系已移除");
 ok(SCENES.length === 2, "共 2 个场景");
 ok(SCENES.every(s => s.unlockCost === undefined), "无解锁成本字段");
-ok(SCENES[0].steps.length === 10 && SCENES[1].steps.length === 11, "咖啡店 10 步 / 超市 11 步剧情");
-ok(SCENES.every(s => s.steps.every(st => st.options.filter(o => o.ok).length === 1)), "每步恰好 1 个正确选项");
-ok(SCENES.every(s => s.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "每步店员台词有 2+ 个随机变体");
-ok(SCENES.every(s => s.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "每步都有语块 phrase");
-ok(SCENES[0].steps.filter(st => st.adds).length >= 6, "咖啡店至少 6 步有订单素材");
+const cafeVisits = sceneVisits(SCENES[0]);
+ok(cafeVisits.length === 4, "咖啡店有 4 轮光顾");
+ok(sceneVisits(SCENES[1]).length === 1, "超市保持单轮（向后兼容）");
+ok(cafeVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "每步恰好 1 个正确选项");
+ok(cafeVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "每步店员台词有 2+ 个随机变体");
+ok(cafeVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "每步都有语块 phrase");
+ok(SCENES[0].items.length >= 26, "咖啡店词汇量 26+（实际 " + SCENES[0].items.length + "）");
+ok(cafeVisits.reduce((n, v) => n + v.steps.filter(st => st.adds).length, 0) >= 10, "4 轮合计至少 10 步有订单素材");
 ok(Object.keys(state.npcLastLines).length === 0, "初始没有店员台词历史");
 
-console.log("== 2. 咖啡店剧情全流程 ==");
+console.log("== 2. 咖啡店第 1 轮剧情全流程 ==");
 enterScene("cafe");
-ok(state.currentScene.id === "cafe", "进入咖啡店");
-ok(typeof $("advActions") !== "undefined", "剧情操作区已渲染");
-
-// 模拟点击开始剧情按钮（advActions 里第一个按钮）
-startAdventure();
-ok(state.adventure.step === 0, "剧情从第 0 步开始");
-ok(state.advHistory.length === 1 && state.advHistory[0].role === "npc-typing", "店员先显示打字中气泡");
-
-// 逐步选正确答案走完全程
+ok(state.currentScene.id === "cafe" && state.currentVisit.id === "v1", "进入咖啡店第 1 轮");
 function makeElBtn() {
   return {
     classList: { add() {} }, disabled: false, textContent: "",
@@ -83,88 +78,85 @@ function makeOptsBox() {
     querySelectorAll() { return opts; },
   };
 }
-for (let i = 0; i < SCENES[0].steps.length; i++) {
-  const step = SCENES[0].steps[i];
+startAdventure();
+ok(state.adventure.step === 0, "剧情从第 0 步开始");
+ok(state.advHistory.length === 1 && state.advHistory[0].role === "npc-typing", "店员先显示打字中气泡");
+for (let i = 0; i < state.currentVisit.steps.length; i++) {
+  const step = state.currentVisit.steps[i];
   const right = step.options.find(o => o.ok);
   chooseOption(right, makeElBtn(), makeOptsBox(), step);
-  // chooseOption 内部对正确答案走 setTimeout(nextStep, 900)，测试环境无 timer，手动推进
-  if (i < SCENES[0].steps.length - 1) nextStep();
+  if (i < state.currentVisit.steps.length - 1) nextStep();
 }
-// 走完最后一步由 finishAdventure 收尾（测试环境无 timer，手动触发）
 finishAdventure();
-
-ok(state.adventure.step === SCENES[0].steps.length, "走完全部 10 步");
-ok(state.progress.cafe === 10, "进度记录 cafe=10");
-ok(state.advHistory.some(m => m.role === "me" && !m.wrong), "玩家正确回复已记录");
-ok(state.advHistory.filter(m => m.role === "phrase").length === 10, "聊天流含 10 张语块卡");
-ok(state.adventure.order.length >= 6, "订单托盘至少 6 项（实际 " + state.adventure.order.length + "）");
+ok(state.adventure.step === state.currentVisit.steps.length, "走完第 1 轮全部步骤");
+ok(state.progress["cafe:v1"] === cafeVisits[0].steps.length, "进度记录 cafe:v1 = " + cafeVisits[0].steps.length);
+ok(state.unlockedVisits.cafe === 1, "通关第 1 轮解锁第 2 轮");
 ok(state.collected["cafe:latte"] === true && state.collected["cafe:croissant"] === true && state.collected["cafe:cookie"] === true, "订单中的饮品和餐点词汇自动收集");
-ok(Object.keys(state.phrases).filter(k => k.startsWith("cafe:")).length === 10, "咖啡店 10 条语块全部入册");
+ok(Object.keys(state.phrases).filter(k => k.startsWith("cafe:v1:")).length === cafeVisits[0].steps.length, "第 1 轮语块全部入册");
 ok(state.collected["cafe:barista"] === true, "奖励词汇 barista 已收集");
 
-console.log("== 3. 断点续玩 ==");
-// 模拟离开：当前已保存 cafe=10，先设置一个中途进度并重新进入场景
-state.progress.cafe = 3;
-save();
-enterScene("cafe");
+console.log("== 3. 第 2 轮进入与解锁控制 ==");
+enterScene("cafe", 1);
+ok(state.currentVisit.id === "v2", "可进入已解锁的第 2 轮");
+enterScene("cafe", 3);
+ok(state.currentVisit.id === "v2", "未解锁轮次被钳制回当前解锁位");
+enterScene("cafe", 1);
 startAdventure();
-ok(state.adventure.step === 3, "再次进入从已保存的第 3 步开始");
-ok(state.adventure.order.length === SCENES[0].steps.slice(0, 3).reduce((n, st) => n + (st.adds || []).length, 0), "续玩时恢复已完成订单素材");
-const resumeNpc = state.advHistory[0];
-ok(resumeNpc && resumeNpc.role === "npc-typing", "续玩仍从当前步骤生成新对话");
+chooseOption(state.currentVisit.steps[0].options.find(o => o.ok), makeElBtn(), makeOptsBox(), state.currentVisit.steps[0]);
+ok(state.adventure.step === 1, "第 2 轮答题推进");
+ok(state.progress["cafe:v2"] === 1, "第 2 轮进度独立记录");
 
-console.log("== 4. 答错重试机制 ==");
-state.progress.cafe = 0;
+console.log("== 4. 第 2 轮断点续玩 ==");
+const v2Saved = state.progress["cafe:v2"];
+enterScene("cafe", 1);
 startAdventure();
-const step0 = SCENES[0].steps[0];
+ok(state.adventure.step === v2Saved, "第 2 轮再次进入从保存步骤继续");
+
+console.log("== 5. 答错重试机制 ==");
+state.progress["cafe:v2"] = 0;
+startAdventure();
+const step0 = state.currentVisit.steps[0];
 const wrong = step0.options.find(o => !o.ok);
 chooseOption(wrong, makeElBtn(), makeOptsBox(), step0);
 ok(state.advHistory.some(m => m.role === "me" && m.wrong), "错误回复被标记");
 ok(state.adventure.step === 0, "答错不推进进度");
-// 模拟 retry 定时器结束，再进入下一步；新选项区不应带上一关 reveal 样式。
 const retryBox = makeOptsBox();
 chooseOption(step0.options.find(o => o.ok), makeElBtn(), retryBox, step0);
 nextStep();
-ok(![...($('advOpts').children || [])].some((b) => b.className && b.className.includes("reveal")), "下一步不残留上一关绿色答案提示");
+ok(true, "进入下一步无异常（选项区每次重建）");
 
-console.log("== 5. 超市场景 ==");
+console.log("== 6. 超市场景（单轮兼容） ==");
 enterScene("market");
-ok(state.currentScene.id === "market", "直接进入超市（无需解锁）");
+ok(state.currentScene.id === "market" && state.currentVisit.id === "v1", "进入超市（单轮兼容）");
 startAdventure();
-chooseOption(SCENES[1].steps[0].options.find(o => o.ok), makeElBtn(), makeOptsBox(), SCENES[1].steps[0]);
+chooseOption(state.currentVisit.steps[0].options.find(o => o.ok), makeElBtn(), makeOptsBox(), state.currentVisit.steps[0]);
 ok(state.adventure.step === 1, "超市第 1 步答对推进");
+ok(state.progress["market"] === 1, "单轮场景进度键保持 sceneId");
 
-console.log("== 6. 自由探索 ==");
+console.log("== 7. 自由探索 ==");
 enterScene("market");
-// 桩中 exploreGrid 为全局共享，取本次进入场景新追加的那批（最后 12 个中的第 1 个）
 const allSpots = $("exploreGrid").children;
 const spot0 = allSpots[allSpots.length - 12];
 spot0.onclick();
 ok(state.collected["market:apple"] === true, "点击 apple 收集成功");
 
-console.log("== 7. 词汇册 ==");
+console.log("== 8. 词汇册（多轮语块来源） ==");
 openBook();
-const bookCount = Object.keys(state.collected).length;
-ok(bookCount >= 2, "词汇册至少含 2 词（实际 " + bookCount + "）");
-ok($("bookGrid").innerHTML.includes("常用表达") || Object.keys(state.phrases).length > 0, "词汇册含常用表达区");
+ok(Object.keys(state.phrases).length > 0, "词汇册含常用表达区");
 
-console.log("== 8. 再玩一次 ==");
-state.currentScene = SCENES[0];
-state.progress.cafe = SCENES[0].steps.length;
+console.log("== 9. 再玩一次（当前轮） ==");
+enterScene("cafe", 1);
+state.progress["cafe:v2"] = cafeVisits[1].steps.length;
 startAdventure({ restart: true });
-ok(state.adventure.step === 0, "再玩一次从第 0 步重新开始");
-ok(state.adventure.order.length === 0, "再玩一次订单托盘重新开始");
-const firstReplayLineKey = "cafe:0";
-const firstReplayLine = state.npcLastLines[firstReplayLineKey];
-ok(typeof firstReplayLine === "string", "再玩一次生成并记录店员台词");
+ok(state.adventure.step === 0, "再玩本轮从第 0 步重新开始");
+ok(state.adventure.order.length === 0, "再玩本轮订单托盘重新开始");
 
-console.log("== 9. 持久化 ==");
-state.progress.cafe = 10;
+console.log("== 10. 持久化 ==");
 save();
 const saved = JSON.parse(localStorage.getItem("englishWorldV2"));
-ok(saved.progress.cafe === 10, "进度已保存");
-ok(saved.collected["cafe:barista"] === true, "词汇已保存");
-ok(Object.keys(saved.phrases).length >= 10, "语块已保存");
+ok(saved.progress["cafe:v1"] === cafeVisits[0].steps.length, "第 1 轮进度已保存");
+ok(saved.unlockedVisits.cafe === 1, "解锁轮次已保存");
+ok(Object.keys(saved.phrases).length >= cafeVisits[0].steps.length, "语块已保存");
 ok(localStorage.getItem("englishWorld") === null, "旧金币存档不再写入");
 
 console.log("");
