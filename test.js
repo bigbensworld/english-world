@@ -145,6 +145,15 @@ chooseOption(step0.options.find(o => o.ok), makeElBtn(), retryBox, step0);
 nextStep();
 ok(true, "进入下一步无异常（选项区每次重建）");
 
+console.log("== 5b. 节奏与防抢答 ==");
+// nextStep 后：任务提示不应同步出现（等店员台词出来后再渲染选项），stepReady=false 防抢答
+enterScene("cafe", 1);
+startAdventure();
+nextStep();
+ok(state.adventure.stepReady === false, "台词未出时 stepReady=false（防看提示抢答）");
+ok(state.adventure.lock === false, "答题锁已复位（不阻塞正常作答）");
+ok($("advActions").innerHTML.includes("task-hint") === false, "任务提示未提前渲染（不剧透台词）");
+
 console.log("== 6. 超市场景（多轮） ==");
 enterScene("market");
 ok(state.currentScene.id === "market" && state.currentVisit.id === "v1", "进入超市第 1 轮");

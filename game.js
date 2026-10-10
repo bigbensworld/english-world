@@ -391,14 +391,32 @@ function nextStep() {
   const visit = adv.visit;
   if (adv.step >= visit.steps.length) return finishAdventure();
   const step = visit.steps[adv.step];
-  adv.lock = false;
+  adv.lock = false; // 立即复位答题锁（与防抢答的 stepReady 解耦）
+  adv.stepReady = false; // 台词未出完前禁止答题（防看提示抢答），选项渲染后置 true
 
-  // 每一步都重新创建选项区，清除上一关遗留的 reveal / retry 状态。
-  const actions = $("advActions");
-  actions.innerHTML = `
-    <div class="task-hint">🎯 ${step.task}</div>
-    <div class="adv-opts" id="advOpts"></div>
-  `;
+  // 选项区渲染：抽成函数，在店员台词出现后再调用（避免任务提示剧透台词）
+  const renderStepOptions = () => {
+    if (state.adventure !== adv) return; // 已被重置
+    const actions = $("advActions");
+    actions.innerHTML = `
+      <div class="task-hint">🎯 ${step.task}</div>
+      <div class="adv-opts" id="advOpts"></div>
+    `;
+    const optsBox = $("advOpts");
+    // 选项顺序打乱，避免正确答案总在第一个
+    // 轻量随机化：每次进入/重玩都会重新打乱选项顺序。
+    const shuffled = step.options.slice().sort(() => Math.random() - 0.5);
+    shuffled.forEach((opt) => {
+      const el = document.createElement("button");
+      el.type = "button";
+      el.className = "adv-opt";
+      el.innerHTML = `<span class="opt-text">${opt.text}</span><span class="opt-play" title="听这句">🔊</span>`;
+      el.querySelector(".opt-play").onclick = (e) => { e.stopPropagation(); speak(opt.text); };
+      el.onclick = () => { if (!adv.stepReady) return; chooseOption(opt, el, optsBox, step); };
+      optsBox.appendChild(el);
+    });
+    adv.stepReady = true; // 选项就绪，允许作答
+  };
 
   // 更新进度点
   renderAdvProgress(sc);
@@ -421,22 +439,9 @@ function nextStep() {
     state.advHistory[state.advHistory.length - 1] = { role: "npc", text: npcText, zh: step.npcZh, scene: sc };
     renderChat();
     speak(npcText);
-  }, 700);
-
-  // 任务提示 + 选项
-  const optsBox = $("advOpts");
-  // 选项顺序打乱，避免正确答案总在第一个
-  // 轻量随机化：每次进入/重玩都会重新打乱选项顺序。
-  const shuffled = step.options.slice().sort(() => Math.random() - 0.5);
-  shuffled.forEach((opt) => {
-    const el = document.createElement("button");
-    el.type = "button";
-    el.className = "adv-opt";
-    el.innerHTML = `<span class="opt-text">${opt.text}</span><span class="opt-play" title="听这句">🔊</span>`;
-    el.querySelector(".opt-play").onclick = (e) => { e.stopPropagation(); speak(opt.text); };
-    el.onclick = () => chooseOption(opt, el, optsBox, step);
-    optsBox.appendChild(el);
-  });
+    // 台词出现后停 600ms 再出任务提示 + 选项：先听对话，再做题
+    setTimeout(renderStepOptions, 600);
+  }, 900);
 }
 
 function chooseOption(opt, el, optsBox, step) {
@@ -477,7 +482,8 @@ function chooseOption(opt, el, optsBox, step) {
       save(); renderHUD(); updateExploreCount(adv.scene);
       renderOrder(adv.scene, adv.order);
     }
-    setTimeout(nextStep, 1100);
+    // 给玩家回复朗读 + 语块卡阅读留足时间，再进下一步
+    setTimeout(nextStep, 2400);
   } else {
     setMascotState("sad", 700);
     // 高亮正确答案，让用户再选一次
