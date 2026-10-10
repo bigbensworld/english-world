@@ -1931,9 +1931,28 @@ const SCENES = [
       { id: "broccoli",en: "broccoli", zh: "西兰花", phon: "/ˈbrɒkəli/", emoji: "🥦", sent: "Eat your broccoli!" },
       { id: "tomato", en: "tomato", zh: "番茄",   phon: "/təˈmɑːtəʊ/", emoji: "🍅", sent: "Is it a fruit or a vegetable?" },
       { id: "cart",   en: "cart",   zh: "购物车", phon: "/kɑːt/",  emoji: "🛒", sent: "Push the cart down the aisle." },
+      // 第 2 轮（找特定商品）新词
+      { id: "oatmeal", en: "oatmeal", zh: "燕麦片", phon: "/ˈəʊtmiːl/", emoji: "🥣", sent: "I eat oatmeal for breakfast." },
+      { id: "aisle",  en: "aisle",  zh: "通道",   phon: "/aɪl/",  emoji: "🛤️", sent: "Cereal is in aisle 2." },
+      { id: "shelf",  en: "shelf",  zh: "货架",   phon: "/ʃelf/", emoji: "🗂️", sent: "The top shelf is hard to reach." },
+      { id: "brand",  en: "store brand", zh: "自有品牌", phon: "/stɔː brænd/", emoji: "🏷️", sent: "The store brand is cheaper." },
+      { id: "expiration", en: "expiration date", zh: "保质期", phon: "/ˌekspəˈreɪʃən deɪt/", emoji: "📅", sent: "Check the expiration date first." },
+      { id: "scale",  en: "scale",  zh: "秤",     phon: "/skeɪl/", emoji: "⚖️", sent: "Weigh the grapes on the scale." },
+      { id: "frozen", en: "frozen food", zh: "冷冻食品", phon: "/ˈfrəʊzn fuːd/", emoji: "🧊", sent: "Frozen food is in the back." },
+      // 第 3 轮（退换货）新词
+      { id: "receipt", en: "receipt", zh: "小票", phon: "/rɪˈsiːt/", emoji: "🧾", sent: "Keep the receipt for returns." },
+      { id: "refund", en: "refund", zh: "退款",   phon: "/ˈriːfʌnd/", emoji: "💸", sent: "I'd like a refund, please." },
+      { id: "exchange", en: "exchange", zh: "换货", phon: "/ɪksˈtʃeɪndʒ/", emoji: "🔄", sent: "Can I exchange this for a new one?" },
     ],
-    // 单轮结构（向后兼容字段 steps）
-    steps: [
+    visits: [
+      {
+        id: "v1",
+        title: "第 1 次光顾 · 日常采购",
+        titleEn: "Weekly Shopping",
+        emoji: "🛒",
+        desc: "第一次来！拿购物车、找商品、看价格、付款，完成一次完整的英文采购。",
+        reward: { en: "cart", zh: "你完成了一次完整的英文超市购物！🛒" },
+        steps: [
       {
         npcLines: [
           "Hi there! Welcome to Fresh Mart. Do you need a shopping cart?",
@@ -2105,8 +2124,259 @@ const SCENES = [
           { text: "Money bye.",                     ok: false, tip: "简单说 Thank you! See you!" },
         ],
         phrase: { en: "See you next time!", zh: "下次再见！", note: "告别 + 表达再来意向，店员听了会很开心" },
+        },
+        ],
+      },
+      {
+        id: "v2",
+        title: "第 2 次光顾 · 找特定商品",
+        titleEn: "Finding Items",
+        emoji: "🔍",
+        desc: "拿着一张英文清单，找燕麦片、认货架、看保质期——学会在超市里精确导航。",
+        reward: { en: "aisle", zh: "你在英文环境里精准找到了每样商品！🔍" },
+        steps: [
+          {
+            npcLines: [
+              "Hey, welcome back to Fresh Mart! You look like you're on a mission today.",
+              "Oh hi again! Back so soon? Looks like you've got a plan today.",
+              "Welcome back! You seem to know exactly what you need today.",
+            ],
+            npcZh: "嘿，欢迎回到 Fresh 超市！你今天看起来目标明确。",
+            task: "说明在找燕麦片",
+            options: [
+              { text: "Hi! I'm looking for oatmeal. Which aisle is it in?", ok: true,  tip: "I'm looking for... 开场 + Which aisle 定位，找东西黄金句" },
+              { text: "Oatmeal where at?",                                 ok: false, tip: "说 Which aisle is the oatmeal in?" },
+              { text: "Find oatmeal you help me yes?",                     ok: false, tip: "更自然：I'm looking for oatmeal" },
+            ],
+            phrase: { en: "I'm looking for ___.", zh: "我在找……", note: "店员听到这句会直接带你去找，比 Where is 更礼貌" },
+          },
+          {
+            npcLines: [
+              "Oatmeal is in aisle 4, with the breakfast stuff. It's on the third shelf from the bottom.",
+              "You'll find oatmeal in aisle 4, breakfast section. Third shelf from the bottom.",
+              "Aisle 4, by the cereals! Look at the third shelf from the bottom — can't miss it.",
+            ],
+            npcZh: "燕麦片在 4 号通道，早餐食品区。从下往上数第三层货架。",
+            task: "请店员再说一遍货架位置",
+            options: [
+              { text: "Sorry, could you say that again? Which shelf?", ok: true,  tip: "Could you say that again? 没听清时的救命句" },
+              { text: "What what repeat.",                            ok: false, tip: "说 Sorry, could you say that again?" },
+              { text: "Again speak slower you.",                      ok: false, tip: "礼貌说法：Could you say that again?" },
+            ],
+            phrase: { en: "Could you say that again?", zh: "您能再说一遍吗？", note: "没听清就大方请对方重复，交流必备" },
+          },
+          {
+            npcLines: [
+              "No problem! Third shelf from the bottom, right next to the cereal. Do you see the two brands?",
+              "Sure! Third shelf up, beside the cereal boxes. There are two brands there — see them?",
+              "Happy to! Bottom-up third shelf, next to the cereals. Two brands side by side.",
+            ],
+            npcZh: "没问题！从下往上第三层，就在麦片旁边。看到两个牌子了吗？",
+            task: "问自有品牌和名牌的区别",
+            options: [
+              { text: "What's the difference between the store brand and the name brand?", ok: true,  tip: "What's the difference between A and B? 对比万能句" },
+              { text: "Brand brand how different?",                                        ok: false, tip: "用 What's the difference between...?" },
+              { text: "Which brand good why?",                                             ok: false, tip: "对比两句：What's the difference between them?" },
+            ],
+            phrase: { en: "What's the difference between ___ and ___?", zh: "……和……有什么区别？", note: "购物比价、比较任何两样东西的万能问句" },
+          },
+          {
+            npcLines: [
+              "The store brand is two dollars cheaper — same oats, just simpler packaging!",
+              "Honestly? Same oats, different box. The store brand saves you two bucks.",
+              "Mainly the price! Store brand is two dollars less, and the oats are identical.",
+            ],
+            npcZh: "自有品牌便宜 2 美元——同样的燕麦，只是包装朴素点！",
+            task: "选择更便宜的自有品牌",
+            options: [
+              { text: "I'll take the store brand, please. It's a good deal.", ok: true,  tip: "I'll take... 表示决定购买，干脆利落" },
+              { text: "Cheap one me take yes.",                            ok: false, tip: "说 I'll take the store brand" },
+              { text: "Give cheaper oats now.",                            ok: false, tip: "更自然：I'll take the store brand, please" },
+            ],
+            phrase: { en: "I'll take ___.", zh: "我就要……了", note: "决定买某样东西时用，比 I want 更自然" },
+            adds: [{ emoji: "🥣", label: "Oatmeal", wordId: "oatmeal" }],
+          },
+          {
+            npcLines: [
+              "Good choice! Quick tip — always check the expiration date on the box before you buy.",
+              "Smart shopper! One tip: check the expiration date on the bottom of the box.",
+              "Nice! Pro tip from someone who's worked here forever — always check the expiration date.",
+            ],
+            npcZh: "好选择！小贴士——买之前记得看盒底的保质期。",
+            task: "检查保质期并确认没问题",
+            options: [
+              { text: "Let me check the expiration date... it's fine. I'll take it.", ok: true,  tip: "Let me check... 买前检查的自然表达" },
+              { text: "Date look I will maybe.",                                   ok: false, tip: "说 Let me check the expiration date" },
+              { text: "Expire when this is?",                                      ok: false, tip: "更自然：Let me check the expiration date" },
+            ],
+            phrase: { en: "Let me check the expiration date.", zh: "我看一下保质期", note: "let me + 动词：当着对方面做动作的地道说法" },
+          },
+          {
+            npcLines: [
+              "You're a natural! Now, did you also need grapes today? They're right over here.",
+              "Look at you, pro shopper! By the way, did you need grapes too? They're over here.",
+              "You've got this down! Hey, we just restocked grapes — did you need some?",
+            ],
+            npcZh: "你很在行嘛！对了，你今天还需要葡萄吗？就在这边。",
+            task: "问葡萄怎么卖（按重量）",
+            options: [
+              { text: "Yes! How much are the grapes per pound?", ok: true,  tip: "per pound 按磅计价，散装水果问法" },
+              { text: "Grape how money is?",                    ok: false, tip: "说 How much are the grapes per pound?" },
+              { text: "Grapes cost what number?",               ok: false, tip: "按重量问价：How much per pound?" },
+            ],
+            phrase: { en: "How much is it per pound?", zh: "每磅多少钱？", note: "per + 单位 = 按单位计价；公斤说 per kilo" },
+          },
+          {
+            npcLines: [
+              "Two fifty a pound. Just put them in a bag and weigh them on the scale over there.",
+              "They're two-fifty per pound. Grab a bag, fill it up, and use the scale right there.",
+              "Two fifty a pound! Take a bag, add your grapes, then pop them on the scale by the register.",
+            ],
+            npcZh: "每磅 2.5 美元。装袋后放到那边秤上称重就行。",
+            task: "称重葡萄",
+            options: [
+              { text: "Got it. I'll weigh them on the scale.", ok: true,  tip: "Got it. = 明白了，简短回应 + 行动" },
+              { text: "Scale put grapes yes I.",               ok: false, tip: "说 I'll weigh them on the scale" },
+              { text: "Weighing now do me help.",              ok: false, tip: "自己动手：I'll weigh them on the scale" },
+            ],
+            phrase: { en: "Got it.", zh: "明白了", note: "万能短回应：听懂指示后确认，比 OK 更地道" },
+            adds: [{ emoji: "🍇", label: "Grapes", wordId: "grape" }],
+          },
+          {
+            npcLines: [
+              "Perfect weight! Anything else on your list? We have a big frozen food section in the back.",
+              "Nice, that's exact! Anything else? Don't forget our frozen food section in the back.",
+              "Beautiful! Anything else today? Frozen food's all the way in the back if you need it.",
+            ],
+            npcZh: "重量正好！清单上还有别的吗？后面有很大的冷冻食品区。",
+            task: "问冷冻食品区怎么走",
+            options: [
+              { text: "Where's the frozen food section?", ok: true,  tip: "Where's...? 问位置最简句式" },
+              { text: "Cold food place where is?",        ok: false, tip: "说 Where's the frozen food section?" },
+              { text: "Frozen where I go?",               ok: false, tip: "更自然：Where's the frozen food section?" },
+            ],
+            phrase: { en: "Where's the ___ section?", zh: "……区在哪里？", note: "section = 区域，超市分区万能问法" },
+          },
+          {
+            npcLines: [
+              "Straight to the back, past the dairy. Your list looks complete — ready to check out?",
+              "Go all the way back, past the milk. Looks like you found everything! Ready to check out?",
+              "Head to the back wall, dairy's on the way. That's a full cart — checking out now?",
+            ],
+            npcZh: "直走到最里面，经过乳制品区。你的清单看起来买齐了——准备结账吗？",
+            task: "确认买齐，去结账",
+            options: [
+              { text: "Yes, that's everything. I'm ready to check out.", ok: true,  tip: "买齐确认 + check out 结账，一气呵成" },
+              { text: "Finish shopping me done yes.",                    ok: false, tip: "说 That's everything, I'm ready to check out" },
+              { text: "No more list over is.",                           ok: false, tip: "更自然：That's everything" },
+            ],
+            phrase: { en: "That's everything.", zh: "就这些了", note: "购物完结万能句：店员问 Is that all? 的标准回答" },
+            adds: [{ emoji: "🧾", label: "Paid", badge: true }],
+          },
+        ],
+      },
+      {
+        id: "v3",
+        title: "第 3 次光顾 · 退换货",
+        titleEn: "Returns & Exchanges",
+        emoji: "🔄",
+        desc: "买回家的牛奶过期了？带着小票来退货/换货——学会礼貌地处理售后问题。",
+        reward: { en: "receipt", zh: "你用英文顺利完成了退换货，售后沟通无压力！🔄" },
+        steps: [
+          {
+            npcLines: [
+              "Hi there! Welcome to Fresh Mart. How can I help you today?",
+              "Hello! What can I do for you today?",
+              "Hi, welcome in! What brings you in today?",
+            ],
+            npcZh: "您好！欢迎来到 Fresh 超市。今天有什么可以帮您？",
+            task: "说明昨天买的牛奶坏了，想退货",
+            options: [
+              { text: "Hi! I bought this milk yesterday, but it went bad. I'd like a refund.", ok: true,  tip: "说清情况 + I'd like a refund，退货标准流程" },
+              { text: "Milk bad. Money back now.",                                             ok: false, tip: "先说明情况再加 please：I'd like a refund" },
+              { text: "This milk is problem give new.",                                        ok: false, tip: "更礼貌：I'd like a refund / an exchange" },
+            ],
+            phrase: { en: "I'd like a refund, please.", zh: "我想退货退款", note: "refund = 退款；换货说 exchange，售后两大关键词" },
+          },
+          {
+            npcLines: [
+              "Oh no, I'm so sorry about that! Do you have the receipt with you?",
+              "That's no good — sorry about that! Do you still have your receipt?",
+              "Aw, sorry that happened! Did you happen to keep the receipt?",
+            ],
+            npcZh: "哎呀，非常抱歉！您带小票了吗？",
+            task: "出示小票",
+            options: [
+              { text: "Yes, here's the receipt.", ok: true,  tip: "Here's... 递东西时的万能句" },
+              { text: "Receipt have is here yes.", ok: false, tip: "说 Yes, here's the receipt" },
+              { text: "Take paper this my.",      ok: false, tip: "小票是 receipt：Here's the receipt" },
+            ],
+            phrase: { en: "Here's the receipt.", zh: "这是小票", note: "Here's + 物品：递上任何东西都能用" },
+            adds: [{ emoji: "🧾", label: "Receipt", wordId: "receipt" }],
+          },
+          {
+            npcLines: [
+              "Thank you! Let me see... yes, I can process that refund for you. Would you like cash back or store credit?",
+              "Perfect, got it! I can do the refund right now. Cash back, or would store credit be okay?",
+              "Thanks! OK, refund approved. Do you want it in cash, or as store credit?",
+            ],
+            npcZh: "谢谢！我看一下……好的，可以给您退款。您想要现金退回还是商店积分？",
+            task: "选择退现金",
+            options: [
+              { text: "Cash back, please.", ok: true,  tip: "cash back 退现金；store credit 商店积分" },
+              { text: "Money cash return me.", ok: false, tip: "说 Cash back, please" },
+              { text: "Cash give my money back now is.", ok: false, tip: "简洁说法：Cash back, please" },
+            ],
+            phrase: { en: "Cash back, please.", zh: "请退现金", note: "cash back = 退回现金；也用于刷卡时顺带取现金" },
+          },
+          {
+            npcLines: [
+              "No problem! Also, we just restocked fresh milk this morning. Would you like to grab a new one?",
+              "You got it! Oh — fresh milk came in this morning. Want to pick up a new carton?",
+              "Sure thing! By the way, we got fresh milk in this morning. Interested in a replacement?",
+            ],
+            npcZh: "没问题！对了，我们今早刚到新鲜牛奶。您要拿一盒新的吗？",
+            task: "决定换一盒新牛奶",
+            options: [
+              { text: "Yes, I'd like to exchange it for a fresh one.", ok: true,  tip: "exchange A for B = 用 A 换 B，换货核心句" },
+              { text: "New milk change this one yes.",                 ok: false, tip: "说 I'd like to exchange it for a fresh one" },
+              { text: "Exchange do milk for me you.",                  ok: false, tip: "句式：exchange it for a fresh one" },
+            ],
+            phrase: { en: "I'd like to exchange ___ for ___.", zh: "我想用……换……", note: "exchange for 后面接想要的东西，换货必备" },
+            adds: [{ emoji: "🥛", label: "Fresh Milk", wordId: "milk" }],
+          },
+          {
+            npcLines: [
+              "Great choice! Let me double-check the expiration date on this one for you... all good!",
+              "Smart! Let me check the date on this carton real quick... perfect, good for two weeks!",
+              "Good thinking! One sec — checking the expiration date... yup, plenty of time on this one!",
+            ],
+            npcZh: "好选择！我帮您再确认一下这盒的保质期……没问题！",
+            task: "表示感谢",
+            options: [
+              { text: "Thank you so much for checking!", ok: true,  tip: "Thank you for + 动名词：为具体行为道谢" },
+              { text: "Thanks you check good.",          ok: false, tip: "说 Thank you for checking" },
+              { text: "Very thank you much help.",       ok: false, tip: "更自然：Thank you so much for checking" },
+            ],
+            phrase: { en: "Thank you for ___ing.", zh: "谢谢你……", note: "为对方的具体动作道谢，比单说 thank you 更真诚" },
+          },
+          {
+            npcLines: [
+              "My pleasure! So that's the refund in cash, plus your new milk. Anything else I can help with?",
+              "Happy to help! You've got your cash refund and the fresh milk. Anything else today?",
+              "Anytime! That's the refund and your new carton. Can I help with anything else?",
+            ],
+            npcZh: "荣幸之至！现金退款和新牛奶都给您了。还有其他需要帮忙的吗？",
+            task: "礼貌地表示没有其他需要",
+            options: [
+              { text: "That's all. Thanks for your help!", ok: true,  tip: "That's all 收尾 + 感谢，礼貌告别组合拳" },
+              { text: "No more need bye now.",             ok: false, tip: "说 That's all. Thanks for your help!" },
+              { text: "Finished am I yes goodbye.",        ok: false, tip: "更自然：That's all, thanks!" },
+            ],
+            phrase: { en: "That's all, thanks!", zh: "就这些，谢谢！", note: "店员问 Anything else? 的标准收尾回答" },
+          },
+        ],
       },
     ],
-    reward: { en: "cart", zh: "你完成了一次完整的英文超市购物！🛒" },
   },
 ];

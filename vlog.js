@@ -319,17 +319,15 @@ function openVlog(id) {
     if ($("vlogNext")) $("vlogNext").onclick = () => { idx++; renderCard(); };
     if ($("vlogQuiz")) $("vlogQuiz").onclick = () => startVlogQuiz(v);
 
-    // 首张卡延迟自动朗读：给用户 1.2s 看清界面，并显示提示
-    setTimeout(() => {
-      if (vlogState.currentVlog === v && $("vlogEn")) {
-        const hint = document.createElement("div");
-        hint.className = "auto-play-hint";
-        hint.textContent = "🔊 自动慢速播放中…（点击单词可查释义）";
-        $("vlogStage").appendChild(hint);
-        speakSlow(card.en, 0.55, (ci) => highlightWordByChar($("vlogEn"), ci));
-        setTimeout(() => hint.remove(), 4000);
-      }
-    }, 1200);
+    // 每张卡自动慢速朗读：进入/切换卡片即播（speakSlow 内部已有 150ms 防吞音延迟）
+    if (vlogState.currentVlog === v) {
+      const hint = document.createElement("div");
+      hint.className = "auto-play-hint";
+      hint.textContent = "🔊 自动慢速播放中…（点击单词可查释义）";
+      $("vlogStage").appendChild(hint);
+      speakSlow(card.en, 0.55, (ci) => highlightWordByChar($("vlogEn"), ci));
+      setTimeout(() => hint.remove(), 4000);
+    }
   }
   renderCard();
 

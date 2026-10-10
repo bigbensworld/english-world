@@ -658,6 +658,7 @@ function openBook() {
   if (keys.length === 0) {
     grid.innerHTML += '<div class="book-empty">还没有收集到词汇，去场景里玩玩看！</div>';
   } else {
+    // 先渲染场景词汇（items 完整数据），再渲染 vlog 词条
     keys.forEach((k) => {
       const [sid, iid] = k.split(":");
       const sc = SCENES.find((s) => s.id === sid);
@@ -668,6 +669,33 @@ function openBook() {
       el.className = "book-item";
       el.innerHTML = `<div class="e">${iconHtml(it, "book-img")}</div><div class="en">${it.en}</div><div class="zh">${it.zh}</div>`;
       el.onclick = () => speak(it.en);
+      grid.appendChild(el);
+    });
+    // vlog 词条（键形如 vlog:morning:alarm clock，值为 true 或 {en, zh, vlog}）
+    const vlogKeys = keys.filter((k) => k.startsWith("vlog:"));
+    if (vlogKeys.length) {
+      const vh = document.createElement("div");
+      vh.className = "book-section-head";
+      vh.textContent = `📺 慢速生活 · ${vlogKeys.length} 个`;
+      grid.appendChild(vh);
+    }
+    vlogKeys.forEach((k) => {
+      const parts = k.split(":");
+      const word = parts.slice(2).join(":");
+      const stored = state.collected[k];
+      const en = (stored && stored.en) || word;
+      // 释义优先级：存档里的 zh > VLOG_DICT 全词 > 首词还原
+      let zh = (stored && stored.zh) || "";
+      if (!zh && typeof lookupWord === "function") {
+        zh = lookupWord(en) || lookupWord(en.split(" ")[0]) || "📺 来自慢速生活频道";
+      }
+      const vlogId = parts[1];
+      const vlog = (typeof VLOGS !== "undefined") && VLOGS.find((v) => v.id === vlogId);
+      const el = document.createElement("button");
+      el.type = "button";
+      el.className = "book-item";
+      el.innerHTML = `<div class="e"><span class="book-img emoji-fallback">${vlog ? vlog.emoji : "📺"}</span></div><div class="en">${en}</div><div class="zh">${zh}</div>`;
+      el.onclick = () => (typeof speakSlow === "function" ? speakSlow(en, 0.55) : speak(en));
       grid.appendChild(el);
     });
   }

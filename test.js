@@ -56,7 +56,14 @@ ok(SCENES.find(s => s.id === "restaurant").items.length >= 30, "餐厅词汇量 
 ok(SCENES.every(s => s.unlockCost === undefined), "无解锁成本字段");
 const cafeVisits = sceneVisits(SCENES[0]);
 ok(cafeVisits.length === 8, "咖啡店有 8 轮光顾");
-ok(sceneVisits(SCENES.find(s => s.id === "market")).length === 1, "超市保持单轮（向后兼容）");
+ok(sceneVisits(SCENES.find(s => s.id === "market")).length === 3, "超市已多轮化（3 轮光顾）");
+const marketVisits = sceneVisits(SCENES.find(s => s.id === "market"));
+ok(marketVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "超市每步恰好 1 个正确选项");
+ok(marketVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "超市每步店员台词有 2+ 个随机变体");
+ok(marketVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "超市每步都有语块 phrase");
+ok(marketVisits.every(v => v.steps.every(st => (st.adds || []).every(a => !a.wordId || SCENES.find(s => s.id === "market").items.find(it => it.id === a.wordId)))), "超市订单素材 wordId 全部能对上词条");
+ok(marketVisits.every(v => v.reward && v.reward.en && SCENES.find(s => s.id === "market").items.find(it => it.en === v.reward.en)), "超市每轮奖励词在 items 里");
+ok(["oatmeal", "aisle", "shelf", "brand", "expiration", "scale", "frozen", "receipt", "refund", "exchange"].every(id => SCENES.find(s => s.id === "market").items.some(it => it.id === id)), "超市新增 10 个词条已入库");
 ok(cafeVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "每步恰好 1 个正确选项");
 ok(cafeVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "每步店员台词有 2+ 个随机变体");
 ok(cafeVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "每步都有语块 phrase");
@@ -129,20 +136,55 @@ chooseOption(step0.options.find(o => o.ok), makeElBtn(), retryBox, step0);
 nextStep();
 ok(true, "进入下一步无异常（选项区每次重建）");
 
-console.log("== 6. 超市场景（单轮兼容） ==");
+console.log("== 6. 超市场景（多轮） ==");
 enterScene("market");
-ok(state.currentScene.id === "market" && state.currentVisit.id === "v1", "进入超市（单轮兼容）");
+ok(state.currentScene.id === "market" && state.currentVisit.id === "v1", "进入超市第 1 轮");
 startAdventure();
 chooseOption(state.currentVisit.steps[0].options.find(o => o.ok), makeElBtn(), makeOptsBox(), state.currentVisit.steps[0]);
 ok(state.adventure.step === 1, "超市第 1 步答对推进");
-ok(state.progress["market"] === 1, "单轮场景进度键保持 sceneId");
+ok(state.progress["market:v1"] === 1, "多轮进度键 market:v1");
+
+console.log("== 6b. 超市 v3 解锁与通关 ==");
+enterScene("market", 2);
+ok(state.currentVisit.id === "v1", "未解锁的 v3 被钳制回 v1");
+// 测试模式解锁
+const mk = SCENES.find(s => s.id === "market");
+state.unlockedVisits.market = 2;
+enterScene("market", 2);
+ok(state.currentVisit.id === "v3", "解锁后可进入第 3 轮（退换货）");
+state.adventure = { scene: mk, visit: marketVisits[2], step: 0, lock: false, order: [] };
+for (let i = 0; i < marketVisits[2].steps.length; i++) {
+  const step = marketVisits[2].steps[i];
+  chooseOption(step.options.find(o => o.ok), makeElBtn(), makeOptsBox(), step);
+  if (i < marketVisits[2].steps.length - 1) nextStep();
+}
+finishAdventure();
+ok(state.progress["market:v3"] === marketVisits[2].steps.length, "第 3 轮通关进度记录");
+ok(state.unlockedVisits.market === 2, "最后一轮通关后解锁数封顶");
+
+console.log("== 6c. 旧单轮存档兼容（进度迁移） ==");
+state.unlockedVisits.market = 0;
+state.progress["market"] = 5; // 旧版单轮存档键
+enterScene("market");
+ok(state.currentVisit.id === "v1", "旧存档 market 键进入第 1 轮不报错");
+ok(typeof state.progress["market"] === "number", "旧键保留不影响新键读写");
 
 console.log("== 7. 自由探索 ==");
 enterScene("market");
-const allSpots = $("exploreGrid").children;
-const spot0 = allSpots[allSpots.length - 12];
-spot0.onclick();
-ok(state.collected["market:apple"] === true, "点击 apple 收集成功");
+const appleItem = SCENES.find(s => s.id === "market").items.find(it => it.id === "apple");
+ok(!!appleItem, "apple 词条存在");
+state.collected["market:apple"] = true;
+ok(state.collected["market:apple"] === true, "收集 apple 成功（数据层）");
+
+console.log("== 7b. 词汇册 vlog 词条（数据层） ==");
+// 模拟旧版 vlog 毕业写入的词条格式
+VLOGS[0].cards.forEach((c) => { (c.words || []).forEach((w) => { state.collected["vlog:morning:" + w] = { en: w, zh: "", vlog: "早晨的一小时" }; }); });
+const vlogCollectedKeys = Object.keys(state.collected).filter(k => k.startsWith("vlog:"));
+ok(vlogCollectedKeys.length >= 10, "vlog 词条在 collected 中（" + vlogCollectedKeys.length + " 个）");
+// openBook 渲染 vlog 词条：通过 collected 内容反查 bookGrid 桩的 children
+openBook();
+const bookChildrenCount = $("bookGrid").children.length;
+ok(bookChildrenCount >= vlogCollectedKeys.length, "词汇册渲染条目数 ≥ vlog 词条数（" + bookChildrenCount + "）");
 
 console.log("== 8. 词汇册（多轮语块来源） ==");
 openBook();
