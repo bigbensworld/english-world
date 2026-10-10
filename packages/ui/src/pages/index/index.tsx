@@ -58,9 +58,10 @@ export default function Index() {
       </View>
 
       {tab === "vlog" ? (
-        <View>
+        <View className="home-pane">
+          <View className="map-title">不敢开口？先从你每天都会遇到的英语开始</View>
+          <View className="map-sub">像刷视频一样，听懂日常英语。5 分钟一集，慢速朗读，逐词跟读。</View>
           <View className="value-prop">
-            <View className="vp-title">不敢开口？先从你每天都会遇到的英语开始</View>
             <View className="vp-sub">看慢速生活短片，听懂最日常的英语。零门槛，点词就能查。</View>
           </View>
           <View className="path-steps">
@@ -81,7 +82,10 @@ export default function Index() {
           </ScrollView>
         </View>
       ) : (
-        <View className="scene-groups">
+        <View className="home-pane scene-pane">
+          <View className="map-title">去哪儿冒险？</View>
+          <View className="map-sub">Pick a place. Chat with real people. Learn step by step.</View>
+          <View className="scene-groups">
           {groups.map((g) => (
             <View key={g.id}>
               <View className="scene-group-head">
@@ -100,6 +104,7 @@ export default function Index() {
               </View>
             </View>
           ))}
+          </View>
         </View>
       )}
     </View>

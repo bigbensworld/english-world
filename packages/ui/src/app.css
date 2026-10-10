@@ -1,53 +1,56 @@
 /* 英语世界 Taro UI 全局样式（Phase 1，从 style.css 精选迁移；2026-10-10 清理重复块重写） */
 page, .app-root {
-  --bg: #f6f4ef;
+  --bg: #f6f4ee;
   --card: #ffffff;
-  --ink: #2a2620;
-  --sub: #7d766b;
-  --border: #e8e2d8;
-  --green: #3d8b5f;
-  --green-soft: #e5f3ec;
-  --red: #c2564b;
-  --accent: #0d1117;
+  --ink: #2c2c2a;
+  --sub: #6f6e66;
+  --border: #d3d1c7;
+  --green: #3b6d11;
+  --green-soft: #eaf3de;
+  --red: #a32d2d;
+  --accent: #2c2c2a;
   --bounce: cubic-bezier(.34,1.56,.64,1);
   background: var(--bg);
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
 }
 
-/* 首页品牌头部：保持原站的识别结构 */
-.brand-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 8px; background: var(--card); border-bottom: 1px solid var(--border); }
-.brand-mark { white-space: nowrap; font-size: 18px; font-weight: 700; }
+/* 首页品牌头部：与原站 header 保持同一层级 */
+.brand-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; background: var(--card); border-bottom: 1px solid var(--border); }
+.brand-mark { white-space: nowrap; font-size: 18px; font-weight: 600; }
 .brand-zh { margin-left: 3px; }
-.brand-en { margin-left: 7px; color: var(--sub); font-size: 13px; font-weight: 400; }
-.brand-stats { display: flex; gap: 8px; }
-.brand-stat { display: flex; align-items: baseline; gap: 2px; padding: 5px 9px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--sub); font-size: 12px; }
-.stat-value { color: var(--green); font-weight: 800; font-size: 15px; }
-.quick-actions { display: flex; gap: 9px; padding: 10px 18px 2px; background: var(--card); }
-.quick-action { padding: 7px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--ink); font-size: 13px; }
+.brand-en { margin-left: 6px; color: var(--sub); font-size: 13px; font-weight: 400; }
+.brand-stats { display: flex; align-items: center; gap: 10px; }
+.brand-stat { display: flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--ink); font-size: 14px; }
+.stat-value { color: var(--green); font-weight: 700; }
+.quick-actions { display: flex; gap: 8px; padding: 0; background: transparent; }
+.quick-action { padding: 8px 14px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--ink); font-size: 14px; }
 
 /* 首页双 Tab */
-.home-tabs { display: flex; gap: 10px; padding: 14px 16px 6px; }
+.home-tabs { display: flex; gap: 10px; padding: 26px 18px 6px; }
 .home-tab {
-  flex: 1; padding: 12px 0; border-radius: 999px; border: 1.5px solid var(--border);
-  background: var(--card); font-size: 16px; font-weight: 600; color: var(--sub); text-align: center;
+  flex: 1; padding: 10px 0; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--card); font-size: 14px; font-weight: 600; color: var(--sub); text-align: center;
 }
-.home-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.home-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
 
-/* 价值主张 + 学习路径 */
-.value-prop { margin: 12px 16px; padding: 18px 16px; border-radius: 16px; background: linear-gradient(135deg, #0d1117, #233241); color: #fff; }
-.value-prop .vp-title { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
-.value-prop .vp-sub { font-size: 13px; opacity: .85; line-height: 1.6; }
-.path-steps { display: flex; gap: 8px; margin: 14px 16px 4px; }
-.path-step { flex: 1; padding: 10px 8px; border-radius: 12px; background: var(--card); border: 1.5px solid var(--border); text-align: center; font-size: 12px; color: var(--sub); }
-.path-step b { display: block; font-size: 15px; color: var(--ink); margin-bottom: 2px; }
+/* 首页首屏：原站是纯背景+标题，不使用深色渐变卡片 */
+.home-pane { max-width: 980px; margin: 0 auto; }
+.map-title { font-size: clamp(22px, 3vw, 26px); text-align: center; margin-top: 12px; font-weight: 700; animation: bounceIn .5s var(--bounce); }
+.map-sub { text-align: center; color: var(--sub); margin: 8px 0 30px; font-size: 14px; animation: bounceIn .5s var(--bounce) .1s backwards; }
+.value-prop { margin: 0; padding: 0; background: transparent; color: var(--ink); }
+.value-prop .vp-sub { font-size: 14px; line-height: 1.6; color: var(--sub); }
+.path-steps { display: flex; gap: 0; justify-content: center; align-items: center; margin: 0 0 14px; padding: 0; background: transparent; border: 0; }
+.path-step { flex: initial; padding: 8px 12px; border: 0; background: transparent; font-size: 14px; color: var(--sub); }
+.path-step b { display: inline; font-size: 14px; color: var(--ink); margin: 0; }
+.path-step + .path-step::before { content: "→"; color: var(--border); margin-right: 14px; }
 
 /* vlog 集列表 */
-.vlog-list { padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px; }
-.vlog-set { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; border: 1.5px solid var(--border); background: var(--card); }
-.vlog-set .vs-emoji { font-size: 34px; }
-.vlog-set .vs-title { font-size: 16px; font-weight: 700; }
-.vlog-set .vs-desc { font-size: 12px; color: var(--sub); margin-top: 3px; line-height: 1.5; }
+.vlog-list { padding: 8px 18px 24px; display: flex; flex-direction: column; gap: 18px; }
+.vlog-set { display: flex; align-items: center; gap: 14px; padding: 0; border-radius: 16px; border: 1px solid var(--border); background: var(--card); overflow: hidden; box-shadow: 0 10px 24px rgba(44,44,42,.08); }
+.vlog-set .vs-emoji { display: flex; align-items: center; justify-content: center; width: 92px; min-height: 90px; flex: 0 0 92px; font-size: 42px; background: #f3eadc; }
+.vlog-set .vs-title { font-size: 17px; font-weight: 600; }
+.vlog-set .vs-desc { font-size: 13px; color: var(--sub); margin-top: 5px; line-height: 1.6; padding-right: 12px; }
 
 /* 场景分组 + 卡片：更接近原站的宽卡片与留白 */
 .scene-groups { max-width: 980px; margin: 0 auto; padding: 14px 18px 28px; }
