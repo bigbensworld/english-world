@@ -368,6 +368,7 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 }
 .stage.theme-cafe { --scene-accent: var(--cafe-accent); --scene-accent-soft: var(--cafe-soft); background: var(--cafe-soft); }
 .stage.theme-market { --scene-accent: var(--market-accent); --scene-accent-soft: var(--market-soft); background: var(--market-soft); }
+.stage.theme-restaurant { --scene-accent: #8b3a4a; --scene-accent-soft: #f8e3e8; background: #f8e3e8; }
 .stage::before {
   content: attr(data-deco);
   position: absolute; right: 14px; top: 8px; font-size: 22px;

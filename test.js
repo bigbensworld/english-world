@@ -48,11 +48,15 @@ function ok(cond, name) {
 
 console.log("== 1. 初始状态 ==");
 ok(state.coins === undefined, "金币体系已移除");
-ok(SCENES.length === 2, "共 2 个场景");
+ok(SCENES.length === 3, "共 3 个场景");
+ok(SCENES.some(s => s.id === "restaurant"), "餐厅场景已加入");
+const restVisits = sceneVisits(SCENES.find(s => s.id === "restaurant"));
+ok(restVisits.length === 4, "餐厅有 4 轮光顾");
+ok(SCENES.find(s => s.id === "restaurant").items.length >= 30, "餐厅词汇量 30+");
 ok(SCENES.every(s => s.unlockCost === undefined), "无解锁成本字段");
 const cafeVisits = sceneVisits(SCENES[0]);
 ok(cafeVisits.length === 8, "咖啡店有 8 轮光顾");
-ok(sceneVisits(SCENES[1]).length === 1, "超市保持单轮（向后兼容）");
+ok(sceneVisits(SCENES.find(s => s.id === "market")).length === 1, "超市保持单轮（向后兼容）");
 ok(cafeVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "每步恰好 1 个正确选项");
 ok(cafeVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "每步店员台词有 2+ 个随机变体");
 ok(cafeVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "每步都有语块 phrase");
