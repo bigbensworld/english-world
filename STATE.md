@@ -1,6 +1,6 @@
 # english-world 项目状态（STATE）
 
-> 更新时间：2026-10-10 12:00 · 最新 commit `6a8d4cd`
+> 更新时间：2026-10-10 12:30 · 最新 commit `b6ea6e0`
 > 新会话冷启动指南：读完本文即可继续开发，无需翻历史对话。
 
 ## 一、项目是什么
@@ -37,7 +37,8 @@
 - 多轮光顾：场景由 visits 数组组成，通关一轮解锁下一轮（unlockedVisits）；单轮场景用 steps（向后兼容，访问层 sceneVisits() 统一）
 - 台词防重复：npcLastLines 记录每步上次台词，重玩排除上一句
 - 隐藏测试模式：场景页连点标题 5 次解锁全部轮次（验收用）
-- TTS：Web Speech API；speakSlow() 已修 Chrome cancel+speak 吞音 bug（延迟 150ms + resume）
+- TTS：Web Speech API；speakSlow() 已修 Chrome cancel+speak 吞音 bug（延迟 150ms + resume）；vlog 进卡/切卡即自动慢速播放
+- 词汇册：vlog 词条（键 `vlog:vlogId:词组`）单独分区展示，释义走 VLOG_DICT（含词形还原），旧格式（true）兼容
 - 逐词高亮：SpeechSynthesisUtterance.onboundary (charIndex) → .v-word.active
 
 ## 三、内容现状
@@ -47,17 +48,17 @@
 |---|---|---|
 | ☕ 咖啡店 | 8 轮（点单/下午茶/赶时间/定制/出错投诉/问推荐忌口/文化深潜/会员优惠） | ✅ 完整 |
 | 🍽️ 餐厅 | 4 轮（入座点餐/牛排酒水/账单打包/特殊饮食） | ✅ 完整 |
-| 🛒 超市 | 1 轮（单轮旧结构） | 待多轮化 |
+| 🛒 超市 | 3 轮（日常采购 11 步/找特定商品 9 步/退换货 6 步，词条 12→22） | ✅ 完整 |
 
 **慢速生活频道（3 集）**：Morning Routine / Cooking Breakfast / Making Coffee，每集 7 动作卡 + 1 冷知识卡；17 组 CSS 动作动画 keyframes；单词点击查词（VLOG_DICT ~150 词条带词形还原）
 
 **内容路线图（已定）**：
 1. ✅ 第一批：餐厅 4 轮
-2. ⬜ 第二批：酒店 3 轮（入住/退房/投诉房间）
-3. ⬜ 第三批：机场 3 轮（值机/安检/登机）
-4. ⬜ 第四批：医院/药房 3 轮（描述症状）
-5. ⬜ 第五批：交通+问路 3 轮
-- 超市多轮化（日常采购/找特定商品/退换货）也排队中
+2. ✅ 超市多轮化 3 轮（日常采购/找特定商品/退换货）
+3. ⬜ 第二批：酒店 3 轮（入住/退房/投诉房间）
+4. ⬜ 第三批：机场 3 轮（值机/安检/登机）
+5. ⬜ 第四批：医院/药房 3 轮（描述症状）
+6. ⬜ 第五批：交通+问路 3 轮
 
 ## 四、开发与部署流程
 
@@ -90,16 +91,17 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 
 - [ ] 语音打分模式（Web Speech API SpeechRecognition，第二期游戏化）
 - [ ] 导演排序模式（卡片排序 + TTS 连播）
-- [ ] 超市多轮化
-- [ ] 酒店场景（第二批）
+- [ ] 酒店场景（下一批，3 轮：入住/退房/投诉房间）
 - [ ] vlog 新主题集（Grocery Run / Doing Laundry / Cleaning）
 - [ ] `media` 字段已预留：单卡可升级 AI 图/视频（A 方案 emoji 舞台覆盖 ~85% 动作，硬伤用分镜拆卡）
-- [ ] 词汇册对 vlog 词条的展示（当前 vlog 词入 collected 但 bookGrid 渲染只认场景 items）
+- [x] 词汇册对 vlog 词条的展示（已修：vlog 分区 + VLOG_DICT 释义 + 旧格式兼容，b6ea6e0）
 - [ ] 小程序适配（微信生态，独立工程，验证后再做）
 
 ## 七、近期 commit 索引（倒序）
 
 ```
+b6ea6e0 超市多轮化 3 轮 + vlog 进卡自动播放 + 词汇册 vlog 词条展示
+7d132a3 文档: 新增 STATE.md 项目交接文档（新会话冷启动指南）
 6a8d4cd 修复: 慢速播放偶发不生效
 a068a7b 体验优化: 单词点击查词 + vlog 进入体验修复
 9b766aa 首页改版: Tab 分离慢速生活与场景冒险
@@ -112,5 +114,3 @@ a543483 内容扩展: 新增餐厅场景（4 轮光顾）
 ca08874 修复: 跨关提示清理 + 再玩重新开始
 e114762 修复: 断点续玩
 ```
-
-详细工作日志见：`.workbuddy/memory/2026-10-10.md`（同目录有 10-07/10-08）
