@@ -1,0 +1,9 @@
+{
+  "name": "@english-world/core",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "英语世界共享内核：数据 + 场景引擎 + 平台适配接口（H5/小程序/App 三端复用）",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}
