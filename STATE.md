@@ -1,6 +1,6 @@
 # english-world 项目状态（STATE）
 
-> 更新时间：2026-10-10 12:50 · 最新 commit `7220752`
+> 更新时间：2026-10-10 14:15 · 最新 commit `be49dfb`
 > 新会话冷启动指南：读完本文即可继续开发，无需翻历史对话。
 
 ## 一、项目是什么
@@ -36,6 +36,7 @@
 - 首页双 Tab：📺 慢速生活 / 🗺️ 场景冒险（默认场景，sessionStorage 记住选择）
 - 多轮光顾：场景由 visits 数组组成，通关一轮解锁下一轮（unlockedVisits）；单轮场景用 steps（向后兼容，访问层 sceneVisits() 统一）
 - 台词防重复：npcLastLines 记录每步上次台词，重玩排除上一句
+- 对话节奏：打字动画 900ms → 店员台词 + 朗读 → 停 600ms 才渲染任务提示/选项（防剧透抢答，adv.stepReady 控制）；答对后停 2400ms 再进下一步（给回复朗读 + 语块卡留时间）
 - 隐藏测试模式：场景页连点标题 5 次解锁全部轮次（验收用）
 - TTS：Web Speech API；speakSlow() 已修 Chrome cancel+speak 吞音 bug（延迟 150ms + resume）；vlog 进卡/切卡即自动慢速播放
 - 词汇册：vlog 词条（键 `vlog:vlogId:词组`）单独分区展示，释义走 VLOG_DICT（含词形还原），旧格式（true）兼容
@@ -101,6 +102,7 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 ## 七、近期 commit 索引（倒序）
 
 ```
+be49dfb 节奏修复: 选项延后至店员台词后渲染（防剧透）+ 答对间隔 1100ms→2400ms
 7220752 内容扩展: 新增酒店场景（入住/退房/投诉房间 3 轮光顾，15 词条）
 a4ae963 文档: STATE.md commit 索引同步 rebase 后 hash
 46d0d5a 文档: STATE.md 更新（超市多轮化完成）
