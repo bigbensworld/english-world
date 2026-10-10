@@ -116,19 +116,28 @@ function onVlogWordClick(evt) {
 }
 
 // ---------- 慢速朗读（带逐词高亮） ----------
+let speakSlowTimer = null;
 function speakSlow(text, rate, onWord, onEnd) {
   if (!("speechSynthesis" in window)) { if (onEnd) onEnd(); return; }
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "en-US";
-  u.rate = rate || 0.55; // 慢 vlog 语速
-  if (onWord) {
-    u.onboundary = (e) => {
-      if (e.name === "word" || e.charIndex !== undefined) onWord(e.charIndex);
-    };
-  }
-  if (onEnd) u.onend = onEnd;
-  speechSynthesis.speak(u);
+  // Chrome 已知 bug：cancel() 后立即 speak() 会被一起吞掉（表现为"没生效"/无声）。
+  // 修复：延迟一小段时间再播，并 resume 防止引擎处于暂停态。
+  clearTimeout(speakSlowTimer);
+  speakSlowTimer = setTimeout(() => {
+    try { speechSynthesis.resume(); } catch (e) { /* ignore */ }
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = rate || 0.55; // 慢 vlog 语速
+    u.pitch = 1;
+    u.volume = 1;
+    if (onWord) {
+      u.onboundary = (e) => {
+        if (e.name === "word" || e.charIndex !== undefined) onWord(e.charIndex);
+      };
+    }
+    if (onEnd) u.onend = onEnd;
+    speechSynthesis.speak(u);
+  }, 150);
 }
 
 // 高亮当前朗读到的词：根据 charIndex 找到第几个词
