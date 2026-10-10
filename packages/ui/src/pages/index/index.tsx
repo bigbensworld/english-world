@@ -1,6 +1,6 @@
 // 首页：双 Tab（慢速生活 / 场景冒险）+ 场景地图 + vlog 列表
 import { useState, useMemo } from "react";
-import { View, Text, ScrollView } from "@tarojs/components";
+import { View, Text } from "@tarojs/components";
 import { SCENES, VLOGS, sceneCardStatus, finishedVisits, sceneVisits } from "../../gameStore";
 import type { Scene, Vlog } from "@english-world/core";
 import ScenePage from "./scene";
@@ -38,17 +38,14 @@ export default function Index() {
 
   return (
     <View className="page-pad">
-      {/* 顶部品牌 + 学习进度（对齐原站） */}
+      {/* 顶部品牌 + 学习进度 */}
       <View className="brand-bar">
         <View className="brand-mark">🌍 <Text className="brand-zh">英语世界</Text><Text className="brand-en">English World</Text></View>
         <View className="brand-stats">
           <View className="brand-stat"><Text className="stat-value">{Object.keys(readSaveOnce().collected || {}).length}</Text><Text>词</Text></View>
           <View className="brand-stat"><Text className="stat-value">{Object.keys(readSaveOnce().phrases || {}).length}</Text><Text>表达</Text></View>
+          <View className="quick-action" onClick={() => setView({ kind: "book" })}>📚</View>
         </View>
-      </View>
-      <View className="quick-actions">
-        <View className="quick-action" onClick={() => setView({ kind: "book" })}>📚 词汇册</View>
-        <View className="quick-action">🗺️ 地图</View>
       </View>
 
       {/* 双 Tab */}
@@ -59,32 +56,40 @@ export default function Index() {
 
       {tab === "vlog" ? (
         <View className="home-pane">
-          <View className="map-title">不敢开口？先从你每天都会遇到的英语开始</View>
-          <View className="map-sub">像刷视频一样，听懂日常英语。5 分钟一集，慢速朗读，逐词跟读。</View>
-          <View className="value-prop">
-            <View className="vp-sub">看慢速生活短片，听懂最日常的英语。零门槛，点词就能查。</View>
+          <View className="hero">
+            <View className="map-title">不敢开口？<br/>先从你每天都会遇到的英语开始</View>
+            <View className="map-sub">像刷视频一样，听懂日常英语。<br/>5 分钟一集，慢速朗读，逐词跟读。</View>
+            <View className="path-steps">
+              <View className="path-step"><Text className="ps-num">1</Text><View><View className="ps-b">先听懂</View><View className="ps-s">慢速 vlog</View></View></View>
+              <View className="path-arrow">→</View>
+              <View className="path-step"><Text className="ps-num">2</Text><View><View className="ps-b">再开口</View><View className="ps-s">场景对话</View></View></View>
+              <View className="path-arrow">→</View>
+              <View className="path-step"><Text className="ps-num">3</Text><View><View className="ps-b">反复练</View><View className="ps-s">词汇册</View></View></View>
+            </View>
           </View>
-          <View className="path-steps">
-            <View className="path-step"><b>① 先听懂</b>慢速 vlog</View>
-            <View className="path-step"><b>② 再开口</b>场景对话</View>
-            <View className="path-step"><b>③ 反复练</b>词汇册</View>
-          </View>
-          <ScrollView className="vlog-list" scrollY style={{ maxHeight: "calc(100vh - 330px)" }}>
+          <View className="vlog-list">
             {VLOGS.map((v) => (
               <View key={v.id} className="vlog-set" onClick={() => setView({ kind: "vlog", vlog: v })}>
                 <View className="vs-emoji">{v.emoji}</View>
-                <View>
+                <View className="vs-body">
                   <View className="vs-title">{v.title} · {v.titleZh}</View>
-                  <View className="vs-desc">{v.desc} ▶ {v.cards.length} 张卡片</View>
+                  <View className="vs-desc">{v.desc}</View>
+                  <View className="vs-meta">▶ {v.cards.length} 张卡片</View>
                 </View>
               </View>
             ))}
-          </ScrollView>
+            <View className="path-next">
+              <View className="path-next-text">🎧 听懂之后？去真实场景里说出第一句</View>
+              <View className="btn btn-primary btn-big" onClick={() => setTab("scenes")}>🗺️ 进入场景冒险</View>
+            </View>
+          </View>
         </View>
       ) : (
         <View className="home-pane scene-pane">
-          <View className="map-title">去哪儿冒险？</View>
-          <View className="map-sub">Pick a place. Chat with real people. Learn step by step.</View>
+          <View className="hero">
+            <View className="map-title">去哪儿冒险？</View>
+            <View className="map-sub">Pick a place. Chat with real people. Learn step by step.</View>
+          </View>
           <View className="scene-groups">
           {groups.map((g) => (
             <View key={g.id}>
@@ -96,9 +101,11 @@ export default function Index() {
                 {g.list.map((sc) => (
                   <View key={sc.id} className="scene-card" onClick={() => setView({ kind: "scene", scene: sc })}>
                     <View className="sc-cover">{sc.cover || sc.emoji}</View>
-                    <View className="sc-name">{sc.emoji} {sc.name}</View>
-                    <View className="sc-name-en">{sc.nameEn}</View>
-                    <View className="sc-status">{sceneCardStatus(stateOf(sc), sc)}</View>
+                    <View className="sc-info">
+                      <View className="sc-name">{sc.emoji} {sc.name}</View>
+                      <View className="sc-name-en">{sc.nameEn}</View>
+                      <View className="sc-status">{sceneCardStatus(stateOf(sc), sc)}</View>
+                    </View>
                   </View>
                 ))}
               </View>

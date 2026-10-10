@@ -15,58 +15,72 @@ page, .app-root {
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
 }
 
-/* 首页品牌头部：与原站 header 保持同一层级 */
-.brand-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; background: var(--card); border-bottom: 1px solid var(--border); }
-.brand-mark { white-space: nowrap; font-size: 18px; font-weight: 600; }
+/* 首页品牌头部：白底细线，与内容区分层 */
+.brand-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--card); border-bottom: 1px solid var(--border); }
+.brand-mark { white-space: nowrap; font-size: 18px; font-weight: 700; }
 .brand-zh { margin-left: 3px; }
-.brand-en { margin-left: 6px; color: var(--sub); font-size: 13px; font-weight: 400; }
-.brand-stats { display: flex; align-items: center; gap: 10px; }
-.brand-stat { display: flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--ink); font-size: 14px; }
+.brand-en { margin-left: 7px; color: var(--sub); font-size: 13px; font-weight: 400; }
+.brand-stats { display: flex; align-items: center; gap: 8px; }
+.brand-stat { display: flex; align-items: center; gap: 3px; padding: 6px 11px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--ink); font-size: 13px; }
 .stat-value { color: var(--green); font-weight: 700; }
-.quick-actions { display: flex; gap: 8px; padding: 0; background: transparent; }
-.quick-action { padding: 8px 14px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--ink); font-size: 14px; }
+.quick-action { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--ink); font-size: 16px; }
 
-/* 首页双 Tab */
-.home-tabs { display: flex; gap: 10px; padding: 26px 18px 6px; }
+/* 双 Tab：胶囊分段，浮于米白背景上 */
+.home-tabs { display: flex; gap: 8px; max-width: 980px; margin: 0 auto; padding: 18px 18px 4px; }
 .home-tab {
-  flex: 1; padding: 10px 0; border-radius: 10px; border: 1px solid var(--border);
+  flex: 1; padding: 11px 0; border-radius: 999px; border: 1px solid var(--border);
   background: var(--card); font-size: 14px; font-weight: 600; color: var(--sub); text-align: center;
+  box-shadow: 0 2px 8px rgba(44,44,42,.04);
 }
-.home-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.home-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: 0 6px 16px rgba(44,44,42,.18); }
 
-/* 首页首屏：原站是纯背景+标题，不使用深色渐变卡片 */
-.home-pane { max-width: 980px; margin: 0 auto; }
-.map-title { font-size: clamp(22px, 3vw, 26px); text-align: center; margin-top: 12px; font-weight: 700; animation: bounceIn .5s var(--bounce); }
-.map-sub { text-align: center; color: var(--sub); margin: 8px 0 30px; font-size: 14px; animation: bounceIn .5s var(--bounce) .1s backwards; }
-.value-prop { margin: 0; padding: 0; background: transparent; color: var(--ink); }
-.value-prop .vp-sub { font-size: 14px; line-height: 1.6; color: var(--sub); }
-.path-steps { display: flex; gap: 0; justify-content: center; align-items: center; margin: 0 0 14px; padding: 0; background: transparent; border: 0; }
-.path-step { flex: initial; padding: 8px 12px; border: 0; background: transparent; font-size: 14px; color: var(--sub); }
-.path-step b { display: inline; font-size: 14px; color: var(--ink); margin: 0; }
-.path-step + .path-step::before { content: "→"; color: var(--border); margin-right: 14px; }
+/* 首屏 hero：留白呼吸感，不塞卡片 */
+.home-pane { max-width: 980px; margin: 0 auto; padding: 0 18px; }
+.hero { padding: 26px 8px 8px; animation: bounceIn .5s var(--bounce); }
+.map-title { font-size: clamp(24px, 3.4vw, 28px); text-align: center; font-weight: 800; line-height: 1.35; letter-spacing: .5px; }
+.map-sub { text-align: center; color: var(--sub); margin: 10px 0 0; font-size: 14px; line-height: 1.7; }
 
-/* vlog 集列表 */
-.vlog-list { padding: 8px 18px 24px; display: flex; flex-direction: column; gap: 18px; }
-.vlog-set { display: flex; align-items: center; gap: 14px; padding: 0; border-radius: 16px; border: 1px solid var(--border); background: var(--card); overflow: hidden; box-shadow: 0 10px 24px rgba(44,44,42,.08); }
-.vlog-set .vs-emoji { display: flex; align-items: center; justify-content: center; width: 92px; min-height: 90px; flex: 0 0 92px; font-size: 42px; background: #f3eadc; }
-.vlog-set .vs-title { font-size: 17px; font-weight: 600; }
-.vlog-set .vs-desc { font-size: 13px; color: var(--sub); margin-top: 5px; line-height: 1.6; padding-right: 12px; }
+/* 学习路径：编号圆点 + 三步卡 */
+.path-steps { display: flex; justify-content: center; align-items: stretch; gap: 10px; margin-top: 22px; }
+.path-step { flex: 1; max-width: 180px; display: flex; gap: 10px; padding: 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(44,44,42,.05); }
+.path-step .ps-num { flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.path-step .ps-b { font-size: 14px; font-weight: 700; color: var(--ink); }
+.path-step .ps-s { font-size: 11px; color: var(--sub); margin-top: 1px; }
+.path-arrow { align-self: center; color: var(--border); font-size: 16px; font-weight: 700; }
 
-/* 场景分组 + 卡片：更接近原站的宽卡片与留白 */
-.scene-groups { max-width: 980px; margin: 0 auto; padding: 14px 18px 28px; }
-.scene-group-head { margin: 16px 0 6px; }
+/* vlog 列表：整页滚动，左图右文的媒体卡 */
+.vlog-list { padding: 8px 0 30px; display: flex; flex-direction: column; gap: 14px; }
+.vlog-set { display: flex; align-items: stretch; border-radius: 16px; border: 1px solid var(--border); background: var(--card); overflow: hidden; box-shadow: 0 8px 20px rgba(44,44,42,.07); transition: transform .15s var(--bounce), box-shadow .15s; }
+.vlog-set:active { transform: scale(.98); }
+.vlog-set .vs-emoji { display: flex; align-items: center; justify-content: center; width: 96px; min-height: 96px; flex: 0 0 96px; font-size: 44px; background: linear-gradient(160deg, #f3eadc, #eef3e8); }
+.vlog-set .vs-body { flex: 1; min-width: 0; padding: 13px 14px; display: flex; flex-direction: column; }
+.vlog-set .vs-title { font-size: 15.5px; font-weight: 700; line-height: 1.4; }
+.vlog-set .vs-desc { font-size: 12.5px; color: var(--sub); margin-top: 5px; line-height: 1.6; }
+.vlog-set .vs-meta { margin-top: auto; padding-top: 6px; font-size: 11px; font-weight: 700; color: var(--green); }
+
+/* vlog 底部 CTA */
+.path-next { margin-top: 6px; padding: 22px 18px; border-radius: 18px; background: linear-gradient(150deg, #0d1117, #233241); color: #fff; text-align: center; }
+.path-next-text { font-size: 14px; opacity: .9; margin-bottom: 14px; line-height: 1.6; }
+
+/* 场景分组 + 宽卡片 */
+.scene-groups { max-width: 980px; margin: 0 auto; padding: 6px 0 30px; }
+.scene-group-head { margin: 20px 0 10px; animation: bounceIn .5s var(--bounce); }
 .scene-group-title { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-.scene-group-sub { font-size: 12px; color: var(--sub); margin-top: 4px; }
-.scene-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.scene-group-sub { font-size: 12px; color: var(--sub); margin-top: 3px; }
+.scene-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
 .scene-card {
-  min-width: 0; box-sizing: border-box; padding: 0; border-radius: 16px; overflow: hidden;
-  border: 1px solid var(--border); background: var(--card); display: flex; flex-direction: column; gap: 0;
-  box-shadow: 0 7px 18px rgba(44,44,42,.06);
+  min-width: 0; box-sizing: border-box; border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--border); background: var(--card);
+  box-shadow: 0 6px 16px rgba(44,44,42,.06);
+  transition: transform .18s var(--bounce), box-shadow .18s;
+  animation: bounceIn .55s var(--bounce) backwards;
 }
-.scene-card .sc-cover { min-height: 94px; padding: 12px; display: flex; align-items: center; justify-content: center; font-size: 50px; background: linear-gradient(135deg, #eef3e8, #f8eee3); }
-.scene-card .sc-name { padding: 12px 14px 0; font-size: 16px; font-weight: 700; }
-.scene-card .sc-name-en { padding: 2px 14px 0; font-size: 12px; color: var(--sub); }
-.scene-card .sc-status { margin: 9px 14px 14px; font-size: 11px; color: var(--green); background: var(--green-soft); border-radius: 8px; padding: 5px 7px; }
+.scene-card:active { transform: scale(.97); }
+.scene-card .sc-cover { min-height: 108px; display: flex; align-items: center; justify-content: center; font-size: 56px; background: linear-gradient(160deg, #eef3e8, #f8eee3); }
+.scene-card .sc-info { padding: 12px 14px 14px; }
+.scene-card .sc-name { font-size: 16px; font-weight: 700; }
+.scene-card .sc-name-en { font-size: 12px; color: var(--sub); margin-top: 2px; }
+.scene-card .sc-status { display: inline-block; margin-top: 9px; font-size: 11px; color: var(--green); background: var(--green-soft); border-radius: 999px; padding: 4px 9px; }
 
 /* 通用按钮 */
 .btn { padding: 11px 18px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--card); font-size: 14px; font-weight: 600; color: var(--ink); text-align: center; }
@@ -134,16 +148,17 @@ page, .app-root {
 .top-bar { display: flex; align-items: center; gap: 10px; padding: 14px 16px 6px; }
 @media (min-width: 700px) {
   .page-pad { max-width: 1080px; margin: 0 auto; }
-  .home-tabs { max-width: 980px; margin: 0 auto; }
-  .value-prop { max-width: 944px; margin-left: auto; margin-right: auto; }
-  .path-steps { max-width: 944px; margin-left: auto; margin-right: auto; }
-  .vlog-list { max-width: 944px; margin-left: auto; margin-right: auto; }
+  .hero { padding-top: 36px; }
+  .path-steps { max-width: 720px; margin-left: auto; margin-right: auto; }
 }
 @media (max-width: 420px) {
   .brand-bar { padding-left: 14px; padding-right: 14px; }
   .brand-en { display: none; }
-  .brand-stats { gap: 4px; }
-  .brand-stat { padding-left: 7px; padding-right: 7px; }
+  .brand-stats { gap: 5px; }
+  .brand-stat { padding-left: 8px; padding-right: 8px; }
+  .path-arrow { display: none; }
+  .path-step { padding: 10px; }
+  .vlog-set .vs-emoji { width: 76px; flex-basis: 76px; min-height: 84px; font-size: 36px; }
 }
 .top-bar .tb-title { font-size: 18px; font-weight: 800; flex: 1; }
 
