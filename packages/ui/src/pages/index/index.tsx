@@ -38,11 +38,17 @@ export default function Index() {
 
   return (
     <View className="page-pad">
-      {/* HUD */}
-      <View className="hud">
-        <View className="hud-chip"><b>{SCENES.length}</b>场景</View>
-        <View className="hud-chip" onClick={() => setView({ kind: "book" })}><b>📖</b>词汇册</View>
-        <View className="hud-chip"><b>{VLOGS.length}</b>集 vlog</View>
+      {/* 顶部品牌 + 学习进度（对齐原站） */}
+      <View className="brand-bar">
+        <View className="brand-mark">🌍 <Text className="brand-zh">英语世界</Text><Text className="brand-en">English World</Text></View>
+        <View className="brand-stats">
+          <View className="brand-stat"><Text className="stat-value">{Object.keys(readSaveOnce().collected || {}).length}</Text><Text>词</Text></View>
+          <View className="brand-stat"><Text className="stat-value">{Object.keys(readSaveOnce().phrases || {}).length}</Text><Text>表达</Text></View>
+        </View>
+      </View>
+      <View className="quick-actions">
+        <View className="quick-action" onClick={() => setView({ kind: "book" })}>📚 词汇册</View>
+        <View className="quick-action">🗺️ 地图</View>
       </View>
 
       {/* 双 Tab */}
