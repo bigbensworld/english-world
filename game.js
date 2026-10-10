@@ -114,7 +114,7 @@ function iconHtml(it, cls) {
 const SCENE_GROUPS = [
   { id: "daily", title: "🏠 日常高频", sub: "Daily Life · 天天都用得上的英语", scenes: ["cafe", "restaurant", "market", "transport", "barber", "gym", "shopping"] },
   { id: "travel", title: "✈️ 旅行出行", sub: "Travel · 机场酒店一手搞定", scenes: ["airport", "hotel"] },
-  { id: "emergency", title: "🚑 应急保障", sub: "Essentials · 医院银行关键时刻", scenes: ["hospital", "bank"] },
+  { id: "emergency", title: "🚑 应急保障", sub: "Essentials · 医院银行邮局关键时刻", scenes: ["hospital", "bank", "postoffice"] },
 ];
 
 function renderMap() {
