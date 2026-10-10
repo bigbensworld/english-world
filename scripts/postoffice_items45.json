@@ -1,0 +1,18 @@
+[
+  { id: "po-misdeliver", en: "misdelivered", zh: "投递错误的", phon: "/ˌmɪsdɪˈlɪvəd/", emoji: "🔀", sent: "My package was misdelivered to the wrong house." },
+  { id: "po-broken",    en: "broken",       zh: "破损的", phon: "/ˈbrəʊkən/", emoji: "💥", sent: "The contents arrived broken." },
+  { id: "po-damaged",   en: "damaged",      zh: "损坏的", phon: "/ˈdæmɪdʒd/", emoji: "🩹", sent: "The box was damaged in transit." },
+  { id: "po-claim",     en: "claim",        zh: "理赔申请", phon: "/kleɪm/", emoji: "📋", sent: "I'd like to file a claim for the damage." },
+  { id: "po-claimform", en: "claim form",  zh: "理赔表", phon: "/kleɪm fɔːm/", emoji: "📄", sent: "Fill out the claim form and attach photos." },
+  { id: "po-photo",     en: "photo",        zh: "照片", phon: "/ˈfəʊtəʊ/", emoji: "📷", sent: "Take photos of the damaged item." },
+  { id: "po-redirect",  en: "redirect",     zh: "改投/转寄", phon: "/ˌriːdəˈrekt/", emoji: "↪️", sent: "Can this letter be redirected?" },
+  { id: "po-intercept", en: "intercept",    zh: "拦截", phon: "/ˌɪntəˈsept/", emoji: "✋", sent: "We can intercept the package before delivery." },
+  { id: "po-transit",   en: "in transit",   zh: "运输途中", phon: "/ɪn ˈtrænzɪt/", emoji: "🚛", sent: "The package is still in transit." },
+  { id: "po-busy",      en: "busiest",      zh: "最忙的", phon: "/ˈbɪziəst/", emoji: "🕒", sent: "Lunch hour is the busiest time." },
+  { id: "po-cutin",     en: "cut in line",  zh: "插队（美式）", phon: "/kʌt ɪn laɪn/", emoji: "🚫", sent: "Never cut in line — people will call you out." },
+  { id: "po-cutoff",    en: "cutoff date",  zh: "截止日期", phon: "/ˈkʌtɒf deɪt/", emoji: "⏳", sent: "Ship before the cutoff date for Christmas." },
+  { id: "po-tape",      en: "tape",         zh: "胶带", phon: "/teɪp/", emoji: "🩶", sent: "The packing tape is on the counter." },
+  { id: "po-hold",      en: "hold the mail", zh: "暂停投递", phon: "/həʊld ðə meɪl/", emoji: "📮", sent: "Hold my mail while I'm on vacation." },
+  { id: "po-shake",     en: "shake test",   zh: "摇晃测试", phon: "/ʃeɪk test/", emoji: "🫨", sent: "Give the box a shake test before shipping." },
+  { id: "po-thanks",    en: "Thanksgiving", zh: "感恩节", phon: "/ˌθæŋksˈɡɪvɪŋ/", emoji: "🦃", sent: "Ship early before Thanksgiving rush." },
+]
