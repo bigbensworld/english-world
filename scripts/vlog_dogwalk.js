@@ -1,0 +1,58 @@
+  {
+    id: "dogwalk",
+    title: "Walking the Dog",
+    titleZh: "遛狗",
+    emoji: "🐕",
+    desc: "系牵引绳、捡便便、交狗友——遛狗遛出地道英语。",
+    linkedScene: "transport",
+    cards: [
+      {
+        emoji: "🦮", anim: "step",
+        en: "My dog knows the word 'walk'. The moment I pick up the leash, she starts to spin in circles!",
+        zh: "我家狗听得懂 walk 这个词。我一拿起牵引绳，她就开始原地转圈！",
+        words: ["leash", "spin in circles"],
+      },
+      {
+        emoji: "🚪", anim: "step",
+        en: "Leash on, and out we go. She pulls me down the stairs — slow down, girl!",
+        zh: "系好绳，出发。她拽着我下楼——慢点儿，姑娘！",
+        words: ["slow down"],
+      },
+      {
+        emoji: "🌳", anim: "wear",
+        en: "First stop: her favorite tree. She sniffs it very carefully, like she's reading the news.",
+        zh: "第一站：她最爱的那棵树。她非常认真地闻，像在读新闻。",
+        words: ["sniff", "carefully"],
+      },
+      {
+        emoji: "🎒", anim: "place",
+        en: "When she does her business, I pick it up with a poop bag. Always clean up!",
+        zh: "她方便完，我用捡便袋收拾干净。一定要清理！",
+        words: ["poop bag", "clean up"],
+      },
+      {
+        emoji: "🐕", anim: "step",
+        en: "Uh-oh, a squirrel! She barks and pulls hard. I hold the leash tight and say 'Leave it!'",
+        zh: "哎呀，一只松鼠！她狂叫猛拽。我抓紧绳子喊『不许追！』",
+        words: ["squirrel", "bark", "leave it"],
+      },
+      {
+        emoji: "🦮", anim: "wear",
+        en: "At the park, I let her off the leash in the dog run. She zooms around with other dogs.",
+        zh: "到了公园，我在狗狗活动区解开她的绳。她和其他狗一起疯跑。",
+        words: ["dog run", "zoom"],
+      },
+      {
+        emoji: "💧", anim: "pour",
+        en: "After all that running, she drinks a lot of water. Then we head home, tired and happy.",
+        zh: "跑完之后，她喝了好多水。然后我们回家，又累又开心。",
+        words: ["head home", "tired"],
+      },
+      {
+        type: "fun-fact", emoji: "💡",
+        en: "Fun fact! Dogs' 'walkies' is British slang for a walk — and it makes every dog in the room go crazy!",
+        zh: "冷知识！walkies 是英式俚语『去遛弯』——屋里每只狗听到都会激动到失控！",
+        words: ["walkies", "slang"],
+      },
+    ],
+  },
