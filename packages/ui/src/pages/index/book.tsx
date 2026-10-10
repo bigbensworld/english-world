@@ -43,7 +43,7 @@ export default function BookPage({ onBack }: { onBack: () => void }) {
         </View>
       )}
 
-      <ScrollView scrollY style={{ maxHeight: "70vh" }}>
+      <ScrollView scrollY style={{ maxHeight: "calc(100vh - 210px)" }}>
         {phraseList.length > 0 && (
           <View className="book-section">
             <View className="book-section-title">💬 常用表达（{phraseList.length}）</View>

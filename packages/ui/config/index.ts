@@ -15,7 +15,9 @@ export default defineConfig(async (merge) => {
   const base: UserConfigExport = {
     projectName: "english-world-ui",
     date: "2026-10-10",
-    designWidth: 750,
+    designWidth: 375,
+    // 样式按 375 视觉稿编写（原站 web 版实际像素迁移）：1px -> 0.5rem，真机 375 宽根字号 20px 时 16px 仍渲染 16px
+    // 若用 750 会导致真机所有尺寸缩小一半（根字号 20px 时 16px 只渲染 8px）
     deviceRatio: { 640: 2.34 / 2, 750: 1, 828: 1.81 / 2, 375: 2 },
     sourceRoot: "src",
     outputRoot: "dist",

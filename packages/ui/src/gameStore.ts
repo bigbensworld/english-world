@@ -7,7 +7,7 @@ import {
   pickNpcLine, applyAnswer, applyFinish, resumeOrder, sceneCardStatus,
 } from "@english-world/core";
 import type {
-  Scene, SceneVisit, VisitStep, GameState, SaveData, OrderAdd,
+  Scene, SceneVisit, VisitStep, GameState, SaveData, OrderAdd, StorageAdapter,
 } from "@english-world/core";
 
 export function emptySave(): SaveData {
@@ -35,8 +35,32 @@ export function stopSpeak() {
   try { (globalThis as any).speechSynthesis?.cancel(); } catch { /* noop */ }
 }
 
-// ---------- 存档 ----------
-const saver = new SaveService(new WebStorageAdapter());
+// ---------- 存档（H5：localStorage；weapp：Taro.setStorageSync 统一适配） ----------
+import { Taro } from "@tarojs/taro";
+
+class TaroStorageAdapter implements StorageAdapter {
+  read(): SaveData | null {
+    try {
+      const raw = Taro.getStorageSync(SAVE_KEY);
+      return raw ? (JSON.parse(raw) as SaveData) : null;
+    } catch {
+      return null;
+    }
+  }
+  write(data: SaveData): void {
+    try {
+      Taro.setStorageSync(SAVE_KEY, JSON.stringify(data));
+    } catch { /* 存储满：静默 */ }
+  }
+}
+
+const isWeapp = typeof process !== "undefined" && process.env?.TARO_ENV === "weapp";
+const saver = new SaveService(isWeapp ? new TaroStorageAdapter() : new WebStorageAdapter());
+
+// 跨端读档（首页场景卡状态等一次性读取，避免直接依赖平台 API）
+export function readSaveOnce(): SaveData {
+  return saver.load();
+}
 
 export interface GameCtx {
   save: SaveData;

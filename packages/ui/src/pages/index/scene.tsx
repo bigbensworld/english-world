@@ -154,7 +154,7 @@ export default function ScenePage({ scene, onBack, onOpenBook }: { scene: Scene;
         </View>
       ) : (
         /* 聊天流 + 选项 */
-        <ScrollView scrollY style={{ maxHeight: "58vh" }} className="chat-list">
+        <ScrollView scrollY style={{ maxHeight: "calc(100vh - 300px)" }} className="chat-list">
           {chat.map((m, i) =>
             (m as any).role === "phrase" ? (
               <View key={i} className="phrase-card">

@@ -62,7 +62,7 @@ export default function Index() {
             <View className="path-step"><b>② 再开口</b>场景对话</View>
             <View className="path-step"><b>③ 反复练</b>词汇册</View>
           </View>
-          <ScrollView className="vlog-list" scrollY style={{ maxHeight: "62vh" }}>
+          <ScrollView className="vlog-list" scrollY style={{ maxHeight: "calc(100vh - 330px)" }}>
             {VLOGS.map((v) => (
               <View key={v.id} className="vlog-set" onClick={() => setView({ kind: "vlog", vlog: v })}>
                 <View className="vs-emoji">{v.emoji}</View>
@@ -100,13 +100,11 @@ export default function Index() {
   );
 }
 
-// sceneCardStatus 需要 GameState：这里从 localStorage 每次读取（轻量，场景数少）
-import { useGame } from "../../gameStore";
+// sceneCardStatus 需要 GameState：走跨端统一读档（不直接依赖 localStorage）
+import { useGame, readSaveOnce } from "../../gameStore";
 function stateOf(_sc: Scene) {
-  // 延迟取存档（简化：读一次）
   try {
-    const raw = (globalThis as any).localStorage?.getItem("englishWorldV2");
-    return raw ? JSON.parse(raw) : { collected: {}, phrases: {}, npcLastLines: {}, progress: {}, unlockedVisits: {} };
+    return readSaveOnce();
   } catch {
     return { collected: {}, phrases: {}, npcLastLines: {}, progress: {}, unlockedVisits: {} };
   }
