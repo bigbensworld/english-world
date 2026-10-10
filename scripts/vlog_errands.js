@@ -1,0 +1,58 @@
+  {
+    id: "errands",
+    title: "Weekend Errands",
+    titleZh: "周末办事",
+    emoji: "🧾",
+    desc: "取干洗衣、下馆子、买药办事——周末跑腿一整套英语。",
+    linkedScene: "market",
+    cards: [
+      {
+        emoji: "📝", anim: "place",
+        en: "Saturday morning! I make a list of errands: dry cleaner, bank, pharmacy, and lunch out.",
+        zh: "周六早上！我列一张办事清单：干洗店、银行、药店，再下馆子吃午饭。",
+        words: ["errands", "dry cleaner", "pharmacy"],
+      },
+      {
+        emoji: "👕", anim: "fold",
+        en: "First stop, the dry cleaner's. I pick up my clean shirts and pay with exact change.",
+        zh: "第一站，干洗店。我取回洗好的衬衫，用零钱正好付清。",
+        words: ["pick up", "exact change"],
+      },
+      {
+        emoji: "🏦", anim: "step",
+        en: "Next, the bank. I deposit a check at the counter. It only takes two minutes.",
+        zh: "下一站，银行。我在柜台存一张支票。只花了两分钟。",
+        words: ["deposit", "check", "counter"],
+      },
+      {
+        emoji: "💊", anim: "place",
+        en: "At the pharmacy, I refill my prescription. The pharmacist tells me to take it with food.",
+        zh: "在药店，我续配处方药。药剂师叮嘱我要随餐服用。",
+        words: ["refill", "prescription", "pharmacist"],
+      },
+      {
+        emoji: "☕", anim: "sip",
+        en: "Halfway done! I grab a coffee to go and take a short break on a park bench.",
+        zh: "任务过半！我买杯外带咖啡，在公园长椅上小歇一会儿。",
+        words: ["halfway", "to go", "bench"],
+      },
+      {
+        emoji: "🍜", anim: "smell",
+        en: "For lunch, I try that new noodle place. I order at the counter and eat in — no dishes today!",
+        zh: "午饭去试试那家新开的面馆。我在柜台点单堂食——今天不用洗碗！",
+        words: ["noodle", "eat in"],
+      },
+      {
+        emoji: "✅", anim: "place",
+        en: "Last errand: mailing a birthday card at the post office. Everything on the list — done!",
+        zh: "最后一件事：去邮局寄一张生日卡。清单上的事——全部搞定！",
+        words: ["mail", "birthday card"],
+      },
+      {
+        type: "fun-fact", emoji: "💡",
+        en: "Fun fact! 'Errand' means a short trip for a small task. Doing many errands in one trip is called an 'errand run'!",
+        zh: "冷知识！errand 指为一桩小事出的门。一趟出门办完一堆事就叫 an errand run！",
+        words: ["errand run"],
+      },
+    ],
+  },
