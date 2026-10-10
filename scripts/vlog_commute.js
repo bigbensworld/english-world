@@ -1,0 +1,58 @@
+  {
+    id: "commute",
+    title: "The Morning Commute",
+    titleZh: "早晨通勤",
+    emoji: "🚇",
+    desc: "赶地铁、刷卡进站、让座下车——通勤路上的高频英语。",
+    linkedScene: "transport",
+    cards: [
+      {
+        emoji: "🚪", anim: "step",
+        en: "I leave home at eight. The morning commute begins! Let's catch the subway.",
+        zh: "我八点出门。早晨通勤开始了！去赶地铁吧。",
+        words: ["commute", "catch"],
+      },
+      {
+        emoji: "🏃", anim: "step",
+        en: "I walk fast to the station. Don't run — just power-walk with the crowd.",
+        zh: "我快步走向车站。不用跑——跟着人流疾走就行。",
+        words: ["station", "crowd"],
+      },
+      {
+        emoji: "🎫", anim: "place",
+        en: "At the gate, I tap my card. Beep! The door opens, and I'm through.",
+        zh: "在闸机口，我刷一下卡。哔！门开了，我过去了。",
+        words: ["gate", "tap", "beep"],
+      },
+      {
+        emoji: "🚇", anim: "step",
+        en: "The train pulls in. Stand behind the yellow line, and let people off first.",
+        zh: "列车进站了。站在黄线后面，先下后上。",
+        words: ["pull in", "yellow line", "get off"],
+      },
+      {
+        emoji: "💺", anim: "wear",
+        en: "Lucky me — there's one empty seat! I sit down and put my bag on my lap.",
+        zh: "真幸运——还有一个空座！我坐下，把包放在腿上。",
+        words: ["empty", "lap"],
+      },
+      {
+        emoji: "👵", anim: "place",
+        en: "An old lady gets on. I stand up and offer her my seat. She smiles and says thanks.",
+        zh: "一位老奶奶上车了。我站起来把座位让给她。她笑着道谢。",
+        words: ["get on", "offer"],
+      },
+      {
+        emoji: "🔔", anim: "ring",
+        en: "My stop is next. 'Excuse me, this is my stop.' I squeeze through and step off.",
+        zh: "下一站是我下车。『借过一下，我到站了。』我挤过去下了车。",
+        words: ["stop", "squeeze through", "step off"],
+      },
+      {
+        type: "fun-fact", emoji: "💡",
+        en: "Fun fact! 'Commute' comes from an old ticket: a 'commutation ticket' — a monthly pass for regular travelers!",
+        zh: "冷知识！commute 来源于一种旧车票——commutation ticket，就是给天天坐车的人的月票！",
+        words: ["monthly pass"],
+      },
+    ],
+  },
