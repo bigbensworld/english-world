@@ -1,8 +1,15 @@
 import { defineConfig, type UserConfigExport } from "@tarojs/cli";
 import path from "path";
-import fs from "fs";
 
 const CORE_DIR = path.resolve(__dirname, "..", "..", "core");
+
+// core 包在项目 src 之外，扩展 script 规则 include 让 babel 处理它
+// （Taro H5/mini 的 webpack script rule 默认只编译项目 src；include 是 ChainedSet，用 .add()）
+function includeCore(chain: any) {
+  const rules = (chain.module as any).rules;
+  const sr: any = rules.get("script");
+  if (sr) sr.include.add(CORE_DIR);
+}
 
 export default defineConfig(async (merge) => {
   const base: UserConfigExport = {
@@ -27,27 +34,16 @@ export default defineConfig(async (merge) => {
         cssModules: { enable: false },
       },
       webpackChain(chain) {
-        try {
-          const dump: any = { ruleNames: [], scriptRule: null, afterFix: null };
-          const rules = (chain.module as any).rules;
-          for (const key of rules.store.keys()) dump.ruleNames.push(key);
-          const sr: any = rules.get("script");
-          if (sr) {
-            dump.scriptRule = sr.toConfig();
-            // include 是 ChainedSet：用 .add() 追加 core 目录
-            sr.include.add(CORE_DIR);
-            dump.afterFix = sr.toConfig();
-          }
-          fs.writeFileSync("/tmp/taro-rules-debug.json", JSON.stringify(dump, (k, v) => (typeof v === "function" ? "FN" : v), 2));
-        } catch (e: any) {
-          fs.writeFileSync("/tmp/taro-rules-debug.json", "ERROR: " + (e && e.stack));
-        }
+        includeCore(chain);
       },
     },
     mini: {
       postcss: {
         pxtransform: { enable: true },
         cssModules: { enable: false },
+      },
+      webpackChain(chain) {
+        includeCore(chain);
       },
     },
   };

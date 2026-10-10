@@ -15,8 +15,24 @@ export default function ScenePage({ scene, onBack, onOpenBook }: { scene: Scene;
   const [chat, setChat] = useState<{ role: "npc" | "me"; text: string; zh?: string }[]>([]);
   const [finished, setFinished] = useState(false);
   const [started, setStarted] = useState(false);
+  const [toast, setToast] = useState("");
+  const tapCount = useRef(0);
+  const tapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const advRef = useRef<any>(null);
   const chatRef = useRef<HTMLDivElement>(null);
+
+  // 隐藏测试模式：连点标题 5 次 → 解锁全部轮次（验收用，对齐原站）
+  const onTitleTap = () => {
+    tapCount.current += 1;
+    if (tapTimer.current) clearTimeout(tapTimer.current);
+    tapTimer.current = setTimeout(() => { tapCount.current = 0; }, 1500);
+    if (tapCount.current >= 5) {
+      tapCount.current = 0;
+      game.update((d) => { d.unlockedVisits[scene.id] = visits.length - 1; });
+      setToast("🧪 测试模式：已解锁全部轮次");
+      setTimeout(() => setToast(""), 2000);
+    }
+  };
 
   const adv = useAdventure(scene, visit, game.save, game.update);
   advRef.current = adv;
@@ -74,9 +90,11 @@ export default function ScenePage({ scene, onBack, onOpenBook }: { scene: Scene;
     <View className="page-pad">
       <View className="top-bar">
         <View className="btn" onClick={onBack}>← 返回</View>
-        <View className="tb-title">{scene.emoji} {scene.name} · {scene.nameEn}</View>
+        <View className="tb-title" onClick={onTitleTap}>{scene.emoji} {scene.name} · {scene.nameEn}</View>
         <View className="btn" onClick={onOpenBook}>📖</View>
       </View>
+
+      {toast && <View className="finish-panel" style={{ margin: "0 16px 8px", padding: "10px 14px", background: "#0d1117" }}><View className="fp-sub">{toast}</View></View>}
 
       {/* 轮次 tab */}
       <ScrollView className="visit-tabs" scrollX>
