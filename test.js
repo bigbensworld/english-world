@@ -109,6 +109,8 @@ enterScene("cafe");
 startAdventure();
 ok(state.adventure.step === 3, "再次进入从已保存的第 3 步开始");
 ok(state.adventure.order.length === SCENES[0].steps.slice(0, 3).reduce((n, st) => n + (st.adds || []).length, 0), "续玩时恢复已完成订单素材");
+const resumeNpc = state.advHistory[0];
+ok(resumeNpc && resumeNpc.role === "npc-typing", "续玩仍从当前步骤生成新对话");
 
 console.log("== 4. 答错重试机制 ==");
 state.progress.cafe = 0;
@@ -118,6 +120,11 @@ const wrong = step0.options.find(o => !o.ok);
 chooseOption(wrong, makeElBtn(), makeOptsBox(), step0);
 ok(state.advHistory.some(m => m.role === "me" && m.wrong), "错误回复被标记");
 ok(state.adventure.step === 0, "答错不推进进度");
+// 模拟 retry 定时器结束，再进入下一步；新选项区不应带上一关 reveal 样式。
+const retryBox = makeOptsBox();
+chooseOption(step0.options.find(o => o.ok), makeElBtn(), retryBox, step0);
+nextStep();
+ok(![...($('advOpts').children || [])].some((b) => b.className && b.className.includes("reveal")), "下一步不残留上一关绿色答案提示");
 
 console.log("== 5. 超市场景 ==");
 enterScene("market");
@@ -140,7 +147,14 @@ const bookCount = Object.keys(state.collected).length;
 ok(bookCount >= 2, "词汇册至少含 2 词（实际 " + bookCount + "）");
 ok($("bookGrid").innerHTML.includes("常用表达") || Object.keys(state.phrases).length > 0, "词汇册含常用表达区");
 
-console.log("== 8. 持久化 ==");
+console.log("== 8. 再玩一次 ==");
+state.currentScene = SCENES[0];
+state.progress.cafe = SCENES[0].steps.length;
+startAdventure({ restart: true });
+ok(state.adventure.step === 0, "再玩一次从第 0 步重新开始");
+ok(state.adventure.order.length === 0, "再玩一次订单托盘重新开始");
+
+console.log("== 9. 持久化 ==");
 state.progress.cafe = 10;
 save();
 const saved = JSON.parse(localStorage.getItem("englishWorldV2"));

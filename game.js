@@ -205,11 +205,14 @@ function updateExploreCount(sc) {
 }
 
 // ---------- 剧情对话引擎 ----------
-function startAdventure() {
+function startAdventure(options = {}) {
   const sc = state.currentScene;
   if (!sc) return;
   setMascotState("thinking");
-  const savedStep = Math.max(0, Math.min(state.progress[sc.id] || 0, sc.steps.length));
+  const forceRestart = options.restart === true;
+  const savedStep = forceRestart
+    ? 0
+    : Math.max(0, Math.min(state.progress[sc.id] || 0, sc.steps.length));
   const isResume = savedStep > 0 && savedStep < sc.steps.length;
   state.adventure = { scene: sc, step: savedStep, lock: false, order: [] };
   if (isResume) {
@@ -275,6 +278,13 @@ function nextStep() {
   const step = sc.steps[adv.step];
   adv.lock = false;
 
+  // 每一步都重新创建选项区，清除上一关遗留的 reveal / retry 状态。
+  const actions = $("advActions");
+  actions.innerHTML = `
+    <div class="task-hint">🎯 ${step.task}</div>
+    <div class="adv-opts" id="advOpts"></div>
+  `;
+
   // 更新进度点
   renderAdvProgress(sc);
   setMascotState("thinking");
@@ -293,13 +303,9 @@ function nextStep() {
   }, 700);
 
   // 任务提示 + 选项
-  const actions = $("advActions");
-  actions.innerHTML = `
-    <div class="task-hint">🎯 ${step.task}</div>
-    <div class="adv-opts" id="advOpts"></div>
-  `;
   const optsBox = $("advOpts");
   // 选项顺序打乱，避免正确答案总在第一个
+  // 轻量随机化：每次进入/重玩都会重新打乱选项顺序。
   const shuffled = step.options.slice().sort(() => Math.random() - 0.5);
   shuffled.forEach((opt) => {
     const el = document.createElement("button");
@@ -420,7 +426,7 @@ function finishAdventure() {
       </div>
     </div>
   `;
-  $("advAgain").onclick = startAdventure;
+  $("advAgain").onclick = () => startAdventure({ restart: true });
   $("advDone").onclick = backToMap;
   toast("🎉 剧情完成！");
 }
