@@ -48,7 +48,7 @@ function ok(cond, name) {
 
 console.log("== 1. 初始状态 ==");
 ok(state.coins === undefined, "金币体系已移除");
-ok(SCENES.length === 11, "共 11 个场景");
+ok(SCENES.length === 12, "共 12 个场景");
 ok(SCENES.some(s => s.id === "restaurant"), "餐厅场景已加入");
 ok(SCENES.some(s => s.id === "hotel"), "酒店场景已加入");
 ok(SCENES.some(s => s.id === "airport"), "机场场景已加入");
@@ -243,7 +243,7 @@ ok(Object.keys(saved.phrases).length >= cafeVisits[0].steps.length, "语块已�
 ok(localStorage.getItem("englishWorld") === null, "旧金币存档不再写入");
 
 console.log("== 11. 慢速生活频道 ==");
-ok(typeof VLOGS !== "undefined" && VLOGS.length === 6, "慢速生活 6 集 vlog（早晨三部曲 + 采购/洗衣/清洁）");
+ok(typeof VLOGS !== "undefined" && VLOGS.length === 9, "慢速生活 9 集 vlog（早晨三部曲 + 采购/洗衣/清洁 + 通勤/遛狗/办事）");
 ok(VLOGS.every(v => v.cards.filter(c => !c.type).length >= 6), "每集至少 6 张动作卡");
 ok(VLOGS.every(v => v.cards.every(c => c.en && c.zh && c.words)), "每张卡都有英文/中文/关键词");
 ok(VLOGS.every(v => v.cards.some(c => c.type === "fun-fact")), "每集都有冷知识彩蛋卡");
