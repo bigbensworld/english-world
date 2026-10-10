@@ -115,6 +115,7 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 ## 七、近期 commit 索引（倒序）
 
 ```
+d552948 内容扩展: 五场景各补 2 轮进阶光顾（34 轮/275 步/188 词条）+ 修复咖啡店 v8 奖励词匹配
 2e07315 内容扩展: 新增医院场景（挂号问诊/药房取药/复诊复查 3 轮光顾，20 词条）
 93be5ef 文档: 跨端架构 v1.1——网站也走纯静态（三端统一离线优先）
 9a548dd 跨端架构 Phase 0: 抽出共享内核 packages/core（TS 类型+数据+场景引擎+平台接口）
