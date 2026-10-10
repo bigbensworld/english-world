@@ -189,7 +189,7 @@ const base = "/Users/alice/WorkBuddy/3/english-world";
 const code = [
   fs.readFileSync(path.join(base, "data.js"), "utf8"),
   fs.readFileSync(path.join(base, "vlogs.js"), "utf8"),
-  fs.readFileSync(path.join(base, "game.js"), "utf8").replace(/vlogLoad\(\);|renderVlogChannelEntry\(\);/g, ""),
+  fs.readFileSync(path.join(base, "game.js"), "utf8").replace(/vlogLoad\(\);|initHomeTabs\(\);/g, ""),
   fs.readFileSync(path.join(base, "vlog.js"), "utf8"),
   TEST_BODY,
 ].join("\n;\n");

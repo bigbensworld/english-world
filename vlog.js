@@ -52,27 +52,57 @@ function highlightWordByChar(container, charIndex) {
   });
 }
 
-// ---------- 频道入口（地图页顶部） ----------
-function renderVlogChannelEntry() {
-  const grid = $("sceneGrid");
-  if (!grid || $("vlogEntry")) return;
-  const entry = document.createElement("button");
-  entry.type = "button";
-  entry.className = "scene-card vlog-entry";
-  entry.id = "vlogEntry";
-  const total = VLOGS.length;
-  const done = VLOGS.filter((v) => vlogState.quizPassed[v.id]).length;
-  entry.innerHTML = `
-    <div class="scene-cover vlog-cover">📺</div>
-    <div class="scene-info">
-      <div class="scene-name">慢速生活频道 · Slow Vlog</div>
-      <div class="scene-words">${done > 0 ? "🎬 已毕业 " + done + "/" + total + " 集" : "🎬 " + total + " 集慢速生活 · 听懂日常动作"}</div>
-    </div>
-  `;
-  entry.onclick = openVlogChannel;
-  grid.prepend(entry);
+// ---------- 频道入口（首页 Tab + 场景页内频道列表） ----------
+// 渲染 vlog 集列表到指定容器（首页 tab 或场景页内均可）
+function renderVlogSetsInto(container) {
+  container.innerHTML = "";
+  VLOGS.forEach((v, i) => {
+    const passed = vlogState.quizPassed[v.id];
+    const seenCount = Object.keys(vlogState.seenCards).filter((k) => k.startsWith(v.id + ":")).length;
+    const seenAll = seenCount >= v.cards.filter((c) => !c.type).length;
+    const el = document.createElement("button");
+    el.type = "button";
+    el.className = "vlog-set" + (passed ? " passed" : "");
+    el.style.animationDelay = (i * 0.06) + "s";
+    el.innerHTML = `
+      <div class="vlog-set-emoji">${v.emoji}</div>
+      <div class="vlog-set-info">
+        <div class="vlog-set-title">${v.title} · ${v.titleZh}</div>
+        <div class="vlog-set-desc">${v.desc}</div>
+        <div class="vlog-set-progress">${passed ? "🎓 已毕业 · 可重刷" : seenAll ? "✅ 已刷完 · 去闯 Quiz！" : seenCount > 0 ? "📖 刷到 " + seenCount + "/" + v.cards.length + " 张" : "▶ " + v.cards.length + " 张卡片"}</div>
+      </div>
+      ${passed ? '<div class="done-badge">✓</div>' : ""}
+    `;
+    el.onclick = () => openVlog(v.id);
+    container.appendChild(el);
+  });
 }
 
+// 首页 Tab 逻辑
+function initHomeTabs() {
+  const tabs = $("homeTabs");
+  if (!tabs) return;
+  // 恢复上次选择的 tab（默认场景）
+  let active = "scenes";
+  try { active = sessionStorage.getItem("ewHomeTab") || "scenes"; } catch (e) {}
+  if (active !== "vlog" && active !== "scenes") active = "scenes";
+  function switchTo(tab) {
+    active = tab;
+    try { sessionStorage.setItem("ewHomeTab", tab); } catch (e) {}
+    tabs.querySelectorAll(".home-tab").forEach((b) => {
+      b.classList.toggle("active", b.dataset.tab === tab);
+    });
+    $("paneVlog").classList.toggle("hidden", tab !== "vlog");
+    $("paneScenes").classList.toggle("hidden", tab !== "scenes");
+    if (tab === "vlog") renderVlogSetsInto($("homeVlogSets"));
+  }
+  tabs.querySelectorAll(".home-tab").forEach((b) => {
+    b.onclick = () => switchTo(b.dataset.tab);
+  });
+  switchTo(active);
+}
+
+// 场景页内的频道列表页（从 vlog 播放器返回时用）
 function openVlogChannel() {
   const stage = $("stage");
   $("sceneTitle").textContent = "📺 慢速生活频道 · Slow Vlog";
@@ -81,6 +111,7 @@ function openVlogChannel() {
   setMascotState("idle");
   state.currentScene = null;
   state.currentVisit = null;
+  vlogState.currentVlog = null;
 
   const box = document.createElement("div");
   box.className = "adventure-box vlog-list";
@@ -93,27 +124,7 @@ function openVlogChannel() {
     <button class="btn btn-big" id="vlogBack">⬅ 返回地图</button>
   `;
   stage.appendChild(box);
-
-  const sets = $("vlogSets");
-  VLOGS.forEach((v, i) => {
-    const passed = vlogState.quizPassed[v.id];
-    const seenCount = Object.keys(vlogState.seenCards).filter((k) => k.startsWith(v.id + ":")).length;
-    const seenAll = seenCount >= v.cards.filter((c) => !c.type).length;
-    const el = document.createElement("button");
-    el.type = "button";
-    el.className = "vlog-set" + (passed ? " passed" : "");
-    el.innerHTML = `
-      <div class="vlog-set-emoji">${v.emoji}</div>
-      <div class="vlog-set-info">
-        <div class="vlog-set-title">${v.title} · ${v.titleZh}</div>
-        <div class="vlog-set-desc">${v.desc}</div>
-        <div class="vlog-set-progress">${passed ? "🎓 已毕业 · 可重刷" : seenAll ? "✅ 已刷完 · 去闯 Quiz！" : seenCount > 0 ? "📖 刷到 " + seenCount + "/" + v.cards.length + " 张" : "▶ " + v.cards.length + " 张卡片"}</div>
-      </div>
-      ${passed ? '<div class="done-badge">✓</div>' : ""}
-    `;
-    el.onclick = () => openVlog(v.id);
-    sets.appendChild(el);
-  });
+  renderVlogSetsInto($("vlogSets"));
   $("vlogBack").onclick = backToMap;
 
   $("mapView").classList.add("hidden");
@@ -313,4 +324,4 @@ function startVlogQuiz(v) {
 
 // ---------- 初始化（vlog.js 在 game.js 之后加载，在此挂载入口） ----------
 vlogLoad();
-renderVlogChannelEntry();
+initHomeTabs();

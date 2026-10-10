@@ -20,9 +20,20 @@
 <main id="app">
   <!-- 场景选择地图 -->
   <section id="mapView" class="view">
-    <h1 class="map-title">去哪儿玩？</h1>
-    <p class="map-sub">Pick a place. Chat with real people. Learn step by step.</p>
-    <div class="scene-grid" id="sceneGrid"></div>
+    <div class="home-tabs" id="homeTabs">
+      <button type="button" class="home-tab" data-tab="vlog">📺 慢速生活</button>
+      <button type="button" class="home-tab" data-tab="scenes">🗺️ 场景冒险</button>
+    </div>
+    <div class="home-pane" id="paneVlog">
+      <h1 class="map-title">像刷视频一样，听懂日常英语</h1>
+      <p class="map-sub">Watch. Listen. Repeat. 像慢速 vlog 一样学动作和表达。</p>
+      <div class="vlog-sets home-vlog-sets" id="homeVlogSets"></div>
+    </div>
+    <div class="home-pane hidden" id="paneScenes">
+      <h1 class="map-title">去哪儿冒险？</h1>
+      <p class="map-sub">Pick a place. Chat with real people. Learn step by step.</p>
+      <div class="scene-grid" id="sceneGrid"></div>
+    </div>
   </section>
 
   <!-- 场景内 -->
