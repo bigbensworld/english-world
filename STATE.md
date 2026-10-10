@@ -104,7 +104,7 @@
 - **`packages/ui/` Taro UI 层（Phase 1，commit 917620b）**：Taro 4.0.9 + React 18，核心页面全移植（双 Tab/分组地图/对话/答错教学/订单托盘/vlog 逐词高亮查词/词汇册）；gameStore.ts hook 封装 core 引擎。构建：`scripts/taro-build.sh build --type h5`。**预览站 https://english-world-taro.pages.dev**（生产站仍是 vanilla 版，切换需拍板）。
 - **Phase 1 构建坑（重要）**：①Taro H5 的 webpack script rule 默认只编译项目 src——外部 core 包必须在 `h5.webpackChain` 里 `chain.module.rules.get('script').include.add(coreDir)`（webpack-chain 的 include 是 ChainedSet，用 `.add()` 不是赋值）；顶层 webpackChain 配置项在 h5 段内才稳定执行；②`src/index.html` 模板必填（含 `<%= htmlWebpackPlugin.options.script %>`），否则 dist 无 html；③Taro CLI 靠 process.cwd() 定位项目，WorkBuddy shell 不能 `cd`，用 `scripts/taro-build.sh` wrapper；④mini.postcss.pxtransform 不允许 selectorBlackList 属性；⑤需要额外装 @babel/preset-react + babel-preset-react-app。
 - **内容生产标准流程**：改 data.js/vlogs.js/vlog.js → `node scripts/extract_core_data.mjs` → 三组测试全过（core.test.ts + sync-guard.test.ts + test.js）。
-- 路线：Phase 1 ✅ H5 预览站 → **待办：H5 全功能对齐（vlog Quiz/隐藏测试模式/订单动画等细节）+ 小程序编译验证 → 切换生产站** → Phase 2 预生成音频 mp3+时间戳 → Phase 3 小程序 MVP + Capacitor App + 云同步。
+- 路线：Phase 1 ✅ + **Phase 1.5 ✅（f523b3f：vlog Quiz + emoji 舞台动画 + 隐藏测试模式 + weapp 编译验证通过 1.2MB）** → **待办：移动端适配精调 + 微信开发者工具真机验证 → 拍板切换生产站** → Phase 2 预生成音频 mp3+时间戳 → Phase 3 小程序 MVP + Capacitor App + 云同步。
 
 ## 四、开发与部署流程
 
