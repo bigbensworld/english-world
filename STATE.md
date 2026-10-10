@@ -103,8 +103,9 @@
 - `packages/core/` 共享内核（TS）：types + 数据（_raw.js 从源提取）+ 场景引擎（去 DOM 纯逻辑）+ Storage/TTS 适配器接口。方案详见 `docs/cross-platform-architecture.md`。
 - **`packages/ui/` Taro UI 层（Phase 1，commit 917620b）**：Taro 4.0.9 + React 18，核心页面全移植（双 Tab/分组地图/对话/答错教学/订单托盘/vlog 逐词高亮查词/词汇册）；gameStore.ts hook 封装 core 引擎。构建：`scripts/taro-build.sh build --type h5`。**预览站 https://english-world-taro.pages.dev**（生产站仍是 vanilla 版，切换需拍板）。
 - **Phase 1 构建坑（重要）**：①Taro H5 的 webpack script rule 默认只编译项目 src——外部 core 包必须在 `h5.webpackChain` 里 `chain.module.rules.get('script').include.add(coreDir)`（webpack-chain 的 include 是 ChainedSet，用 `.add()` 不是赋值）；顶层 webpackChain 配置项在 h5 段内才稳定执行；②`src/index.html` 模板必填（含 `<%= htmlWebpackPlugin.options.script %>`），否则 dist 无 html；③Taro CLI 靠 process.cwd() 定位项目，WorkBuddy shell 不能 `cd`，用 `scripts/taro-build.sh` wrapper；④mini.postcss.pxtransform 不允许 selectorBlackList 属性；⑤需要额外装 @babel/preset-react + babel-preset-react-app。
+- **移动端适配坑（2026-10-10 晚修复，0e13e4c）**：①**designWidth 必须 375**——app.css 的 px 按 375 视觉稿（原站 web 实际像素）编写；750 会让真机所有尺寸减半（根字号 20px 时 16px 只渲染 8px），桌面预览因根字号 clamp 40px 看不出问题；②**weapp 构建会覆盖同一个 dist/**——曾导致 H5 部署拿到小程序文件（线上 404），现 wrapper 自动把 weapp 产物移至 `dist-weapp/`，H5 留 `dist/`；③weapp 端 storage 用 `TaroStorageAdapter`（Taro.setStorageSync，gameStore.ts 按 `process.env.TARO_ENV` 分流），TTS 在 weapp 无 speechSynthesis 时优雅降级静音（音频属 Phase 2）；④headless Chrome 验证移动端 viewport 要用 CDP `Emulation.setDeviceMetricsOverride`（--window-size 有约 500px 最小窗口限制）；⑤GitHub API sync 逐文件追加曾把 app.css 写坏（动画块重复 15 次 + `--bounce` 变量丢失）——大文件 sync 后务必检查重复块。
 - **内容生产标准流程**：改 data.js/vlogs.js/vlog.js → `node scripts/extract_core_data.mjs` → 三组测试全过（core.test.ts + sync-guard.test.ts + test.js）。
-- 路线：Phase 1 ✅ + **Phase 1.5 ✅（f523b3f：vlog Quiz + emoji 舞台动画 + 隐藏测试模式 + weapp 编译验证通过 1.2MB）** → **待办：移动端适配精调 + 微信开发者工具真机验证 → 拍板切换生产站** → Phase 2 预生成音频 mp3+时间戳 → Phase 3 小程序 MVP + Capacitor App + 云同步。
+- 路线：Phase 1 ✅ + **Phase 1.5 ✅（f523b3f：vlog Quiz + emoji 舞台动画 + 隐藏测试模式 + weapp 编译验证通过 1.2MB）** → **移动端适配修复 ✅（0e13e4c：designWidth 375 + weapp storage + 构建隔离 + CDP 375 视口 9/9 验证）** → **待办：用户浏览器/真机验收 Taro 版 → 拍板切换生产站** → Phase 2 预生成音频 mp3+时间戳 → Phase 3 小程序 MVP + Capacitor App + 云同步。
 
 ## 四、开发与部署流程
 
@@ -146,6 +147,7 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 ## 七、近期 commit 索引（倒序）
 
 ```
+0e13e4c 移动端适配修复: designWidth 750→375 + app.css 去重 + weapp storage 适配 + 构建输出隔离 dist-weapp
 63e2ac9 内容扩展: 新增图书馆/宠物医院/学校场景 15 场景 79 轮 564 步 538 词条 + vlog 补 3 集（12 集）
 ce90770 文档: STATE.md 同步第四批内容（12 场景 64 轮 471 步 431 词条，vlog 9 集）（API 逐文件上传等价提交）
 874664c 内容扩展: 新增邮局场景 5 轮 + vlog 补 3 集（12 场景 64 轮 471 步 431 词条 + vlog 9 集）
