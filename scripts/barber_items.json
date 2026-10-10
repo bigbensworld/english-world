@@ -1,0 +1,18 @@
+[
+  { id: "corrective", en: "corrective styling", zh: "修型（补救造型）", phon: "/kəˈrektɪv ˈstaɪlɪŋ/", emoji: "🩹", sent: "We offer a free corrective styling session." },
+  { id: "refund2", en: "refund", zh: "退款", phon: "/ˈriːfʌnd/", emoji: "💸", sent: "I'd like a full refund for today's cut." },
+  { id: "onsb", en: "that's on us", zh: "这是我们的责任", phon: "/ðæts ɒn ʌs/", emoji: "🙏", sent: "The mistake is on us — let us fix it." },
+  { id: "makeitright", en: "make it right", zh: "补救，把事情做好", phon: "/meɪk ɪt raɪt/", emoji: "🔧", sent: "Let me make this right for you." },
+  { id: "evenout", en: "even out", zh: "修齐，修均匀", phon: "/ˈiːvn aʊt/", emoji: "📐", sent: "Can you even out the sides?" },
+  { id: "growback", en: "grow back", zh: "（头发）长回来", phon: "/ɡrəʊ bæk/", emoji: "🌱", sent: "It'll grow back in six weeks." },
+  { id: "blend", en: "blend", zh: "过渡衔接（发型）", phon: "/blend/", emoji: "🎨", sent: "Blend the top into the sides." },
+  { id: "senior", en: "senior stylist", zh: "高级发型师", phon: "/ˈsiːniə ˈstaɪlɪst/", emoji: "🏅", sent: "Ben is our senior stylist." },
+  { id: "etiquette", en: "etiquette", zh: "礼仪，规矩", phon: "/ˈetɪket/", emoji: "🎩", sent: "What's the tipping etiquette here?" },
+  { id: "works", en: "the works", zh: "全套服务", phon: "/ðə wɜːks/", emoji: "💯", sent: "Color, cut, treatment — the works!" },
+  { id: "shampooer", en: "shampooer", zh: "洗头小工", phon: "/ʃæmˈpuːə/", emoji: "🧖", sent: "Tip the shampooer three to five dollars in cash." },
+  { id: "commission", en: "commission", zh: "提成", phon: "/kəˈmɪʃn/", emoji: "💰", sent: "Stylists work on commission." },
+  { id: "noshow", en: "no-show", zh: "放鸽子（未到访）", phon: "/nəʊ ʃəʊ/", emoji: "🚫", sent: "A no-show means lost income for the stylist." },
+  { id: "unwritten", en: "unwritten rules", zh: "不成文的规矩", phon: "/ʌnˈrɪtn ruːlz/", emoji: "📜", sent: "Every industry has unwritten rules." },
+  { id: "coiffed", en: "well-coiffed", zh: "发型精致的", phon: "/wel kwɔːft/", emoji: "✨", sent: "Look at that well-coiffed gentleman!" },
+  { id: "ownthelook", en: "own the look", zh: "自信驾驭造型", phon: "/əʊn ðə lʊk/", emoji: "😎", sent: "Confidence — just own the look!" }
+]

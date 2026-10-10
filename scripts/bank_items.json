@@ -1,0 +1,19 @@
+[
+  { id: "check2", en: "check", zh: "支票", phon: "/tʃek/", emoji: "🧾", sent: "I received a check from my landlord." },
+  { id: "endorse", en: "endorse", zh: "背书（背面签名）", phon: "/ɪnˈdɔːs/", emoji: "✍️", sent: "Endorse the check before depositing it." },
+  { id: "clear", en: "clear (a check)", zh: "（支票）到账清算", phon: "/klɪə/", emoji: "⏳", sent: "The check will clear in two days." },
+  { id: "creditscore", en: "credit score", zh: "信用分", phon: "/ˈkredɪt skɔː/", emoji: "📊", sent: "A good credit score means lower interest." },
+  { id: "reportcard", en: "report card", zh: "成绩单", phon: "/rɪˈpɔːt kɑːd/", emoji: "📝", sent: "A credit score is like a financial report card." },
+  { id: "interest", en: "interest rate", zh: "利率", phon: "/ˈɪntrəst reɪt/", emoji: "📈", sent: "The interest rate on the loan is five percent." },
+  { id: "ontime", en: "on time", zh: "按时", phon: "/ɒn taɪm/", emoji: "⏰", sent: "Pay every bill on time." },
+  { id: "balance2", en: "keep balances low", zh: "保持低欠款", phon: "/kiːp ˈbælənsɪz ləʊ/", emoji: "📉", sent: "Keep your card balances low." },
+  { id: "swift", en: "SWIFT code", zh: "银行国际识别码", phon: "/swɪft kəʊd/", emoji: "🌐", sent: "I need the SWIFT code for the transfer." },
+  { id: "recipient", en: "recipient", zh: "收款人", phon: "/rɪˈsɪpiənt/", emoji: "👤", sent: "Write the recipient's full name here." },
+  { id: "wire", en: "wire transfer", zh: "电汇", phon: "/ˈwaɪə ˈtrænsfɜː/", emoji: "⚡", sent: "International wire transfers take one to three days." },
+  { id: "margin", en: "margin", zh: "差价，利润空间", phon: "/ˈmɑːdʒɪn/", emoji: "📊", sent: "Banks make money on the exchange rate margin." },
+  { id: "rmb", en: "convert", zh: "兑换，换算", phon: "/kənˈvɜːt/", emoji: "💱", sent: "Two thousand dollars converts to about fourteen thousand RMB." },
+  { id: "doublecheck", en: "double-check", zh: "反复核对", phon: "/ˈdʌbl tʃek/", emoji: "🔍", sent: "Double-check all the details before submitting." },
+  { id: "goastray", en: "go astray", zh: "丢失，出错", phon: "/ɡəʊ əˈstreɪ/", emoji: "🧭", sent: "One wrong number and the money could go astray." },
+  { id: "walkthrough", en: "walk me through", zh: "一步步讲解", phon: "/wɔːk miː θruː/", emoji: "🚶", sent: "Thanks for walking me through the process." },
+  { id: "confirm2", en: "confirmation", zh: "确认（页/函）", phon: "/ˌkɒnfəˈmeɪʃn/", emoji: "✅", sent: "The app shows a confirmation page before sending." }
+]

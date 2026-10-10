@@ -23,7 +23,7 @@ function scene(id: string): Scene {
 }
 
 console.log("== 1. 数据完整性（迁移自 test.js 断言） ==");
-ok(SCENES.length === 9, "共 9 个场景");
+ok(SCENES.length === 11, "共 11 个场景");
 ok(VLOGS.length === 6, "慢速生活 6 集 vlog");
 ok(VLOGS.every(v => v.cards.filter(c => !c.type).length >= 6), "每集至少 6 张动作卡");
 ok(VLOGS.every(v => v.cards.every(c => c.en && c.zh && c.words)), "每张卡都有英文/中文/关键词");

@@ -48,7 +48,7 @@ function ok(cond, name) {
 
 console.log("== 1. 初始状态 ==");
 ok(state.coins === undefined, "金币体系已移除");
-ok(SCENES.length === 9, "共 9 个场景（咖啡/餐厅/超市/酒店/机场/医院/交通/银行/理发店）");
+ok(SCENES.length === 11, "共 11 个场景");
 ok(SCENES.some(s => s.id === "restaurant"), "餐厅场景已加入");
 ok(SCENES.some(s => s.id === "hotel"), "酒店场景已加入");
 ok(SCENES.some(s => s.id === "airport"), "机场场景已加入");

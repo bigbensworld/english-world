@@ -591,6 +591,8 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 .stage.theme-vlog { --scene-accent: #7c5cbf; --scene-accent-soft: #efe9fb; background: #efe9fb; }
 .theme-bank { --scene-accent: #2f6b4f; --scene-accent-soft: #e2f0e8; background: #e2f0e8; }
 .theme-barber { --scene-accent: #8a4fbd; --scene-accent-soft: #f0e6fa; background: #f0e6fa; }
+.theme-gym { --scene-accent: #d2691e; --scene-accent-soft: #faeedd; background: #faeedd; }
+.theme-shopping { --scene-accent: #c2571a; --scene-accent-soft: #fbe8dc; background: #fbe8dc; }
 .vlog-entry .scene-cover { background: linear-gradient(135deg, #7c5cbf22, #7c5cbf44); }
 .vlog-list { display: flex; flex-direction: column; gap: 12px; }
 .vlog-sets { display: flex; flex-direction: column; gap: 10px; margin: 10px 0 16px; }
