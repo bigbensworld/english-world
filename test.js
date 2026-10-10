@@ -48,8 +48,17 @@ function ok(cond, name) {
 
 console.log("== 1. 初始状态 ==");
 ok(state.coins === undefined, "金币体系已移除");
-ok(SCENES.length === 3, "共 3 个场景");
+ok(SCENES.length === 4, "共 4 个场景");
 ok(SCENES.some(s => s.id === "restaurant"), "餐厅场景已加入");
+ok(SCENES.some(s => s.id === "hotel"), "酒店场景已加入");
+const hotelVisits = sceneVisits(SCENES.find(s => s.id === "hotel"));
+ok(hotelVisits.length === 3, "酒店有 3 轮光顾");
+ok(hotelVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "酒店每步恰好 1 个正确选项");
+ok(hotelVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "酒店每步店员台词有 2+ 个随机变体");
+ok(hotelVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "酒店每步都有语块 phrase");
+ok(hotelVisits.every(v => v.steps.every(st => (st.adds || []).every(a => !a.wordId || SCENES.find(s => s.id === "hotel").items.find(it => it.id === a.wordId)))), "酒店订单素材 wordId 全部能对上词条");
+ok(hotelVisits.every(v => v.reward && v.reward.en && SCENES.find(s => s.id === "hotel").items.find(it => it.en === v.reward.en)), "酒店每轮奖励词在 items 里");
+ok(["reservation", "luggage", "keycard", "elevator", "lobby", "receptionist", "checkout", "bill", "minibar", "deposit", "ac", "towel", "noisy", "upgrade", "apology"].every(id => SCENES.find(s => s.id === "hotel").items.some(it => it.id === id)), "酒店 15 个词条全部入库");
 const restVisits = sceneVisits(SCENES.find(s => s.id === "restaurant"));
 ok(restVisits.length === 4, "餐厅有 4 轮光顾");
 ok(SCENES.find(s => s.id === "restaurant").items.length >= 30, "餐厅词汇量 30+");
