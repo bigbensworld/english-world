@@ -1,0 +1,116 @@
+# english-world 项目状态（STATE）
+
+> 更新时间：2026-10-10 12:00 · 最新 commit `6a8d4cd`
+> 新会话冷启动指南：读完本文即可继续开发，无需翻历史对话。
+
+## 一、项目是什么
+
+**英语世界（English World）**——教育游戏网站，"剧本化英语场景学习"，对标 TikTok 慢 vlog + 场景对话。
+
+核心差异化（已确认的产品战略）：
+- **无 AI、剧本化、零门槛**——纯静态前端，无 API 依赖，离线可用
+- 输入训练（慢 vlog）+ 输出训练（场景对话）双模式
+- 服务"还不敢开口"的初学者（AI 陪练产品的用户漏斗上游）
+
+- 线上地址：**https://english-world.pages.dev**
+- 仓库：GitHub bigbensworld/english-world（main）
+- 本地路径：`/Users/alice/WorkBuddy/3/english-world`
+
+## 二、技术架构
+
+纯静态站（无构建、无框架、无后端）：
+
+| 文件 | 职责 |
+|---|---|
+| `index.html` | 页面骨架：首页 Tab + 场景页 + 词汇册/词卡弹窗 |
+| `data.js` | 场景对话数据（SCENES） |
+| `vlogs.js` | 慢 vlog 数据（VLOGS） |
+| `game.js` | 场景对话引擎 + 全局 state + 词汇册 |
+| `vlog.js` | vlog 引擎 + 内置词典 VLOG_DICT + speakSlow |
+| `style.css` | 全部样式 + CSS 动画库 |
+| `test.js` | 无头回归测试（50 个断言，node 直接跑） |
+| `assets/icons/` | Fluent Emoji 3D PNG 图标 |
+
+**关键机制**：
+- localStorage key `englishWorldV2`：collected / phrases / npcLastLines / progress / unlockedVisits / vlogSeen / vlogQuiz
+- 首页双 Tab：📺 慢速生活 / 🗺️ 场景冒险（默认场景，sessionStorage 记住选择）
+- 多轮光顾：场景由 visits 数组组成，通关一轮解锁下一轮（unlockedVisits）；单轮场景用 steps（向后兼容，访问层 sceneVisits() 统一）
+- 台词防重复：npcLastLines 记录每步上次台词，重玩排除上一句
+- 隐藏测试模式：场景页连点标题 5 次解锁全部轮次（验收用）
+- TTS：Web Speech API；speakSlow() 已修 Chrome cancel+speak 吞音 bug（延迟 150ms + resume）
+- 逐词高亮：SpeechSynthesisUtterance.onboundary (charIndex) → .v-word.active
+
+## 三、内容现状
+
+**场景冒险（3 个场景）**：
+| 场景 | 轮次 | 状态 |
+|---|---|---|
+| ☕ 咖啡店 | 8 轮（点单/下午茶/赶时间/定制/出错投诉/问推荐忌口/文化深潜/会员优惠） | ✅ 完整 |
+| 🍽️ 餐厅 | 4 轮（入座点餐/牛排酒水/账单打包/特殊饮食） | ✅ 完整 |
+| 🛒 超市 | 1 轮（单轮旧结构） | 待多轮化 |
+
+**慢速生活频道（3 集）**：Morning Routine / Cooking Breakfast / Making Coffee，每集 7 动作卡 + 1 冷知识卡；17 组 CSS 动作动画 keyframes；单词点击查词（VLOG_DICT ~150 词条带词形还原）
+
+**内容路线图（已定）**：
+1. ✅ 第一批：餐厅 4 轮
+2. ⬜ 第二批：酒店 3 轮（入住/退房/投诉房间）
+3. ⬜ 第三批：机场 3 轮（值机/安检/登机）
+4. ⬜ 第四批：医院/药房 3 轮（描述症状）
+5. ⬜ 第五批：交通+问路 3 轮
+- 超市多轮化（日常采购/找特定商品/退换货）也排队中
+
+## 四、开发与部署流程
+
+```bash
+# 测试（必须全过再部署）
+/Users/alice/.workbuddy/binaries/node/versions/22.22.2-3/bin/node /Users/alice/WorkBuddy/3/english-world/test.js
+
+# 部署（Pages 为直传模式，push GitHub 不会自动部署！）
+env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u all_proxy \
+  CLOUDFLARE_API_TOKEN=$(cat ~/.wrangler/config/api-token | tr -d ' \n') \
+  npx wrangler pages deploy /Users/alice/WorkBuddy/3/english-world --project-name english-world
+
+# Git push（github.com 443 有时超时；API 逐文件上传可作 fallback）
+env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u all_proxy \
+  git -C /Users/alice/WorkBuddy/3/english-world push origin main
+```
+
+线上验证：用 cdp-live-web-verify skill（headless Chrome 真实点击流 + console errors 断言 0）。
+
+## 五、已知坑（务必看）
+
+1. **Write 工具单次上限 ~4.5KB**——长文件分片写入（Write 骨架 + Edit 追加）
+2. **多 script 加载顺序**：game.js 顶层不能调用 vlog.js 的函数（vlog.js 在其后加载）→ ReferenceError 中断整个初始化链且不易察觉。vlog 初始化在 vlog.js 尾部自执行
+3. **git 命令前加 `env -u http_proxy ...`** 绕代理；`GIT_PAGER=cat` 防 pager 卡死
+4. **Chrome speechSynthesis**：cancel() 后立即 speak() 会被吞（已修，见 speakSlow）
+5. **macOS 无 timeout 命令**；无头测试别用 `| tail`（会缓冲）
+6. 验收时中文文案断言需带 `?lang=zh-CN`（headless Chrome 默认 en-US）
+
+## 六、遗留事项 / 下一步建议
+
+- [ ] 语音打分模式（Web Speech API SpeechRecognition，第二期游戏化）
+- [ ] 导演排序模式（卡片排序 + TTS 连播）
+- [ ] 超市多轮化
+- [ ] 酒店场景（第二批）
+- [ ] vlog 新主题集（Grocery Run / Doing Laundry / Cleaning）
+- [ ] `media` 字段已预留：单卡可升级 AI 图/视频（A 方案 emoji 舞台覆盖 ~85% 动作，硬伤用分镜拆卡）
+- [ ] 词汇册对 vlog 词条的展示（当前 vlog 词入 collected 但 bookGrid 渲染只认场景 items）
+- [ ] 小程序适配（微信生态，独立工程，验证后再做）
+
+## 七、近期 commit 索引（倒序）
+
+```
+6a8d4cd 修复: 慢速播放偶发不生效
+a068a7b 体验优化: 单词点击查词 + vlog 进入体验修复
+9b766aa 首页改版: Tab 分离慢速生活与场景冒险
+3ab6cf4 新功能: 慢速生活频道（Slow Vlog）
+a543483 内容扩展: 新增餐厅场景（4 轮光顾）
+54a1eae 功能: 隐藏测试模式
+0d9dce8 内容升级: 咖啡店补齐 v5-v8（8 轮全集）
+5151661 内容升级: 咖啡店多轮光顾模式
+81a10d6 增强: 台词防重复
+ca08874 修复: 跨关提示清理 + 再玩重新开始
+e114762 修复: 断点续玩
+```
+
+详细工作日志见：`.workbuddy/memory/2026-10-10.md`（同目录有 10-07/10-08）
