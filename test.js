@@ -97,6 +97,7 @@ ok(state.progress.cafe === 10, "进度记录 cafe=10");
 ok(state.advHistory.some(m => m.role === "me" && !m.wrong), "玩家正确回复已记录");
 ok(state.advHistory.filter(m => m.role === "phrase").length === 10, "聊天流含 10 张语块卡");
 ok(state.adventure.order.length >= 6, "订单托盘至少 6 项（实际 " + state.adventure.order.length + "）");
+ok(state.collected["cafe:latte"] === true && state.collected["cafe:croissant"] === true && state.collected["cafe:cookie"] === true, "订单中的饮品和餐点词汇自动收集");
 ok(Object.keys(state.phrases).filter(k => k.startsWith("cafe:")).length === 10, "咖啡店 10 条语块全部入册");
 ok(state.collected["cafe:barista"] === true, "奖励词汇 barista 已收集");
 

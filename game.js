@@ -332,6 +332,13 @@ function chooseOption(opt, el, optsBox, step) {
     // 订单素材入托盘
     if (step.adds && step.adds.length) {
       adv.order = adv.order.concat(step.adds);
+      // 订单中出现的实体也算学会：完成真实点单，不应只收集 barista 奖励词
+      step.adds.forEach((item) => {
+        if (!item.wordId) return;
+        const word = adv.scene.items.find((it) => it.id === item.wordId);
+        if (word) state.collected[adv.scene.id + ":" + word.id] = true;
+      });
+      save(); renderHUD(); updateExploreCount(adv.scene);
       renderOrder(adv.scene, adv.order);
     }
     setTimeout(nextStep, 1100);

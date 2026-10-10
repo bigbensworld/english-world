@@ -61,7 +61,7 @@ const SCENES = [
           { text: "Latte!!!",                     ok: false, tip: "加上 I'd like a ... please 更礼貌" },
         ],
         phrase: { en: "I'd like a ___, please.", zh: "我想要一个……", note: "点单万能句式：饮料食物都能套，比 I want 礼貌得多" },
-        adds: [{ emoji: "☕", label: "Latte" }],
+        adds: [{ emoji: "☕", label: "Latte", wordId: "latte" }],
       },
       {
         npcLines: [
@@ -109,7 +109,7 @@ const SCENES = [
           { text: "No hungry.",                               ok: false, tip: "想拒绝可以说 No, thanks. 但这次来一个吧" },
         ],
         phrase: { en: "I'll take one.", zh: "我要一个", note: "对方刚提过的东西，用 one 指代即可，简洁地道" },
-        adds: [{ emoji: "🥐", label: "Croissant" }],
+        adds: [{ emoji: "🥐", label: "Croissant", wordId: "croissant" }],
       },
       {
         npcLines: [
@@ -172,7 +172,7 @@ const SCENES = [
           { text: "I no want cookie.",         ok: false, tip: "免费的好意，Why not? Thank you! 更友好" },
         ],
         phrase: { en: "Thank you so much!", zh: "非常感谢！", note: "接受好意时的热情道谢，so much 加强感谢程度" },
-        adds: [{ emoji: "🍪", label: "Cookie 🆓" }],
+        adds: [{ emoji: "🍪", label: "Cookie 🆓", wordId: "cookie" }]
       },
       {
         npcLines: [
