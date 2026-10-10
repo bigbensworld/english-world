@@ -579,3 +579,115 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* ================= 慢速生活频道 Slow Vlog ================= */
+.stage.theme-vlog { --scene-accent: #7c5cbf; --scene-accent-soft: #efe9fb; background: #efe9fb; }
+.vlog-entry .scene-cover { background: linear-gradient(135deg, #7c5cbf22, #7c5cbf44); }
+.vlog-list { display: flex; flex-direction: column; gap: 12px; }
+.vlog-sets { display: flex; flex-direction: column; gap: 10px; margin: 10px 0 16px; }
+.vlog-set {
+  display: flex; align-items: center; gap: 14px; text-align: left;
+  border: 1.5px solid var(--border); border-radius: 16px; background: var(--card);
+  padding: 14px 16px; font: inherit; color: var(--ink); cursor: pointer;
+  transition: transform .15s var(--bounce), border-color .15s;
+  animation: bounceIn .4s var(--bounce) backwards; position: relative;
+}
+.vlog-set:hover { transform: translateY(-2px); border-color: var(--scene-accent, #7c5cbf); }
+.vlog-set.passed { border-color: var(--green); background: var(--green-soft); }
+.vlog-set-emoji { font-size: 40px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.15)); }
+.vlog-set-info { flex: 1; }
+.vlog-set-title { font-weight: 700; font-size: 15px; }
+.vlog-set-desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.vlog-set-progress { font-size: 12px; color: var(--purple, #7c5cbf); margin-top: 6px; font-weight: 600; }
+
+.vlog-cardstage { min-height: 320px; }
+.vlog-card {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 20px 16px; animation: bounceIn .35s var(--bounce);
+}
+.vlog-count { font-size: 12px; color: var(--muted); align-self: flex-end; }
+.vlog-anim {
+  width: 150px; height: 150px; margin: 10px 0 16px;
+  display: flex; align-items: center; justify-content: center; position: relative;
+  border-radius: 24px; background: linear-gradient(160deg, #ffffff, #f3edfb);
+  box-shadow: inset 0 2px 10px rgba(124,92,191,.12);
+}
+.vlog-emoji { font-size: 64px; filter: drop-shadow(0 8px 12px rgba(0,0,0,.18)); }
+.vlog-fire { position: absolute; bottom: 16px; right: 22px; font-size: 26px; animation: flicker .5s ease-in-out infinite alternate; }
+.vlog-steam { position: absolute; top: 18px; right: 30px; font-size: 24px; animation: riseUp 2.2s ease-in-out infinite; }
+.vlog-sun { position: absolute; top: 14px; right: 18px; font-size: 34px; animation: sunPulse 2.4s ease-in-out infinite; }
+.vlog-liquid { position: absolute; bottom: 26px; left: 50%; width: 30px; height: 8px; border-radius: 4px;
+  background: linear-gradient(#a9744f, #6f4a2f); animation: liquidRise 1.8s ease-in-out infinite alternate; }
+
+.vlog-en { font-size: 18px; line-height: 1.7; font-weight: 600; max-width: 460px; }
+.vlog-en .v-word { transition: all .12s; border-radius: 6px; padding: 1px 3px; }
+.vlog-en .v-word.active {
+  background: var(--scene-accent-soft, #efe9fb); color: var(--scene-accent, #7c5cbf);
+  transform: scale(1.18); display: inline-block; box-shadow: 0 2px 8px rgba(124,92,191,.25);
+}
+.vlog-zh { margin-top: 10px; font-size: 14px; color: var(--muted); }
+.vlog-zh summary { cursor: pointer; font-size: 13px; color: var(--scene-accent, #7c5cbf); font-weight: 600; user-select: none; }
+.vlog-words { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 12px; }
+.vlog-word-chip {
+  font-size: 12px; font-weight: 600; color: var(--scene-accent, #7c5cbf);
+  background: #ffffff; border: 1px solid #ddd0f5; border-radius: 999px; padding: 4px 12px;
+}
+.vlog-actions { display: flex; gap: 10px; margin-top: 16px; }
+.vlog-nav { display: flex; gap: 10px; justify-content: center; padding: 6px 0 10px; }
+
+.fact-card .vlog-anim { background: linear-gradient(160deg, #fffbe8, #fdf3cd); box-shadow: inset 0 2px 10px rgba(214,178,66,.18); }
+.fact-tag { position: absolute; bottom: 12px; font-size: 12px; font-weight: 700; color: #b8860b; letter-spacing: 1px; }
+
+/* Quiz */
+.quiz-card .quiz-head { font-size: 13px; font-weight: 800; color: var(--scene-accent, #7c5cbf); letter-spacing: 1px; }
+.quiz-question { font-size: 16px; font-weight: 600; margin: 8px 0 14px; }
+.quiz-opts { display: flex; gap: 14px; justify-content: center; margin-top: 18px; }
+.quiz-opt {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  border: 2px solid var(--border); border-radius: 18px; background: var(--card);
+  padding: 18px 22px; font: inherit; cursor: pointer;
+  transition: transform .15s var(--bounce), border-color .15s;
+}
+.quiz-opt:hover { transform: translateY(-3px); border-color: var(--scene-accent, #7c5cbf); }
+.quiz-emoji { font-size: 52px; }
+.quiz-label { font-size: 13px; color: var(--muted); font-weight: 600; }
+.quiz-opt.right { border-color: var(--green); background: var(--green-soft); animation: squish .45s var(--bounce); }
+.quiz-opt.wrong { border-color: var(--error-red); background: var(--error-red-soft); animation: wiggle .4s ease; }
+.quiz-opt.reveal { border-color: var(--green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 30%, transparent); }
+.quiz-result { margin-top: 16px; font-size: 14px; font-weight: 600; min-height: 22px; }
+
+/* ---- 动作动画库（慢 vlog 舞台） ---- */
+@keyframes ringShake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); } }
+@keyframes slideOpen { 0% { transform: translateX(-40px); opacity: .3; } 60% { transform: translateX(6px); opacity: 1; } 100% { transform: translateX(0); } }
+@keyframes brushMove { 0%,100% { transform: translateX(-16px) rotate(-8deg); } 50% { transform: translateX(16px) rotate(8deg); } }
+@keyframes toastJump { 0%,100% { transform: translateY(0); } 45% { transform: translateY(-34px) scale(1.06); } 55% { transform: translateY(-30px); } }
+@keyframes tiltPour { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-24deg) translateY(-4px); } }
+@keyframes dropDown { 0% { transform: translateY(-44px); opacity: 0; } 70% { transform: translateY(4px); opacity: 1; } 100% { transform: translateY(0); } }
+@keyframes spinRound { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+@keyframes crackOpen { 0% { transform: scale(1); } 40% { transform: scale(1.12) rotate(-4deg); } 100% { transform: scale(1); } }
+@keyframes flipJump { 0%,100% { transform: rotateY(0) translateY(0); } 45% { transform: rotateY(180deg) translateY(-30px); } 55% { transform: rotateY(360deg) translateY(-26px); } }
+@keyframes sizzleWiggle { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(2px,-2px) scale(1.04); } 66% { transform: translate(-2px,1px) scale(.98); } }
+@keyframes flicker { from { transform: scale(1); opacity: .9; } to { transform: scale(1.18); opacity: 1; } }
+@keyframes riseUp { 0% { transform: translateY(0); opacity: .8; } 100% { transform: translateY(-22px); opacity: 0; } }
+@keyframes sunPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.22); filter: drop-shadow(0 0 12px rgba(255,193,59,.7)); } }
+@keyframes liquidRise { from { height: 8px; opacity: .7; } to { height: 34px; opacity: 1; } }
+@keyframes grindSpin { from { transform: rotate(0) scale(1); } to { transform: rotate(240deg) scale(.82); } }
+@keyframes dripFall { 0% { transform: translateY(-18px) scale(.6); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(24px) scale(1); opacity: 0; } }
+@keyframes leanIn { 0%,100% { transform: translate(0); } 50% { transform: translate(8px, -6px) scale(1.05); } }
+@keyframes sipBob { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-6px) rotate(-6deg); } }
+
+.anim-ring .vlog-emoji { animation: ringShake .45s ease-in-out 4; }
+.anim-curtain .vlog-emoji { animation: slideOpen 1.6s ease-out; }
+.anim-brush .vlog-emoji { animation: brushMove 1s ease-in-out 3; }
+.anim-toast .vlog-emoji { animation: toastJump 1.8s ease-in-out 2; }
+.anim-pour .vlog-emoji { animation: tiltPour 1.6s ease-in-out 3; }
+.anim-wear .vlog-emoji, .anim-place .vlog-emoji, .anim-plate .vlog-emoji { animation: dropDown 1.2s var(--bounce); }
+.anim-stir .vlog-emoji, .anim-grind .vlog-emoji { animation: spinRound 1.8s linear 3; }
+.anim-crack .vlog-emoji { animation: crackOpen 1s ease-in-out 2; }
+.anim-flip .vlog-emoji { animation: flipJump 1.6s ease-in-out 2; }
+.anim-heat .vlog-emoji, .anim-fry .vlog-emoji { animation: sizzleWiggle .5s ease-in-out 5; }
+.anim-boil .vlog-emoji { animation: sizzleWiggle .7s ease-in-out 4; }
+.anim-drip .vlog-emoji { animation: dripFall 1.4s ease-in infinite; }
+.anim-smell .vlog-emoji { animation: leanIn 1.4s ease-in-out 3; }
+.anim-sip .vlog-emoji { animation: sipBob 1.2s ease-in-out 3; }
+.anim-step .vlog-emoji { animation: toastJump 1s ease-in-out 3; }

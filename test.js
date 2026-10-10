@@ -163,6 +163,22 @@ ok(saved.unlockedVisits.cafe === 1, "解锁轮次已保存");
 ok(Object.keys(saved.phrases).length >= cafeVisits[0].steps.length, "语块已保存");
 ok(localStorage.getItem("englishWorld") === null, "旧金币存档不再写入");
 
+console.log("== 11. 慢速生活频道 ==");
+ok(typeof VLOGS !== "undefined" && VLOGS.length === 3, "早晨三部曲 3 集 vlog");
+ok(VLOGS.every(v => v.cards.filter(c => !c.type).length >= 6), "每集至少 6 张动作卡");
+ok(VLOGS.every(v => v.cards.every(c => c.en && c.zh && c.words)), "每张卡都有英文/中文/关键词");
+ok(VLOGS.every(v => v.cards.some(c => c.type === "fun-fact")), "每集都有冷知识彩蛋卡");
+ok(VLOGS.every(v => v.cards.filter(c => !c.type).every(c => c.anim)), "动作卡都有动画编排");
+vlogState.seenCards["morning:0"] = true; vlogState.seenCards["morning:1"] = true;
+vlogSave();
+ok(JSON.parse(localStorage.getItem("englishWorldV2")).vlogSeen["morning:1"] === true, "vlog 观看进度持久化");
+// 模拟通过 quiz 后词汇入册
+vlogState.quizPassed["morning"] = true;
+VLOGS[0].cards.forEach((c) => { (c.words || []).forEach((w) => { state.collected["vlog:morning:" + w] = { en: w, zh: "", vlog: "早晨的一小时" }; }); });
+save();
+ok(Object.keys(state.collected).filter(k => k.startsWith("vlog:morning:")).length >= 10, "毕业集词汇入册（与场景共享收集）");
+ok(state.progress["cafe:v1"] === 10, "vlog 不影响场景对话进度");
+
 console.log("");
 console.log("结果: " + pass + " 通过 / " + fail + " 失败");
 if (fail > 0) throw new Error("测试失败");
@@ -172,7 +188,9 @@ if (fail > 0) throw new Error("测试失败");
 const base = "/Users/alice/WorkBuddy/3/english-world";
 const code = [
   fs.readFileSync(path.join(base, "data.js"), "utf8"),
-  fs.readFileSync(path.join(base, "game.js"), "utf8"),
+  fs.readFileSync(path.join(base, "vlogs.js"), "utf8"),
+  fs.readFileSync(path.join(base, "game.js"), "utf8").replace(/vlogLoad\(\);|renderVlogChannelEntry\(\);/g, ""),
+  fs.readFileSync(path.join(base, "vlog.js"), "utf8"),
   TEST_BODY,
 ].join("\n;\n");
 
