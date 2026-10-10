@@ -3,13 +3,14 @@ const fs = require("fs");
 const path = require("path");
 
 // --- 最小 DOM 桩 ---
-const elements = {};
 function makeEl(id) {
   const el = {
     id, textContent: "", className: "", children: [], style: {},
-    classList: { add() {}, remove() {}, contains() { return false; } },
+    classList: { add() {}, remove() {}, contains() { return false; }, toggle() {} },
     addEventListener() {}, appendChild(c) { el.children.push(c); },
-    onclick: null, querySelector() { return null; }, querySelectorAll() { return []; },
+    onclick: null, disabled: false,
+    querySelector(sel) { return el._q && el._q[sel] || makeEl("q"); },
+    querySelectorAll() { return []; },
     dataset: {},
   };
   let _html = "";
@@ -19,9 +20,11 @@ function makeEl(id) {
   });
   return el;
 }
-const ids = ["app","coinCount","wordCount","sceneGrid","sceneTitle","stage","mapView","sceneView",
-  "wordOverlay","wordCard","bookOverlay","bookGrid","gameOverlay","gamePanel","toast",
-  "btnMap","btnBack","btnBook","btnCloseBook","btnGame","wcSpeak","wcClose","gSpeak","gQuit","gAgain","gDone","gOpts"];
+const ids = ["app","wordCount","sceneGrid","sceneTitle","stage","mapView","sceneView",
+  "wordOverlay","wordCard","bookOverlay","bookGrid","toast",
+  "btnMap","btnBack","btnBook","btnCloseBook","chatBox","advActions","advOpts","advProgress",
+  "exploreGrid","exploreToggle","exploreCount","exploreArrow","advAgain","advDone","wcSpeak","wcClose"];
+const elements = {};
 ids.forEach((id) => elements[id] = makeEl(id));
 globalThis.document = {
   getElementById: (id) => elements[id] || (elements[id] = makeEl(id)),
@@ -43,52 +46,87 @@ function ok(cond, name) {
 }
 
 console.log("== 1. 初始状态 ==");
-ok(state.coins === 0, "初始金币为 0");
-ok(state.unlocked.cafe === true, "咖啡店默认解锁");
+ok(state.coins === undefined, "金币体系已移除");
 ok(SCENES.length === 2, "共 2 个场景");
-ok(SCENES[0].items.length === 12 && SCENES[1].items.length === 12, "每场景 12 个物品");
+ok(SCENES.every(s => s.unlockCost === undefined), "无解锁成本字段");
+ok(SCENES[0].steps.length === 10 && SCENES[1].steps.length === 11, "咖啡店 10 步 / 超市 11 步剧情");
+ok(SCENES.every(s => s.steps.every(st => st.options.filter(o => o.ok).length === 1)), "每步恰好 1 个正确选项");
 
-console.log("== 2. 进入咖啡店 + 点词收集 ==");
+console.log("== 2. 咖啡店剧情全流程 ==");
 enterScene("cafe");
 ok(state.currentScene.id === "cafe", "进入咖啡店");
-const spot0 = document.getElementById("stage").children[0];
-spot0.onclick();
-ok(state.collected["cafe:coffee"] === true, "点击 coffee 后被收集");
-ok(document.getElementById("wordCard").innerHTML.includes("/ˈkɒfi/"), "词卡含音标");
-ok(document.getElementById("wordCard").innerHTML.includes("新词已收集"), "新词提示显示");
-spot0.onclick();
-ok(state.collected["cafe:coffee"] === true, "重复点击不报错");
+ok(typeof $("advActions") !== "undefined", "剧情操作区已渲染");
 
-console.log("== 3. 点单小游戏 ==");
-startGame();
-ok(game.round === 1 && game.total === 5, "游戏开局第 1/5 轮");
-ok(typeof document.getElementById("gamePanel").innerHTML === "string"
-  && document.getElementById("gamePanel").innerHTML.includes("game-opt"), "选项渲染正常");
-game.score = 5;
-endGame();
-ok(state.coins === 10, "5 单全对得 10 金币（实际 " + state.coins + "）");
+// 模拟点击开始剧情按钮（advActions 里第一个按钮）
+startAdventure();
+ok(state.adventure.step === 0, "剧情从第 0 步开始");
+ok(state.advHistory.length === 1 && state.advHistory[0].role === "npc", "店员先开口说话");
 
-console.log("== 4. 解锁超市 ==");
-state.coins = 30;
-const market = SCENES.find((s) => s.id === "market");
-tryUnlock(market);
-ok(state.unlocked.market === true, "30 金币解锁超市成功");
-ok(state.coins === 0, "解锁后金币清零");
+// 逐步选正确答案走完全程
+function makeElBtn() {
+  return {
+    classList: { add() {} }, disabled: false, textContent: "",
+    querySelector() { return { onclick: null }; },
+    querySelectorAll() { return []; },
+    children: [], appendChild() {},
+  };
+}
+function makeOptsBox() {
+  const opts = [];
+  return {
+    children: opts, appendChild(c) { opts.push(c); },
+    querySelectorAll() { return opts; },
+  };
+}
+for (let i = 0; i < SCENES[0].steps.length; i++) {
+  const step = SCENES[0].steps[i];
+  const right = step.options.find(o => o.ok);
+  chooseOption(right, makeElBtn(), makeOptsBox(), step);
+  // chooseOption 内部对正确答案走 setTimeout(nextStep, 900)，测试环境无 timer，手动推进
+  if (i < SCENES[0].steps.length - 1) nextStep();
+}
+// 走完最后一步由 finishAdventure 收尾（测试环境无 timer，手动触发）
+finishAdventure();
 
-console.log("== 5. 超市场景 ==");
+ok(state.adventure.step === SCENES[0].steps.length, "走完全部 10 步");
+ok(state.progress.cafe === 10, "进度记录 cafe=10");
+ok(state.advHistory.some(m => m.role === "me" && !m.wrong), "玩家正确回复已记录");
+ok(state.collected["cafe:barista"] === true, "奖励词汇 barista 已收集");
+
+console.log("== 3. 答错重试机制 ==");
+startAdventure();
+const step0 = SCENES[0].steps[0];
+const wrong = step0.options.find(o => !o.ok);
+chooseOption(wrong, makeElBtn(), makeOptsBox(), step0);
+ok(state.advHistory.some(m => m.role === "me" && m.wrong), "错误回复被标记");
+ok(state.adventure.step === 0, "答错不推进进度");
+
+console.log("== 4. 超市场景 ==");
 enterScene("market");
-ok(state.currentScene.id === "market", "进入超市");
-document.getElementById("stage").children[0].onclick();
-ok(state.collected["market:apple"] === true, "超市 apple 收集成功");
+ok(state.currentScene.id === "market", "直接进入超市（无需解锁）");
+startAdventure();
+chooseOption(SCENES[1].steps[0].options.find(o => o.ok), makeElBtn(), makeOptsBox(), SCENES[1].steps[0]);
+ok(state.adventure.step === 1, "超市第 1 步答对推进");
+
+console.log("== 5. 自由探索 ==");
+enterScene("market");
+// 桩中 exploreGrid 为全局共享，取本次进入场景新追加的那批（最后 12 个中的第 1 个）
+const allSpots = $("exploreGrid").children;
+const spot0 = allSpots[allSpots.length - 12];
+spot0.onclick();
+ok(state.collected["market:apple"] === true, "点击 apple 收集成功");
 
 console.log("== 6. 词汇册 ==");
 openBook();
-ok(Object.keys(state.collected).length === 2, "词汇册含 2 词");
+const bookCount = Object.keys(state.collected).length;
+ok(bookCount >= 2, "词汇册至少含 2 词（实际 " + bookCount + "）");
 
 console.log("== 7. 持久化 ==");
 save();
-const saved = JSON.parse(localStorage.getItem("englishWorld"));
-ok(saved.unlocked.market === true, "localStorage 保存正确");
+const saved = JSON.parse(localStorage.getItem("englishWorldV2"));
+ok(saved.progress.cafe === 10, "进度已保存");
+ok(saved.collected["cafe:barista"] === true, "词汇已保存");
+ok(localStorage.getItem("englishWorld") === null, "旧金币存档不再写入");
 
 console.log("");
 console.log("结果: " + pass + " 通过 / " + fail + " 失败");

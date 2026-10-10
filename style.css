@@ -101,8 +101,6 @@ header {
   transition: transform .15s var(--bounce);
 }
 .hud-item.bump { animation: squish .4s var(--bounce); }
-.coins b { color: var(--amber); display: inline-block; }
-.coins.bump b { animation: coinSpin .6s ease; }
 .words b { color: var(--green); }
 
 .btn {
@@ -150,11 +148,6 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 .scene-name { font-size: 17px; font-weight: 600; }
 .scene-name-en { font-size: 13px; color: var(--muted); margin-top: 2px; }
 .scene-words { font-size: 12px; color: var(--green); margin-top: 8px; }
-.lock-badge {
-  position: absolute; top: 12px; right: 12px;
-  background: var(--amber-soft); color: var(--amber);
-  border: 1px solid #f0d9ac; border-radius: 999px; padding: 4px 10px; font-size: 12px;
-}
 
 .scene-topbar {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -166,9 +159,118 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
   --scene-accent: var(--brand-green);
   --scene-accent-soft: var(--brand-green-soft);
   background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius-card); padding: 8px;
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px; min-height: 340px; position: relative; overflow: hidden;
+  border-radius: var(--radius-card);
+  position: relative; overflow: hidden;
+}
+.stage.stage-wide {
+  display: flex; flex-direction: column; gap: 16px; padding: 18px;
+  min-height: 420px;
+}
+
+/* ---------- 剧情对话区 ---------- */
+.adventure-box { display: flex; flex-direction: column; gap: 12px; }
+.adv-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.adv-title { font-size: 17px; font-weight: 700; }
+.adv-progress { display: flex; gap: 5px; flex-wrap: wrap; }
+.adv-progress .dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--border); transition: background .3s, transform .3s;
+}
+.adv-progress .dot.on { background: var(--green); transform: scale(1.15); }
+.adv-intro {
+  background: var(--scene-accent-soft, var(--green-soft));
+  border-left: 4px solid var(--scene-accent, var(--green));
+  border-radius: 8px; padding: 10px 14px; font-size: 14px; color: var(--muted);
+}
+
+.chat {
+  display: flex; flex-direction: column; gap: 10px;
+  max-height: 300px; overflow-y: auto; padding: 4px 2px;
+  scroll-behavior: smooth;
+}
+.chat .msg { display: flex; gap: 8px; align-items: flex-start; animation: bounceIn .35s var(--bounce); }
+.chat .msg.me { flex-direction: row-reverse; }
+.chat .avatar {
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; background: var(--scene-accent-soft, var(--green-soft));
+  border: 1.5px solid var(--border);
+}
+.chat .me-avatar { background: var(--green-soft); }
+.chat .bubble {
+  padding: 10px 14px; border-radius: 14px; max-width: 78%;
+  font-size: 15px; line-height: 1.5;
+}
+.chat .npc-bubble {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-top-left-radius: 4px;
+}
+.chat .me-bubble {
+  background: var(--green); color: #fff; border-top-right-radius: 4px;
+}
+.chat .msg.me.wrong .me-bubble { background: var(--error-red); }
+.chat .msg-en { font-weight: 600; }
+.chat .msg-zh { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+.chat .speak-icon { cursor: pointer; font-size: 13px; opacity: .7; }
+.chat .speak-icon:hover { opacity: 1; }
+.tip-row {
+  font-size: 13px; color: var(--muted); background: var(--bg);
+  border-radius: 8px; padding: 6px 12px; margin-left: 42px;
+  animation: bounceIn .3s var(--bounce);
+}
+
+.task-hint {
+  background: var(--amber-soft); color: var(--amber);
+  border-radius: 10px; padding: 10px 14px; font-size: 14px; font-weight: 600;
+  animation: bounceIn .35s var(--bounce);
+}
+.adv-opts { display: flex; flex-direction: column; gap: 9px; }
+.adv-opt {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  border: 1.5px solid var(--border); border-radius: 12px; background: var(--card);
+  padding: 12px 16px; font: inherit; font-size: 15px; color: var(--ink);
+  cursor: pointer; text-align: left;
+  transition: transform .15s var(--bounce), border-color .15s, background .15s;
+  animation: bounceIn .4s var(--bounce) backwards;
+}
+.adv-opt:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--green); background: var(--green-soft); }
+.adv-opt:active:not(:disabled) { transform: scale(.98); }
+.adv-opt.right { border-color: var(--green); background: var(--green-soft); animation: squish .45s var(--bounce); }
+.adv-opt.wrong { border-color: var(--error-red); background: var(--error-red-soft); animation: wiggle .4s ease; }
+.adv-opt.reveal { border-color: var(--green); box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 35%, transparent); }
+.adv-opt:disabled { cursor: default; opacity: .85; }
+.adv-opt .opt-text { flex: 1; }
+.adv-opt .opt-play { font-size: 14px; opacity: .6; flex-shrink: 0; }
+.retry-hint { text-align: center; font-size: 13px; color: var(--amber); font-weight: 600; animation: bounceIn .3s var(--bounce); }
+.resume-note { text-align: center; font-size: 13px; color: var(--muted); margin-top: 8px; }
+.adv-start { align-self: center; margin-top: 6px; }
+
+.adv-finish { text-align: center; padding: 16px 0 6px; animation: bounceIn .4s var(--bounce); }
+.adv-finish .finish-big { font-size: 52px; animation: popStar .6s var(--bounce); }
+.adv-finish h3 { font-size: 20px; margin: 8px 0; }
+.adv-finish p { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+.finish-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ---------- 自由探索（次要，折叠） ---------- */
+.explore-box { display: flex; flex-direction: column; gap: 10px; }
+.explore-toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  border: 1.5px dashed var(--border); border-radius: 12px; background: transparent;
+  padding: 12px 16px; font: inherit; font-size: 14px; font-weight: 600; color: var(--muted);
+  cursor: pointer; transition: border-color .15s, color .15s;
+}
+.explore-toggle:hover { border-color: var(--scene-accent, var(--green)); color: var(--ink); }
+.explore-count { font-weight: 400; font-size: 13px; }
+.explore-arrow { font-size: 12px; }
+.explore-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.done-badge {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--green-soft); color: var(--green);
+  border: 1px solid #cde3b4; border-radius: 999px; padding: 4px 10px; font-size: 12px;
 }
 .stage.theme-cafe { --scene-accent: var(--cafe-accent); --scene-accent-soft: var(--cafe-soft); background: var(--cafe-soft); }
 .stage.theme-market { --scene-accent: var(--market-accent); --scene-accent-soft: var(--market-soft); background: var(--market-soft); }
@@ -355,7 +457,9 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 }
 
 @media (max-width: 560px) {
-  .game-opts { grid-template-columns: repeat(2, 1fr); }
+  .chat .bubble { max-width: 88%; font-size: 14px; }
+  .chat { max-height: 240px; }
+  .adv-opt { font-size: 14px; padding: 11px 13px; }
   .logo-en { display: none; }
   .mascot { width: 68px; height: 68px; }
   .mascot .body { width: 58px; height: 58px; }

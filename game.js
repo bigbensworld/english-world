@@ -1,28 +1,28 @@
-// 英语世界 - 游戏主逻辑
-// 纯场景探索：点物品学词 + TTS 发音 + 词汇收集 + 场景小游戏赚金币解锁新场景
+// 英语世界 - 剧情对话引擎
+// 核心玩法：进入场景 = 开启一段连续剧情，用户选对回复推进对话，一步步完成整个场景任务
+// 辅助玩法：自由探索点物品学词（可折叠）、词汇册、TTS 发音
 
 const $ = (id) => document.getElementById(id);
 const state = {
-  coins: 0,
-  collected: {},      // wordId -> true
-  unlocked: { cafe: true },
+  collected: {},        // wordId -> true
+  progress: {},         // sceneId -> 已完成的步骤数
   currentScene: null,
+  adventure: null,      // 当前冒险会话 { scene, step, lock }
+  advHistory: [],       // 当前场景的聊天记录（用于重渲染）
 };
 
-// ---------- 持久化 ----------
+// ---------- 持久化（换新 key，避免旧金币数据干扰）----------
 function save() {
-  localStorage.setItem("englishWorld", JSON.stringify({
-    coins: state.coins, collected: state.collected, unlocked: state.unlocked,
+  localStorage.setItem("englishWorldV2", JSON.stringify({
+    collected: state.collected, progress: state.progress,
   }));
 }
 function load() {
   try {
-    const d = JSON.parse(localStorage.getItem("englishWorld"));
+    const d = JSON.parse(localStorage.getItem("englishWorldV2"));
     if (d) {
-      state.coins = d.coins || 0;
       state.collected = d.collected || {};
-      state.unlocked = d.unlocked || { cafe: true };
-      if (!state.unlocked.cafe) state.unlocked.cafe = true;
+      state.progress = d.progress || {};
     }
   } catch (e) { /* fresh start */ }
 }
@@ -48,13 +48,8 @@ function toast(msg) {
 }
 
 // ---------- HUD ----------
-function renderHUD(bumpCoins) {
-  $("coinCount").textContent = state.coins;
+function renderHUD() {
   $("wordCount").textContent = Object.keys(state.collected).length;
-  if (bumpCoins) {
-    const c = document.querySelector(".coins");
-    if (c) { c.classList.remove("bump"); void c.offsetWidth; c.classList.add("bump"); }
-  }
 }
 
 // ---------- 图标渲染：优先 Fluent Emoji 3D PNG，emoji 作降级 ----------
@@ -69,51 +64,41 @@ function renderMap() {
   const grid = $("sceneGrid");
   grid.innerHTML = "";
   SCENES.forEach((sc, i) => {
-    const unlocked = !!state.unlocked[sc.id];
+    const done = state.progress[sc.id] || 0;
+    const finished = done >= sc.steps.length;
     const learned = sc.items.filter((it) => state.collected[sc.id + ":" + it.id]).length;
     const card = document.createElement("button");
     card.type = "button";
-    card.className = "scene-card" + (unlocked ? "" : " locked");
+    card.className = "scene-card";
     card.style.animationDelay = (i * 0.08) + "s";
     card.innerHTML = `
-      <div class="scene-cover">${unlocked ? iconHtml({ id: sc.iconId || sc.id, emoji: sc.emoji }, "cover-img") : "🔒"}</div>
+      <div class="scene-cover">${iconHtml({ id: sc.iconId || sc.id, emoji: sc.emoji }, "cover-img")}</div>
       <div class="scene-info">
         <div class="scene-name">${sc.name} · ${sc.nameEn}</div>
-        <div class="scene-words">📖 已学 ${learned}/${sc.items.length} 词 · 🎮 ${sc.game.name}</div>
+        <div class="scene-words">${finished
+          ? "🏆 剧情已完成 · 可重玩"
+          : done > 0
+            ? `📖 剧情进行中 ${done}/${sc.steps.length} 步`
+            : `🎮 剧情 ${sc.steps.length} 步 · 已学 ${learned}/${sc.items.length} 词`}</div>
       </div>
-      ${unlocked ? "" : `<div class="lock-badge">🪙 ${sc.unlockCost} 金币解锁</div>`}
+      ${finished ? '<div class="done-badge">✓ 完成</div>' : ""}
     `;
-    card.onclick = () => {
-      if (unlocked) enterScene(sc.id);
-      else tryUnlock(sc);
-    };
+    card.onclick = () => enterScene(sc.id);
     grid.appendChild(card);
   });
-}
-
-function tryUnlock(sc) {
-  if (state.coins >= sc.unlockCost) {
-    state.coins -= sc.unlockCost;
-    state.unlocked[sc.id] = true;
-    save(); renderHUD(); renderMap();
-    setMascotState("happy", 900);
-    toast(`🎉 解锁「${sc.name}」！`);
-    enterScene(sc.id);
-    speak("Welcome to the " + sc.nameEn + "!");
-  } else {
-    toast(`还差 ${sc.unlockCost - state.coins} 金币，去玩小游戏赚金币吧！`);
-  }
 }
 
 // ---------- 场景 ----------
 function enterScene(id) {
   const sc = SCENES.find((s) => s.id === id);
   state.currentScene = sc;
+  state.adventure = null;
+  state.advHistory = [];
   $("sceneTitle").textContent = `${sc.emoji} ${sc.name} · ${sc.nameEn}`;
   const stage = $("stage");
   stage.innerHTML = "";
   const theme = sc.theme || sc.id || "default";
-  stage.className = "stage theme-" + theme;
+  stage.className = "stage stage-wide theme-" + theme;
   if (stage.style.setProperty) {
     stage.style.setProperty("--scene-accent", sc.accent || "var(--brand-green)");
     stage.style.setProperty("--scene-accent-soft", sc.accentSoft || "var(--brand-green-soft)");
@@ -121,12 +106,42 @@ function enterScene(id) {
   stage.dataset.deco = sc.deco || "";
   stage.dataset.deco2 = sc.deco2 || "";
   setMascotState("idle");
+
+  // ---- 左列：剧情对话 ----
+  const advBox = document.createElement("div");
+  advBox.className = "adventure-box";
+  const done = state.progress[sc.id] || 0;
+  const finished = done >= sc.steps.length;
+  advBox.innerHTML = `
+    <div class="adv-head">
+      <div class="adv-title">🎬 场景剧情 · ${sc.name}</div>
+      <div class="adv-progress" id="advProgress"></div>
+    </div>
+    <div class="adv-intro">${sc.intro}</div>
+    <div class="chat" id="chatBox"></div>
+    <div class="adv-actions" id="advActions"></div>
+  `;
+  stage.appendChild(advBox);
+
+  // ---- 右列：自由探索（次要，可折叠） ----
+  const exploreBox = document.createElement("div");
+  exploreBox.className = "explore-box";
+  exploreBox.innerHTML = `
+    <button type="button" class="explore-toggle" id="exploreToggle">
+      🔍 自由探索学词 <span class="explore-count" id="exploreCount"></span> <span class="explore-arrow" id="exploreArrow">▾</span>
+    </button>
+    <div class="explore-grid hidden" id="exploreGrid"></div>
+  `;
+  stage.appendChild(exploreBox);
+
+  // 自由探索网格
+  const grid = $("exploreGrid");
   sc.items.forEach((it, i) => {
     const wordKey = sc.id + ":" + it.id;
     const spot = document.createElement("button");
     spot.type = "button";
     spot.className = "spot" + (state.collected[wordKey] ? " collected" : "");
-    spot.style.animationDelay = (i * 0.06) + "s";
+    spot.style.animationDelay = (i * 0.05) + "s";
     spot.innerHTML = `
       <div class="ico">${iconHtml(it, "spot-img")}</div>
       <div class="en">${it.en}</div>
@@ -135,7 +150,7 @@ function enterScene(id) {
     spot.onclick = () => {
       const isNew = !state.collected[wordKey];
       state.collected[wordKey] = true;
-      save(); renderHUD();
+      save(); renderHUD(); updateExploreCount(sc);
       if (isNew) {
         setMascotState("happy", 900);
         spot.classList.add("collected");
@@ -147,16 +162,200 @@ function enterScene(id) {
       }
       showWordCard(it, isNew);
     };
-    stage.appendChild(spot);
+    grid.appendChild(spot);
   });
+  $("exploreToggle").onclick = () => {
+    grid.classList.toggle("hidden");
+    $("exploreArrow").textContent = grid.classList.contains("hidden") ? "▾" : "▴";
+  };
+  updateExploreCount(sc);
+
+  // ---- 启动/继续剧情 ----
+  const startBtn = document.createElement("button");
+  startBtn.type = "button";
+  startBtn.className = "btn btn-big btn-primary adv-start";
+  startBtn.innerHTML = finished
+    ? "🔄 重新开始剧情"
+    : done > 0 ? "▶ 继续剧情" : "▶ 开始剧情";
+  startBtn.onclick = startAdventure;
+  $("advActions").appendChild(startBtn);
+
+  if (done > 0 && !finished) {
+    const resumeNote = document.createElement("div");
+    resumeNote.className = "resume-note";
+    resumeNote.textContent = `上次进行到第 ${done} 步，可以接着来！`;
+    $("advActions").appendChild(resumeNote);
+  }
+
   $("mapView").classList.add("hidden");
   $("sceneView").classList.remove("hidden");
+  renderAdvProgress(sc);
   speak("Welcome to the " + sc.nameEn + "!");
+}
+
+function updateExploreCount(sc) {
+  const learned = sc.items.filter((it) => state.collected[sc.id + ":" + it.id]).length;
+  const el = $("exploreCount");
+  if (el) el.textContent = `(${learned}/${sc.items.length})`;
+}
+
+// ---------- 剧情对话引擎 ----------
+function startAdventure() {
+  const sc = state.currentScene;
+  if (!sc) return;
+  setMascotState("thinking");
+  state.adventure = { scene: sc, step: 0, lock: false };
+  state.advHistory = [];
+  $("advActions").innerHTML = "";
+  renderChat();
+  nextStep();
+}
+
+function renderChat() {
+  const box = $("chatBox");
+  if (!box) return;
+  box.innerHTML = state.advHistory.map((m) => chatMsgHtml(m)).join("");
+  box.scrollTop = box.scrollHeight;
+}
+
+function chatMsgHtml(m) {
+  if (m.role === "npc") {
+    return `
+      <div class="msg npc">
+        <div class="avatar">${m.scene.emoji}</div>
+        <div class="bubble npc-bubble">
+          <div class="msg-en">${m.text} <span class="speak-icon" title="再听一次" onclick="speak('${m.text.replace(/'/g, "\\'")}')">🔊</span></div>
+          <div class="msg-zh">${m.zh}</div>
+        </div>
+      </div>`;
+  }
+  return `
+    <div class="msg me ${m.wrong ? "wrong" : ""}">
+      <div class="bubble me-bubble">${m.text}</div>
+      <div class="avatar me-avatar">🙂</div>
+    </div>
+    ${m.tip ? `<div class="tip-row">${m.wrong ? "💡" : "✅"} ${m.tip}</div>` : ""}`;
+}
+
+function nextStep() {
+  const adv = state.adventure;
+  if (!adv) return;
+  const sc = adv.scene;
+  if (adv.step >= sc.steps.length) return finishAdventure();
+  const step = sc.steps[adv.step];
+  adv.lock = false;
+
+  // 更新进度点
+  renderAdvProgress(sc);
+  setMascotState("thinking");
+
+  // 店员说话
+  state.advHistory.push({ role: "npc", text: step.npc, zh: step.npcZh, scene: sc });
+  renderChat();
+  speak(step.npc);
+
+  // 任务提示 + 选项
+  const actions = $("advActions");
+  actions.innerHTML = `
+    <div class="task-hint">🎯 ${step.task}</div>
+    <div class="adv-opts" id="advOpts"></div>
+  `;
+  const optsBox = $("advOpts");
+  // 选项顺序打乱，避免正确答案总在第一个
+  const shuffled = step.options.slice().sort(() => Math.random() - 0.5);
+  shuffled.forEach((opt) => {
+    const el = document.createElement("button");
+    el.type = "button";
+    el.className = "adv-opt";
+    el.innerHTML = `<span class="opt-text">${opt.text}</span><span class="opt-play" title="听这句">🔊</span>`;
+    el.querySelector(".opt-play").onclick = (e) => { e.stopPropagation(); speak(opt.text); };
+    el.onclick = () => chooseOption(opt, el, optsBox, step);
+    optsBox.appendChild(el);
+  });
+}
+
+function chooseOption(opt, el, optsBox, step) {
+  const adv = state.adventure;
+  if (!adv || adv.lock) return;
+  adv.lock = true;
+
+  state.advHistory.push({ role: "me", text: opt.text, tip: opt.tip, wrong: !opt.ok });
+  renderChat();
+  el.classList.add(opt.ok ? "right" : "wrong");
+  optsBox.querySelectorAll(".adv-opt").forEach((b) => (b.disabled = true));
+
+  if (opt.ok) {
+    setMascotState("happy", 700);
+    speak(opt.text);
+    adv.step++;
+    state.progress[adv.scene.id] = adv.step;
+    save(); renderAdvProgress(adv.scene);
+    setTimeout(nextStep, 900);
+  } else {
+    setMascotState("sad", 700);
+    // 高亮正确答案，让用户再选一次
+    setTimeout(() => {
+      const right = [...optsBox.children].find((b) =>
+        step.options.find((o) => o.ok && b.textContent.includes(o.text))
+      );
+      if (right) right.classList.add("reveal");
+      const retry = document.createElement("div");
+      retry.className = "retry-hint";
+      retry.textContent = "🤔 再试一次吧！绿色的是正确说法";
+      optsBox.appendChild(retry);
+      adv.lock = false; // 解锁允许重选
+      optsBox.querySelectorAll(".adv-opt").forEach((b) => (b.disabled = false));
+      el.disabled = true; // 错的选项保持禁用
+    }, 800);
+  }
+}
+
+function renderAdvProgress(sc) {
+  const el = $("advProgress");
+  if (!el) return;
+  const done = state.adventure ? state.adventure.step : (state.progress[sc.id] || 0);
+  el.innerHTML = sc.steps.map((_, i) =>
+    `<span class="dot ${i < done ? "on" : ""}"></span>`
+  ).join("");
+}
+
+function finishAdventure() {
+  const sc = state.currentScene;
+  setMascotState("happy", 2000);
+  speak("Congratulations! You did it!");
+  // 收集奖励词汇
+  if (sc.reward && sc.reward.en) {
+    const it = sc.items.find((i) => i.en === sc.reward.en);
+    if (it) {
+      state.collected[sc.id + ":" + it.id] = true;
+      save(); renderHUD(); updateExploreCount(sc);
+    }
+  }
+  const learned = sc.items.filter((it) => state.collected[sc.id + ":" + it.id]).length;
+  state.advHistory.push({ role: "npc", text: "Congratulations! You completed the " + sc.nameEn + " challenge!", zh: sc.reward.zh, scene: sc });
+  renderChat();
+  renderAdvProgress(sc);
+  $("advActions").innerHTML = `
+    <div class="adv-finish">
+      <div class="finish-big">🎉</div>
+      <h3>场景完成！</h3>
+      <p>${sc.reward.zh} 本场景已收集 ${learned}/${sc.items.length} 个词汇。</p>
+      <div class="finish-btns">
+        <button class="btn btn-big btn-primary" id="advAgain">🔄 再玩一次</button>
+        <button class="btn btn-big" id="advDone">🗺️ 返回地图</button>
+      </div>
+    </div>
+  `;
+  $("advAgain").onclick = startAdventure;
+  $("advDone").onclick = backToMap;
+  toast("🎉 剧情完成！");
 }
 
 function backToMap() {
   setMascotState("idle");
   state.currentScene = null;
+  state.adventure = null;
+  state.advHistory = [];
   $("sceneView").classList.add("hidden");
   $("mapView").classList.remove("hidden");
   renderMap();
@@ -189,7 +388,7 @@ function openBook() {
   grid.innerHTML = "";
   const keys = Object.keys(state.collected);
   if (keys.length === 0) {
-    grid.innerHTML = '<div class="book-empty">还没有收集到词汇，去场景里点点看！</div>';
+    grid.innerHTML = '<div class="book-empty">还没有收集到词汇，去场景里玩玩看！</div>';
   } else {
     keys.forEach((k) => {
       const [sid, iid] = k.split(":");
@@ -207,110 +406,13 @@ function openBook() {
   $("bookOverlay").classList.remove("hidden");
 }
 
-// ---------- 小游戏：点单 / 购物清单 ----------
-let game = null;
-
-function startGame() {
-  const sc = state.currentScene;
-  if (!sc) return;
-  setMascotState("thinking");
-  game = { scene: sc, round: 0, total: 5, score: 0, lock: false };
-  nextRound();
-}
-
-function pickDistractors(sc, answer) {
-  const pool = sc.items.filter((i) => i.id !== answer.id);
-  const shuffled = pool.sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, Math.min(5, pool.length));
-}
-
-function nextRound() {
-  if (game.round >= game.total) return endGame();
-  game.round++;
-  game.lock = false;
-  const sc = game.scene;
-  const answer = sc.items[Math.floor(Math.random() * sc.items.length)];
-  const opts = [answer, ...pickDistractors(sc, answer)].sort(() => Math.random() - 0.5);
-
-  const isOrder = sc.game.type === "order";
-  const lines = isOrder ? ORDER_LINES : SHOPPING_LINES;
-  const line = lines[Math.floor(Math.random() * lines.length)].replace("{item}", answer.en);
-
-  setMascotState("thinking");
-  $("gamePanel").innerHTML = `
-    <div class="game-head">
-      <div class="game-title">${isOrder ? "☕ 顾客点单" : "🛒 购物清单"}</div>
-      <div class="game-sub">${isOrder ? "顾客点了什么？点选正确的物品！" : "清单上写了什么？把它放进购物车！"}</div>
-    </div>
-    <div class="game-order">
-      <span class="speak" id="gSpeak" title="再听一次">🔊</span>
-      "${line}"
-    </div>
-    <div class="game-opts" id="gOpts"></div>
-    <div class="game-progress">第 ${game.round} / ${game.total} 单 · 得分 ${game.score}</div>
-    <div style="text-align:center;margin-top:14px">
-      <button class="btn btn-ghost" id="gQuit">不玩了</button>
-    </div>
-  `;
-  $("gameOverlay").classList.remove("hidden");
-  speak(line);
-
-  $("gSpeak").onclick = () => speak(line);
-  $("gQuit").onclick = () => { $("gameOverlay").classList.add("hidden"); };
-
-  const optsBox = $("gOpts");
-  opts.forEach((it) => {
-    const el = document.createElement("button");
-    el.type = "button";
-    el.className = "game-opt";
-    el.innerHTML = `<div class="e">${iconHtml(it, "opt-img")}</div><div class="en">${it.en}</div>`;
-    el.onclick = () => {
-      if (game.lock) return;
-      game.lock = true;
-      if (it.id === answer.id) {
-        setMascotState("happy", 650);
-        el.classList.add("right");
-        game.score++;
-        speak(it.en + "! Great!");
-        setTimeout(nextRound, 900);
-      } else {
-        setMascotState("sad", 650);
-        el.classList.add("wrong");
-        const right = [...optsBox.children].find((c) => c.querySelector(".en").textContent === answer.en);
-        if (right) right.classList.add("right");
-        speak("Oops! It is " + answer.en);
-        setTimeout(nextRound, 1400);
-      }
-    };
-    optsBox.appendChild(el);
-  });
-}
-
-function endGame() {
-  const earned = game.score * 2;
-  state.coins += earned;
-  save(); renderHUD(true);
-  const stars = game.score >= 5 ? "🏆" : game.score >= 3 ? "🥈" : "💪";
-  $("gamePanel").innerHTML = `
-    <div class="game-result">
-      <div class="big">${stars}</div>
-      <h3>完成 ${game.score} / ${game.total} 单！</h3>
-      <p>获得 🪙 ${earned} 金币</p>
-      <button class="btn btn-big btn-primary" id="gAgain">🎮 再来一局</button>
-      <button class="btn btn-big" id="gDone">回去逛逛</button>
-    </div>
-  `;
-  $("gAgain").onclick = startGame;
-  $("gDone").onclick = () => { setMascotState("idle"); $("gameOverlay").classList.add("hidden"); };
-}
-
 // ---------- 吉祥物 ----------
 const MASCOT_LINES = [
   "Tap anything you like!",
   "You can do it!",
   "New words = new powers!",
-  "Play the game, get coins!",
   "Hello, my friend!",
+  "Take it step by step!",
 ];
 let mascotTimer = null;
 let mascotStateTimer = null;
@@ -350,12 +452,13 @@ function initMascot() {
   document.body.appendChild(m);
   m.onclick = () => {
     setMascotState("happy", 650);
-    speak(MASCOT_LINES[Math.floor(Math.random() * MASCOT_LINES.length)]);
+    const line = MASCOT_LINES[Math.floor(Math.random() * MASCOT_LINES.length)];
+    speak(line);
     const old = m.querySelector(".bubble");
     if (old) old.remove();
     const b = document.createElement("div");
     b.className = "bubble";
-    b.textContent = MASCOT_LINES[Math.floor(Math.random() * MASCOT_LINES.length)];
+    b.textContent = line;
     m.appendChild(b);
     clearTimeout(mascotTimer);
     mascotTimer = setTimeout(() => b.remove(), 2600);
@@ -372,7 +475,6 @@ $("btnMap").onclick = backToMap;
 $("btnBack").onclick = backToMap;
 $("btnBook").onclick = openBook;
 $("btnCloseBook").onclick = () => $("bookOverlay").classList.add("hidden");
-$("btnGame").onclick = startGame;
 
 [$("wordOverlay"), $("bookOverlay")].forEach((ov) => {
   ov.addEventListener("click", (e) => { if (e.target === ov) ov.classList.add("hidden"); });
