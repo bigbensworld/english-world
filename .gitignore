@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+packages/ui/dist/
+packages/ui/config/.taro/
+.swc/
