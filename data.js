@@ -1166,7 +1166,7 @@ const SCENES = [
         titleEn: "Rewards & Deals",
         emoji: "💳",
         desc: "积分卡、礼品卡、今日特惠——用英语算清每一分钱。",
-        reward: { en: "rewards", zh: "你已经是精通省钱之道的咖啡老江湖了！💰" },
+        reward: { en: "rewards card", zh: "你已经是精通省钱之道的咖啡老江湖了！💰" },
         steps: [
           {
             npcLines: [
@@ -1362,7 +1362,16 @@ const SCENES = [
       { id: "gluten",   en: "gluten-free",  zh: "无麸质",   phon: "/ˈɡluːtn friː/", emoji: "🌾", sent: "Do you have gluten-free options?" },
       { id: "spicy",    en: "spicy",        zh: "辣的",     phon: "/ˈspaɪsi/",   emoji: "🌶️", sent: "Not too spicy, please." },
       { id: "wait",     en: "wait",         zh: "等待",     phon: "/weɪt/",     emoji: "⏳", sent: "We've been waiting a while." },
-      { id: "understand", en: "I see",      zh: "我明白了", phon: "/aɪ siː/",   emoji: "👌", sent: "I see — thank you for explaining." },
+      { id: "understand", en: "I see",      zh: "我明白了", phon: "/aɪ siː/",   emoji: "👌", sent: "I see — thank you for explaining." },// 餐厅新词条（供 append 脚本用）
+      // v5 上错菜投诉新词
+      { id: "apology",  en: "apology",   zh: "道歉",   phon: "/əˈpɒlədʒi/",  emoji: "🙏", sent: "Please accept my apology." },
+      { id: "wrong",    en: "wrong dish", zh: "上错菜", phon: "/rɒŋ dɪʃ/",   emoji: "❌", sent: "Excuse me, this is the wrong dish." },
+      { id: "comp",     en: "on the house", zh: "店家招待", phon: "/ɒn ðə haʊs/", emoji: "🎁", sent: "The dessert is on the house." },
+      // v6 小费文化新词
+      { id: "gratuity", en: "gratuity",  zh: "服务费", phon: "/ɡrəˈtjuːəti/", emoji: "🧾", sent: "An 18% gratuity is added for large parties." },
+      { id: "pairing",  en: "pair with", zh: "搭配",   phon: "/peə wɪð/",    emoji: "🥂", sent: "This wine pairs well with fish." },
+      { id: "sommelier",en: "sommelier", zh: "侍酒师", phon: "/ˈsɒməljeɪ/",  emoji: "🍷", sent: "Ask the sommelier for wine advice." },
+
     ],
     visits: [
       {
@@ -1902,6 +1911,271 @@ const SCENES = [
           },
         ],
       },
+      // 餐厅 第 5 轮：上错菜投诉（8 步）
+      {
+        id: "v5",
+        title: "第 5 次光顾 · 上错菜了怎么办",
+        titleEn: "Wrong Dish",
+        emoji: "❌",
+        desc: "菜上错了？汤里有异物？学会冷静、礼貌地指出问题并争取补偿——投诉也可以很体面。",
+        reward: { en: "apology", zh: "你用英文优雅地解决了一场餐厅危机！❌➡️✅" },
+        steps: [
+          {
+            npcLines: [
+              "Here's your mushroom soup — enjoy!",
+              "One mushroom soup for you. Careful, the bowl is hot!",
+              "Soup's up! Mushroom soup, right?",
+            ],
+            npcZh: "您的蘑菇汤来了——请慢用！",
+            task: "指出这不是你点的菜（你点的是海鲜汤）",
+            options: [
+              { text: "Excuse me, I'm afraid this isn't what I ordered. I asked for the seafood soup.", ok: true,  tip: "I'm afraid... 委婉指出错误，投诉不吵架的标准开场" },
+              { text: "Wrong! Soup wrong! Me no order this.",                                          ok: false, tip: "更礼貌：Excuse me, this isn't what I ordered" },
+              { text: "What is this? I hate mushrooms, take it back.",                                  ok: false, tip: "先说明事实：I ordered the seafood soup" },
+            ],
+            phrase: { en: "I'm afraid this isn't what I ordered.", zh: "恐怕这不是我点的菜", note: "I'm afraid + 委婉指出问题，投诉第一句" },
+          },
+          {
+            npcLines: [
+              "Oh no, I'm so sorry about that! Let me double-check your order...",
+              "You're absolutely right — my apologies! Give me one second to check...",
+              "Oh dear, that's my mistake! Sorry about that. Let me verify...",
+            ],
+            npcZh: "哎呀，非常抱歉！让我核对一下您的订单……",
+            task: "理解并等待，主动说明你点的东西",
+            options: [
+              { text: "No worries. I ordered the seafood soup, not the mushroom one.", ok: true,  tip: "No worries 表大度 + 重复正确订单，高效沟通" },
+              { text: "I say already! Seafood! You not listen!",                      ok: false, tip: "保持礼貌：No worries, I ordered the seafood soup" },
+              { text: "Hurry up check fast please.",                                   ok: false, tip: "加 No worries 缓和气氛，再说明订单" },
+            ],
+            phrase: { en: "No worries. I ordered the ___.", zh: "没关系。我点的是……", note: "No worries 大度回应 + 复述正确信息" },
+          },
+          {
+            npcLines: [
+              "You're right, it was the seafood soup. I'll take this back and get you the right one right away!",
+              "My mistake — seafood soup it is! I'll swap it immediately.",
+              "So sorry! Seafood soup, coming right up. This won't take long.",
+            ],
+            npcZh: "您说得对，是海鲜汤。我马上撤掉这碗，给您换正确的！",
+            task: "询问大约要等多久",
+            options: [
+              { text: "Thank you. How long will it take?", ok: true,  tip: "How long will it take? 询问时长的万能句" },
+              { text: "How many time need wait soup?",     ok: false, tip: "说 How long will it take?" },
+              { text: "Long time or fast?",                ok: false, tip: "更自然：How long will it take?" },
+            ],
+            phrase: { en: "How long will it take?", zh: "大概要多久？", note: "任何等待场景都能用的时长问句" },
+          },
+          {
+            npcLines: [
+              "About ten minutes, and the soup is on the house for the mix-up. Again, I'm really sorry!",
+              "Ten minutes tops — and the soup is free, of course. Our apologies!",
+              "Just ten minutes. And don't worry about the bill for it — it's on us. Sorry again!",
+            ],
+            npcZh: "大约十分钟。给您添麻烦了，这碗汤免费，算我们的。再次抱歉！",
+            task: "接受道歉并致谢（on the house = 免费）",
+            options: [
+              { text: "That's very kind. Thank you for fixing it so quickly!", ok: true,  tip: "接受补偿 + 肯定对方的处理，得体收尾" },
+              { text: "Free good. I accept the sorry thing.",                 ok: false, tip: "更自然：That's very kind. Thank you!" },
+              { text: "Okay but more free food maybe?",                       ok: false, tip: "适度接受即可：Thank you for fixing it" },
+            ],
+            phrase: { en: "on the house", zh: "店家免费赠送", note: "餐厅道歉常用的补偿说法，= free, paid by the restaurant" },
+          },
+          {
+            npcLines: [
+              "Here's your seafood soup — freshly made! And I brought some extra bread for the wait.",
+              "Seafood soup, extra hot! Plus some warm bread to make up for the delay.",
+              "One seafood soup! And a little bread on the side — again, our apologies.",
+            ],
+            npcZh: "您的海鲜汤来了——新鲜出炉！还为您准备了额外的面包，补偿久等。",
+            task: "检查无误并表达满意",
+            options: [
+              { text: "This is exactly what I ordered. Thank you!", ok: true,  tip: "exactly what I ordered 确认无误的地道表达" },
+              { text: "Yes this is the correct soup thing.",       ok: false, tip: "说 This is exactly what I ordered" },
+              { text: "Soup good now right yes.",                  ok: false, tip: "更自然：This is exactly what I ordered" },
+            ],
+            phrase: { en: "This is exactly what I ordered.", zh: "这正是我点的", note: "确认正确的标准句，exactly 加强语气" },
+            adds: [{ emoji: "🍲", label: "Seafood Soup ✓", wordId: "soup" }],
+          },
+          {
+            npcLines: [
+              "Great! Your main course will be out shortly. Is there anything else I can do for you?",
+              "Perfect! Your main dish is coming right up. Anything else at all?",
+              "Wonderful! The main course is on its way. Can I get you anything in the meantime?",
+            ],
+            npcZh: "太好了！主菜马上就来。还有其他需要吗？",
+            task: "顺便反馈：叉子有点脏，想换一把",
+            options: [
+              { text: "Actually, could I get a clean fork? This one has a spot on it.", ok: true,  tip: "could I get...? + 具体原因，提出小要求的模板" },
+              { text: "Fork dirty. Change fork now.",                                  ok: false, tip: "更礼貌：Could I get a clean fork?" },
+              { text: "This fork is bad you gave me dirty one.",                       ok: false, tip: "说明现象即可：This one has a spot on it" },
+            ],
+            phrase: { en: "Could I get a clean ___?", zh: "能给我换一个干净的……吗？", note: "换餐具/杯子的小请求万能句" },
+          },
+          {
+            npcLines: [
+              "Of course! So sorry about that — I'll bring a fresh one immediately.",
+              "Absolutely, my apologies! A clean fork, right away.",
+              "Yes, of course! Sorry about that, fresh cutlery coming up!",
+            ],
+            npcZh: "当然！非常抱歉——我马上给您拿一把新的。",
+            task: "表示感谢，说明小事一桩",
+            options: [
+              { text: "Thanks. It's not a big deal — just wanted to let you know.", ok: true,  tip: "not a big deal 轻描淡写，给双方台阶下" },
+              { text: "Okay thanks no problem for you.",                          ok: false, tip: "说 It's not a big deal" },
+              { text: "Thank you I am very angry but okay.",                       ok: false, tip: "保持轻松：It's not a big deal" },
+            ],
+            phrase: { en: "It's not a big deal.", zh: "不是什么大事", note: "化解尴尬、表明不计较的常用语" },
+          },
+          {
+            npcLines: [
+              "You're very understanding, thank you. Enjoy the rest of your meal!",
+              "That's very kind of you. Enjoy your dinner!",
+              "Thank you for your patience! Please enjoy your meal.",
+            ],
+            npcZh: "非常感谢您的理解。请享用您的晚餐！",
+            task: "礼貌收尾",
+            options: [
+              { text: "Thank you. Everyone makes mistakes — the service is still great!", ok: true,  tip: "宽慰对方 + 正面评价，投诉后的完美收尾" },
+              { text: "Yes mistake okay bye now.",                                     ok: false, tip: "大度一点：Everyone makes mistakes" },
+              { text: "Fine. I still remember the wrong soup.",                        ok: false, tip: "得体收场：The service is still great!" },
+            ],
+            phrase: { en: "Everyone makes mistakes.", zh: "人人都会犯错", note: "宽慰金句：给对方台阶，也显自己大度" },
+          },
+        ],
+      },
+      // 餐厅 第 6 轮：小费文化（8 步）
+      {
+        id: "v6",
+        title: "第 6 次光顾 · 小费文化深潜",
+        titleEn: "Tipping Culture",
+        emoji: "💰",
+        desc: "在美国餐厅，小费是绕不开的文化。该给多少？什么时候可以不给？变打工达人前先学会消费达人！",
+        reward: { en: "tip", zh: "你搞懂了小费文化，再也不用在账单前装冷静！💰" },
+        steps: [
+          {
+            npcLines: [
+              "Good evening! Welcome back to Rosewood! Your usual table by the window?",
+              "Evening! Great to see you again. Window table, as always?",
+              "Well hello again! The usual spot by the window, I presume?",
+            ],
+            npcZh: "晚上好！欢迎回到 Rosewood 餐厅！还是老位置，靠窗那桌吗？",
+            task: "确认老位置",
+            options: [
+              { text: "Yes, the usual, please. Great to be back!", ok: true,  tip: "the usual 老样子，熟客感拉满的口语" },
+              { text: "Same same table window again yes.",         ok: false, tip: "说 The usual, please" },
+              { text: "I always sit here you know.",               ok: false, tip: "更自然：Yes, the usual, please" },
+            ],
+            phrase: { en: "The usual, please.", zh: "老样子", note: "常客点单/选座万能句，= 和平常一样" },
+          },
+          {
+            npcLines: [
+              "Perfect. Here's the menu. By the way, we have a new seasonal tasting menu tonight — five courses!",
+              "Here you go! Oh — just so you know, tonight we're featuring a five-course tasting menu.",
+              "Menu for you! Quick heads-up: there's a new seasonal tasting menu tonight, five courses.",
+            ],
+            npcZh: "好的。这是菜单。对了，今晚我们新推了季节品鉴套餐——五道式！",
+            task: "询问品鉴套餐价格是否含小费",
+            options: [
+              { text: "Sounds interesting! Does the price include tax and tip?", ok: true,  tip: "include tax and tip 问清总价构成，点套餐必问" },
+              { text: "How much money all together is it?",                     ok: false, tip: "更精准：Does the price include tax and tip?" },
+              { text: "Price have tip inside or not?",                          ok: false, tip: "说 Does the price include tip?" },
+            ],
+            phrase: { en: "Does the price include tax and tip?", zh: "价格含税和小费吗？", note: "套餐/团餐必问：含税+含小费一次问清" },
+          },
+          {
+            npcLines: [
+              "Great question! The price includes tax but not tip. For parties of six or more, we add an 18% gratuity automatically.",
+              "Good of you to ask! Tax is included, tip is not. Heads-up: parties of six or more get an automatic 18% gratuity.",
+              "Tax is in there, tip isn't. And just so you know, six or more people means an automatic 18% service charge.",
+            ],
+            npcZh: "问得好！价格含税但不含小费。另外，六人及以上聚会会自动加收 18% 的服务费。",
+            task: "理解 gratuity 规则，继续点餐",
+            options: [
+              { text: "Got it. It's just the two of us tonight, so we'll tip separately. We'll try the tasting menu!", ok: true,  tip: "Got it 表示听懂规则 + 二人不受影响，理解后行动" },
+              { text: "18 percent too much money no want.",                ok: false, tip: "先确认人数：It's just the two of us" },
+              { text: "Gratuity word I don't know. Free is good.",         ok: false, tip: "gratuity = 小费的正式说法，自动加收时用" },
+            ],
+            phrase: { en: "gratuity / service charge", zh: "服务费（小费的正式说法）", note: "账单上自动加的小费叫 gratuity，通常 18%~20%" },
+          },
+          {
+            npcLines: [
+              "Excellent choice! I'll get that started for you. The first course will be out in about fifteen minutes.",
+              "Wonderful! I'll put that order in right away. First course in about fifteen minutes!",
+              "Great pick! Your first course will arrive in about fifteen minutes.",
+            ],
+            npcZh: "绝佳选择！我这就下单。第一道菜大约十五分钟后上。",
+            task: "询问可否配酒（红酒推荐）",
+            options: [
+              { text: "Could you recommend a red wine that pairs well with the menu?", ok: true,  tip: "pair with 搭配，配餐酒的行话" },
+              { text: "Give me best wine for this food.",                            ok: false, tip: "更地道：Could you recommend a wine that pairs well?" },
+              { text: "Red wine good with food yes?",                               ok: false, tip: "说 pairs well with the menu" },
+            ],
+            phrase: { en: "What pairs well with ___?", zh: "……和什么搭？", note: "pair with 餐饮搭配万能词：酒配菜、菜配酱都能用" },
+          },
+          {
+            npcLines: [
+              "Our sommelier suggests a Pinot Noir — light enough for every course. Would you like a glass?",
+              "I'd go with the Pinot Noir — it works with all five courses. A glass?",
+              "The Pinot Noir is a lovely match for the tasting menu. Care for a glass?",
+            ],
+            npcZh: "我们的侍酒师推荐黑皮诺——轻盈百搭，配五道菜都合适。来一杯吗？",
+            task: "接受推荐，来一杯",
+            options: [
+              { text: "That sounds perfect. I'll have a glass, please.", ok: true,  tip: "I'll have... 接受推荐点单的标准句" },
+              { text: "Okay wine yes one cup give.",                   ok: false, tip: "一杯酒是 a glass：I'll have a glass, please" },
+              { text: "You choose I drink anything free.",             ok: false, tip: "说 I'll have a glass, please" },
+            ],
+            phrase: { en: "I'll have a glass of ___.", zh: "我来一杯……", note: "点酒水标准句；红酒杯是 glass，整瓶才叫 bottle" },
+            adds: [{ emoji: "🍷", label: "Pinot Noir", wordId: "wine" }],
+          },
+          {
+            npcLines: [
+              "How is everything so far? Are you enjoying the courses?",
+              "Checking in — how are the courses treating you?",
+              "Well? How's the tasting menu working out for you?",
+            ],
+            npcZh: "目前一切还好吗？喜欢这些菜吗？",
+            task: "称赞 + 好奇问一句菜量会太大吗",
+            options: [
+              { text: "Everything is delicious! The portions are perfect — not too big, not too small.", ok: true,  tip: "not too big, not too small 中庸表达，自然赞美" },
+              { text: "Food good. Too much food maybe I will fat.",                                   ok: false, tip: "更自然：The portions are perfect" },
+              { text: "Delicious yes. Small plates expensive though.",                                ok: false, tip: "只夸分量即可：The portions are perfect" },
+            ],
+            phrase: { en: "not too ___, not too ___", zh: "不太……也不太……", note: "表达刚刚好的万能句式" },
+          },
+          {
+            npcLines: [
+              "So glad you're enjoying it! Here's the bill whenever you're ready — no rush at all.",
+              "Wonderful! Take your time — the bill's here whenever you're ready for it.",
+              "Delighted to hear it! I'll leave the bill here — whenever you're ready.",
+            ],
+            npcZh: "很高兴您喜欢！账单放这儿了，您慢慢来，不着急。",
+            task: "看账单：$80。按 20% 给小费，刷卡",
+            options: [
+              { text: "I'll pay by card. The service was excellent — 20% tip, please.", ok: true,  tip: "小费比例直接说，刷卡时 tip 在刷卡机或账单上操作" },
+              { text: "Card pay. Add some extra money for you okay.",                   ok: false, tip: "说清比例：20% tip, please" },
+              { text: "I pay 80 dollar only exact no tip today.",                       ok: false, tip: "服务很好，正常小费 15%~20%" },
+            ],
+            phrase: { en: "___% tip", zh: "给……% 的小费", note: "美国惯例：午餐 15%~18%，晚餐 18%~20%，服务出色给 20%+" },
+            adds: [{ emoji: "💳", label: "Paid + 20% Tip", wordId: "card" }],
+          },
+          {
+            npcLines: [
+              "That's very generous — thank you so much! We love having you here. See you next time!",
+              "You're too kind, thank you! It's always a pleasure. Until next time!",
+              "Wow, thank you! You're one of our favorites. Safe travels home!",
+            ],
+            npcZh: "您太慷慨了——非常感谢！很高兴您光临。下次见！",
+            task: "总结小费文化要点，道别",
+            options: [
+              { text: "Great service deserves a great tip. Have a good one!", ok: true,  tip: "have a good one 美式随性告别，比 have a good day 更口语" },
+              { text: "Bye bye restaurant money finished.",                 ok: false, tip: "更自然：Have a good one!" },
+              { text: "Next time I pay less money okay deal?",              ok: false, tip: "大方道别：Have a good one!" },
+            ],
+            phrase: { en: "Have a good one!", zh: "回见！", note: "美式万能告别：比 have a good day 更随意，人人爱用" },
+          },
+        ],
+      },
     ],
   },
   {
@@ -1942,7 +2216,18 @@ const SCENES = [
       // 第 3 轮（退换货）新词
       { id: "receipt", en: "receipt", zh: "小票", phon: "/rɪˈsiːt/", emoji: "🧾", sent: "Keep the receipt for returns." },
       { id: "refund", en: "refund", zh: "退款",   phon: "/ˈriːfʌnd/", emoji: "💸", sent: "I'd like a refund, please." },
-      { id: "exchange", en: "exchange", zh: "换货", phon: "/ɪksˈtʃeɪndʒ/", emoji: "🔄", sent: "Can I exchange this for a new one?" },
+      { id: "exchange", en: "exchange", zh: "换货", phon: "/ɪksˈtʃeɪndʒ/", emoji: "🔄", sent: "Can I exchange this for a new one?" },// 超市新词条（供 append 脚本用）
+      // 第 4 轮（会员折扣）新词
+      { id: "coupon",   en: "coupon",   zh: "优惠券",   phon: "/ˈkuːpɒn/",   emoji: "🎟️", sent: "Don't forget to use your coupon." },
+      { id: "bogo",     en: "BOGO",     zh: "买一送一", phon: "/ˌbiː oʊ dʒiː ˈoʊ/", emoji: "🛍️", sent: "Cereal is BOGO this week." },
+      { id: "selfcheckout", en: "self-checkout", zh: "自助结账", phon: "/self ˈtʃekaʊt/", emoji: "🤖", sent: "Use the self-checkout for faster service." },
+      { id: "discount", en: "discount", zh: "折扣",     phon: "/ˈdɪskaʊnt/", emoji: "🏷️", sent: "Members get an extra discount." },
+      // 第 5 轮（生鲜称重）新词
+      { id: "deli",     en: "deli counter", zh: "熟食柜台", phon: "/ˈdeli ˈkaʊntə(r)/", emoji: "🥓", sent: "Get sliced ham at the deli counter." },
+      { id: "pound",    en: "pound",    zh: "磅",       phon: "/paʊnd/",     emoji: "⚖️", sent: "A pound is about 450 grams." },
+      { id: "ripe",     en: "ripe",     zh: "成熟的",   phon: "/raɪp/",      emoji: "🍈", sent: "This watermelon is perfectly ripe." },
+      { id: "sample",   en: "sample",   zh: "试吃样品", phon: "/ˈsɑːmpl/",   emoji: "🍽️", sent: "Would you like a free sample?" },
+
     ],
     visits: [
       {
@@ -2377,6 +2662,258 @@ const SCENES = [
           },
         ],
       },
+      // 超市 第 4 轮：会员折扣（8 步）
+      {
+        id: "v4",
+        title: "第 4 次光顾 · 会员与折扣",
+        titleEn: "Deals & Membership",
+        emoji: "🏷️",
+        desc: "BOGO、coupon、会员价……美国超市省钱门道多。学会问折扣、用会员卡、走自助结账，省下真金白银！",
+        reward: { en: "coupon", zh: "你解锁了超市省钱三件套：问折扣、用会员卡、自助结账！🏷️" },
+        steps: [
+          {
+            npcLines: [
+              "Hi! Welcome to Fresh Mart. Before you shop — do you have our member card?",
+              "Hello there! Do you have a Fresh Mart rewards card with you today?",
+              "Hi, welcome in! Just wondering — got a member card on you?",
+            ],
+            npcZh: "您好！欢迎来到 Fresh 超市。逛之前问一下——您有我们的会员卡吗？",
+            task: "没有会员卡，顺便问办卡有什么好处",
+            options: [
+              { text: "Not yet. What are the benefits of becoming a member?", ok: true,  tip: "What are the benefits? 问权益，办卡前必问" },
+              { text: "No card. Card is good for what things?",               ok: false, tip: "说 What are the benefits?" },
+              { text: "No have card. Free card give me?",                     ok: false, tip: "先问好处：What are the benefits?" },
+            ],
+            phrase: { en: "What are the benefits of ___?", zh: "……有什么好处？", note: "办卡/订阅/入会前的灵魂三问之一" },
+          },
+          {
+            npcLines: [
+              "Great question! Members get exclusive discounts, and today we have a buy-one-get-one deal on cereal!",
+              "Well, members save a ton! Plus today's BOGO on cereal — buy one, get one free!",
+              "Oh, lots! Member-only prices, and right now cereal is buy-one-get-one-free!",
+            ],
+            npcZh: "问得好！会员享专属折扣，而且今天麦片买一送一！",
+            task: "了解 BOGO，决定办卡",
+            options: [
+              { text: "Buy one, get one free? That's a great deal! I'd like to sign up, please.", ok: true,  tip: "That's a great deal! 听到优惠的标配反应 + sign up 注册" },
+              { text: "BOGO I don't understand this word meaning.",                              ok: false, tip: "BOGO = buy one, get one，买一送一的缩写" },
+              { text: "Free cereal only? Other free things too?",                                 ok: false, tip: "先办卡：I'd like to sign up, please" },
+            ],
+            phrase: { en: "buy one, get one free (BOGO)", zh: "买一送一", note: "美国超市高频缩写 BOGO，广告传单上到处都是" },
+          },
+          {
+            npcLines: [
+              "Perfect! I just need your phone number, and you're all set. Takes thirty seconds!",
+              "Easy! Just your phone number and you're a member. Thirty seconds, tops!",
+              "Great! Phone number, please — that's all it takes to join!",
+            ],
+            npcZh: "太好了！只需要您的手机号就能注册，三十秒搞定！",
+            task: "提供手机号完成注册",
+            options: [
+              { text: "Sure, it's 555-0123. Here you go.", ok: true,  tip: "报号码用 it's...，简洁清楚" },
+              { text: "Phone number yes I have one phone.", ok: false, tip: "直接报号码：It's 555-0123" },
+              { text: "Why need my number secret?",        ok: false, tip: "会员卡常规流程，报号即可：It's..." },
+            ],
+            phrase: { en: "Sure, it's ___. Here you go.", zh: "好的，是……给", note: "报号码/信息 + 递东西的组合句" },
+            adds: [{ emoji: "💳", label: "Member Card ✓", badge: true }],
+          },
+          {
+            npcLines: [
+              "You're a member now! By the way, do you have any coupons today?",
+              "All signed up! Oh — any coupons with you today?",
+              "Welcome to the family! Got any coupons to use?",
+            ],
+            npcZh: "您现在是会员了！对了，您今天有优惠券吗？",
+            task: "出示手机上的电子优惠券",
+            options: [
+              { text: "Yes, I have a digital coupon on my phone. Can you scan it?", ok: true,  tip: "digital coupon 电子券；Can you scan it? 扫码请求" },
+              { text: "Coupon in phone yes scan please it.",                        ok: false, tip: "说 Can you scan it?" },
+              { text: "I have paper money only no coupon.",                         ok: false, tip: "手机券更常见：I have a digital coupon on my phone" },
+            ],
+            phrase: { en: "Can you scan it?", zh: "能扫一下吗？", note: "扫码/扫券/扫会员码万能句" },
+            adds: [{ emoji: "📱", label: "Coupon", wordId: "coupon" }],
+          },
+          {
+            npcLines: [
+              "Scanned! You just saved $2.50. Now, is this everything for you today?",
+              "Done — that's $2.50 back in your pocket! Is this everything?",
+              "Got it, $2.50 saved! Anything else in your basket?",
+            ],
+            npcZh: "扫好了！您省了 2.5 美元。今天就买这些吗？",
+            task: "询问某种商品是否有会员价",
+            options: [
+              { text: "Is this milk on sale for members?", ok: true,  tip: "on sale 打折中；Is this... on sale? 问折扣万能句" },
+              { text: "Milk have special price today or no?", ok: false, tip: "说 Is this on sale?" },
+              { text: "Member milk cheaper how much?",      ok: false, tip: "更地道：Is this milk on sale for members?" },
+            ],
+            phrase: { en: "Is this on sale?", zh: "这个在打折吗？", note: "on sale = 打折中；会员价常说 member price" },
+          },
+          {
+            npcLines: [
+              "Yes! Members get it for $2.99 instead of $3.99. Would you like to grab two? They're both discounted.",
+              "You bet — $2.99 for members, down from $3.99. Two would both be at the discount price!",
+              "That's right, member price is $2.99! Grabing two? Both ring up discounted.",
+            ],
+            npcZh: "是的！会员价 2.99 美元，原价 3.99。拿两瓶吧？两瓶都享会员价。",
+            task: "接受建议拿两瓶",
+            options: [
+              { text: "Sure, I'll take two then. Thanks for letting me know!", ok: true,  tip: "I'll take two 数量直说 + 致谢提醒" },
+              { text: "Two milk yes good deal I buy.",                        ok: false, tip: "更自然：I'll take two, thanks!" },
+              { text: "If free I take hundred haha.",                         ok: false, tip: "接受优惠即可：I'll take two then" },
+            ],
+            phrase: { en: "I'll take two.", zh: "我拿两个", note: "接受店员建议时数量直说，干脆利落" },
+            adds: [{ emoji: "🥛", label: "Milk ×2 $5.98", wordId: "milk" }],
+          },
+          {
+            npcLines: [
+              "Great! Would you like to use the self-checkout, or come to my register?",
+              "Perfect! Self-checkout or my lane — which do you prefer?",
+              "All set! Want to do self-checkout, or ring up here with me?",
+            ],
+            npcZh: "好的！您想用自助结账，还是来我这边的人工通道？",
+            task: "尝试自助结账（第一次用）",
+            options: [
+              { text: "I'd like to try the self-checkout. Could you show me how it works?", ok: true,  tip: "Could you show me how it works? 求演示的礼貌问法" },
+              { text: "Machine scary, I don't know use.",                                  ok: false, tip: "大胆尝试：Could you show me how it works?" },
+              { text: "Self what? English word too hard.",                                 ok: false, tip: "self-checkout = 自助结账机，超市标配" },
+            ],
+            phrase: { en: "Could you show me how it works?", zh: "能演示一下怎么用吗？", note: "面对新机器/新流程的万能求助句" },
+          },
+          {
+            npcLines: [
+              "Of course! Just scan each item, bag them, and pay at the end. I'll be right here if you need help. See you next time!",
+              "Happy to! Scan, bag, pay — that's it! I'm right over here if you get stuck. Have a good one!",
+              "Sure thing! Scan each item, bag them up, then pay. Holler if you need me. Take care!",
+            ],
+            npcZh: "当然！逐件扫码、装袋、最后付款。需要帮忙我就在旁边。下次见！",
+            task: "完成自助结账并道别",
+            options: [
+              { text: "Got it — scan, bag, pay. Thank you for your help!", ok: true,  tip: "复述流程 = 确认理解，学习闭环" },
+              { text: "Okay bye machine I go now.",                      ok: false, tip: "复述要点更清楚：Scan, bag, pay. Thanks!" },
+              { text: "Too many steps I forget already sorry.",          ok: false, tip: "简版复述即可：Scan, bag, pay!" },
+            ],
+            phrase: { en: "Scan, bag, pay.", zh: "扫码、装袋、付款", note: "自助结账三步曲，记住它走遍美国超市" },
+          },
+        ],
+      },
+      // 超市 第 5 轮：生鲜称重（7 步）
+      {
+        id: "v5",
+        title: "第 5 次光顾 · 生鲜称重",
+        titleEn: "Fresh Counter",
+        emoji: "⚖️",
+        desc: "熟食柜台买火腿、水果区挑西瓜——磅和公斤怎么换算？半份怎么开口？学会称重区生存英语！",
+        reward: { en: "scale", zh: "你在生鲜柜台用英文买到了刚刚好的分量！⚖️" },
+        steps: [
+          {
+            npcLines: [
+              "Hi there! Welcome to the deli counter. What can I get for you today?",
+              "Hello! Fresh deli counter here — what'll it be today?",
+              "Hi, welcome! What can I slice up for you today?",
+            ],
+            npcZh: "您好！欢迎来到熟食柜台。今天想买点什么？",
+            task: "想买半磅火腿片",
+            options: [
+              { text: "Could I get half a pound of sliced ham, please?", ok: true,  tip: "half a pound 半磅；磅是美国重量单位（约 0.45 公斤）" },
+              { text: "Ham give me some small piece.",                    ok: false, tip: "说清分量：half a pound of ham" },
+              { text: "I want ham how much is one?",                      ok: false, tip: "先报分量：Half a pound of sliced ham, please" },
+            ],
+            phrase: { en: "Half a pound of ___, please.", zh: "请给我半磅……", note: "熟食柜台标准句；1 磅 ≈ 0.45 kg，半磅 ≈ 227 克" },
+          },
+          {
+            npcLines: [
+              "Sure! This brand is on sale this week — $4.99 a pound. Would you like to try a sample first?",
+              "You got it! Heads-up, this one's on sale — $4.99 a pound. Want a taste first?",
+              "No problem! By the way, this brand's discounted this week — $4.99 a pound. Free sample?",
+            ],
+            npcZh: "好的！这个牌子这周特价——4.99 美元一磅。要先试吃一下吗？",
+            task: "试吃后表示喜欢",
+            options: [
+              { text: "Sure, I'd love to try. ... Mmm, that's really good! I'll take it.", ok: true,  tip: "I'd love to try 接受试吃 + I'll take it 决定购买" },
+              { text: "Eat free sample yes yes delicious.",                              ok: false, tip: "礼貌版：I'd love to try... I'll take it" },
+              { text: "No try. Just give ham fast.",                                      ok: false, tip: "试吃不吃亏：Sure, I'd love to try" },
+            ],
+            phrase: { en: "I'd love to try.", zh: "我很想试试", note: "接受试吃/体验邀请的自然说法" },
+          },
+          {
+            npcLines: [
+              "Great! Just to confirm — half a pound, thinly sliced? Anything else from the deli?",
+              "Perfect! So that's half a pound, thin slices, right? Anything else for you?",
+              "Got it — half a pound, thin cut. Anything else at the counter today?",
+            ],
+            npcZh: "好的！确认一下——半磅，切薄片，对吧？熟食区还要别的吗？",
+            task: "确认，再要一份土豆沙拉",
+            options: [
+              { text: "Yes, that's right. And could I also get a container of potato salad?", ok: true,  tip: "And could I also get...? 追加订单的礼貌句" },
+              { text: "Yes correct. Potato salad one also buy.",                            ok: false, tip: "说 And could I also get a potato salad?" },
+              { text: "Right. More food different kind too.",                               ok: false, tip: "具体说商品：And could I also get a potato salad?" },
+            ],
+            phrase: { en: "And could I also get ___?", zh: "另外能再来一份……吗？", note: "追加购买万能句，点单/购物通吃" },
+            adds: [{ emoji: "🥗", label: "Potato Salad", badge: true }],
+          },
+          {
+            npcLines: [
+              "One potato salad coming up! Now, for the fruit section — our watermelons are seedless today. Interested?",
+              "There you go, potato salad! Oh — seedless watermelons just came in. Want to take a look?",
+              "Potato salad, done! By the way, seedless watermelons are in season. Interested?",
+            ],
+            npcZh: "土豆沙拉来了！对了，水果区今天的西瓜是无籽的。感兴趣吗？",
+            task: "想去挑一个，问能买半个吗",
+            options: [
+              { text: "A whole one is too big for me. Could I buy half a watermelon?", ok: true,  tip: "too big for me 说明原因 + 请求半份，逻辑满分" },
+              { text: "Watermelon huge. Half cut sell me.",                          ok: false, tip: "更自然：Could I buy half a watermelon?" },
+              { text: "I want small watermelon baby size.",                          ok: false, tip: "常见做法是买半个：Could I buy half?" },
+            ],
+            phrase: { en: "Could I buy half a ___?", zh: "能买半个……吗？", note: "西瓜/南瓜/大面包都能这样问，店员会帮你切" },
+          },
+          {
+            npcLines: [
+              "Of course! We can cut one in half for you. Or would you prefer the pre-cut halves in the cooler?",
+              "Absolutely! We'll slice one open for you. Or there are pre-cut halves in the fridge case?",
+              "Sure thing! Happy to cut one for you — or grab a pre-cut half from the cooler?",
+            ],
+            npcZh: "当然可以！我们可以帮您切一半。或者您想直接拿冷柜里预先切好的？",
+            task: "选择现切，请店员挑个熟的",
+            options: [
+              { text: "Could you pick a ripe one for me, please? I can never tell.", ok: true,  tip: "Could you pick... for me? 请人代挑 + 坦承不会挑，诚实又讨喜" },
+              { text: "You choose good one I trust you money.",                    ok: false, tip: "更自然：Could you pick a ripe one for me?" },
+              { text: "Ripe means what which is ripe word?",                       ok: false, tip: "ripe = 成熟的；直接请店员挑即可" },
+            ],
+            phrase: { en: "Could you pick a ripe one for me?", zh: "能帮我挑个熟的吗？", note: "挑瓜/挑果神器句；ripe 成熟的，生的是 unripe" },
+          },
+          {
+            npcLines: [
+              "Haha, it's a skill! Let me knock on a few... This one sounds perfect. I'll cut and wrap it for you.",
+              "You and me both! Let me do the knock test... This one's a winner. Cutting it up now!",
+              "Trick of the trade! Knocking on them... ah, this one's ready. I'll halve and wrap it.",
+            ],
+            npcZh: "哈哈，挑瓜是个技术活！我敲几个听听……这个声音正合适。我帮您切开包好。",
+            task: "对挑瓜技术表示好奇",
+            options: [
+              { text: "How can you tell? It sounds like magic!", ok: true,  tip: "How can you tell? 问对方是怎么看出来的，好奇宝宝必备" },
+              { text: "Knock knock watermelon magic show?",      ok: false, tip: "说 How can you tell?" },
+              { text: "Sound good bad how to know?",             ok: false, tip: "更自然：How can you tell?" },
+            ],
+            phrase: { en: "How can you tell?", zh: "怎么看出来的？", note: "请教对方判断方法的万能问句" },
+            adds: [{ emoji: "🍉", label: "Half Watermelon", badge: true }],
+          },
+          {
+            npcLines: [
+              "Ripe watermelons sound hollow and deep! Here's your half — that'll be $3.50 at the register. Enjoy!",
+              "A hollow, deep knock means it's ripe! Here you go — $3.50 at checkout. Enjoy the melon!",
+              "Hollow thump = ripe melon, that's the secret! Your half's ready — $3.50 up front. Enjoy!",
+            ],
+            npcZh: "熟西瓜敲起来声音空而深沉！您的半个好了——收银台付 3.5 美元。慢慢享用！",
+            task: "学到挑瓜知识，感谢道别",
+            options: [
+              { text: "Hollow and deep — got it! Thanks for the lesson. Have a great day!", ok: true,  tip: "复述知识点 + Thanks for the lesson，学以致用" },
+              { text: "Okay bye watermelon man thanks.",                                  ok: false, tip: "更有内容：Thanks for the lesson!" },
+              { text: "I still don't understand but okay thanks.",                         ok: false, tip: "复述要点巩固记忆：Hollow and deep — got it!" },
+            ],
+            phrase: { en: "Thanks for the lesson!", zh: "受教了！", note: "学到新知识后的趣味致谢，比 thank you 更有心意" },
+          },
+        ],
+      },
     ],
   },
   {
@@ -2410,7 +2947,19 @@ const SCENES = [
       { id: "towel",    en: "towel",    zh: "毛巾",  phon: "/ˈtaʊəl/", emoji: "🧻", sent: "Could I get a clean towel?" },
       { id: "noisy",    en: "noisy",    zh: "吵闹的", phon: "/ˈnɔɪzi/", emoji: "🔊", sent: "The street is too noisy." },
       { id: "upgrade",  en: "upgrade",  zh: "升级",  phon: "/ˈʌpɡreɪd/", emoji: "⬆️", sent: "We upgraded you to a suite." },
-      { id: "apology",  en: "apology",  zh: "道歉",  phon: "/əˈpɒlədʒi/", emoji: "🙏", sent: "Please accept our apology." },
+      { id: "apology",  en: "apology",  zh: "道歉",  phon: "/əˈpɒlədʒi/", emoji: "🙏", sent: "Please accept our apology." },// 酒店新词条（供 append 脚本用）
+      // 第 4 轮（房卡报修）新词
+      { id: "maintenance", en: "maintenance", zh: "维修", phon: "/ˈmeɪntənəns/", emoji: "🔧", sent: "Maintenance will fix the AC today." },
+      { id: "thermostat",  en: "thermostat",  zh: "温控器", phon: "/ˈθɜːməstæt/", emoji: "🌡️", sent: "Set the thermostat to 22 degrees." },
+      { id: "stuffy",      en: "stuffy",      zh: "闷的", phon: "/ˈstʌfi/", emoji: "💨", sent: "It's stuffy in here — let's open a window." },
+      { id: "demagnetize", en: "demagnetized", zh: "消磁了", phon: "/ˌdiːˈmæɡnətaɪzd/", emoji: "🧲", sent: "My card got demagnetized." },
+      // 第 5 轮（设施服务）新词
+      { id: "gym",         en: "gym",         zh: "健身房", phon: "/dʒɪm/", emoji: "🏋️", sent: "The hotel gym is open 24 hours." },
+      { id: "pool",        en: "pool",        zh: "泳池", phon: "/puːl/", emoji: "🏊", sent: "The pool closes at 10 p.m." },
+      { id: "wake",        en: "wake-up call", zh: "叫醒服务", phon: "/ˈweɪk ʌp kɔːl/", emoji: "⏰", sent: "I'd like a wake-up call at 6:30." },
+      { id: "laundry",     en: "laundry service", zh: "洗衣服务", phon: "/ˈlɔːndri ˈsɜːvɪs/", emoji: "🧺", sent: "The laundry service is fast here." },
+      { id: "blanket",     en: "blanket",     zh: "毛毯", phon: "/ˈblæŋkɪt/", emoji: "🛏️", sent: "Could I have an extra blanket?" },
+
     ],
     visits: [
       {
@@ -2761,6 +3310,271 @@ const SCENES = [
           },
         ],
       },
+      // 酒店 第 4 轮：房卡与报修（8 步）
+      {
+        id: "v4",
+        title: "第 4 次光顾 · 房卡失效与报修",
+        titleEn: "Key Card & Repairs",
+        emoji: "🔧",
+        desc: "半夜房卡突然失效？空调罢工？别慌！学会前台换卡、房间报修、请求换房的完整流程。",
+        reward: { en: "maintenance", zh: "你搞定了房卡和空调两大危机，酒店生存力满级！🔧" },
+        steps: [
+          {
+            npcLines: [
+              "Good evening, sir! How can I help you tonight?",
+              "Evening! What can I do for you?",
+              "Hello! Welcome to the front desk. What's up?",
+            ],
+            npcZh: "晚上好，先生！今晚有什么可以帮您？",
+            task: "说明房卡失效，进不去房间",
+            options: [
+              { text: "Hi, my key card suddenly stopped working. I can't get into my room.", ok: true,  tip: "stopped working 失效了；开门失败就这么说" },
+              { text: "Card bad. Door no open. Help me.",                                 ok: false, tip: "说 My key card stopped working" },
+              { text: "Room locked forever me outside sad.",                              ok: false, tip: "更清楚：I can't get into my room" },
+            ],
+            phrase: { en: "My key card stopped working.", zh: "我的房卡失效了", note: "stop working 设备失灵万能说法：房卡、遥控器、Wi-Fi 都能用" },
+          },
+          {
+            npcLines: [
+              "Oh, I'm sorry about that! Sometimes the cards get demagnetized. Could I see your ID to verify?",
+              "Apologies! Cards get demagnetized sometimes. May I see some ID to confirm?",
+              "Sorry about that! Cards do lose their charge occasionally. Could I check your ID?",
+            ],
+            npcZh: "非常抱歉！有时卡会被消磁。能看下您的证件核实身份吗？",
+            task: "出示证件",
+            options: [
+              { text: "Sure, here's my passport. Room 1208.", ok: true,  tip: "出示证件 + 报房号，一次说清省时间" },
+              { text: "ID yes have. Which room I am?",        ok: false, tip: "主动报房号：Room 1208" },
+              { text: "Why need passport? Suspicious.",       ok: false, tip: "换卡核身是常规流程，出示即可" },
+            ],
+            phrase: { en: "Here's my passport. Room ___.", zh: "这是我的护照，……房间", note: "前台办事组合句：证件 + 房号" },
+            adds: [{ emoji: "🪪", label: "ID Verified ✓", badge: true }],
+          },
+          {
+            npcLines: [
+              "Thank you! Let me reactivate that for you... All set. Here's your new card, same room.",
+              "Perfect, give me one moment... Done! Fresh card for Room 1208.",
+              "Great, reactivating... There you go — brand new card, same room!",
+            ],
+            npcZh: "谢谢！我为您重新激活一下……好了，新卡给您，还是原房间。",
+            task: "测试新卡前再想起另一个问题：空调坏了",
+            options: [
+              { text: "Thanks! Actually, there's one more thing — the air conditioner in my room isn't working.", ok: true,  tip: "one more thing 追加话题的经典过渡语" },
+              { text: "Card okay good. Also cold room machine broken too.",                                  ok: false, tip: "说 the air conditioner isn't working" },
+              { text: "New problem I have many problems tonight.",                                           ok: false, tip: "直说问题：The AC isn't working" },
+            ],
+            phrase: { en: "There's one more thing — ___", zh: "还有一件事——……", note: "礼貌追加话题神器，前台/客服场景高频" },
+          },
+          {
+            npcLines: [
+              "Oh no, sorry to hear that! Is it not turning on at all, or just blowing warm air?",
+              "That's no good! Is the AC completely dead, or just not cooling?",
+              "Ugh, sorry! So it won't turn on, or is it just warm air?",
+            ],
+            npcZh: "哎呀，很抱歉！是彻底不启动，还是只吹自然风？",
+            task: "描述故障：启动了但只吹风不制冷",
+            options: [
+              { text: "It's running, but it only blows warm air. The room is really stuffy.", ok: true,  tip: "blows warm air 吹热风 + stuffy 闷，故障描述两件套" },
+              { text: "Machine work but hot air only no cold.",                              ok: false, tip: "说 It only blows warm air" },
+              { text: "Air bad. Room like sauna temperature.",                               ok: false, tip: "加细节：It's running but only blows warm air" },
+            ],
+            phrase: { en: "It's running, but it only blows warm air.", zh: "机器在转，但只吹热风", note: "running = 在运转；设备半坏的精准描述" },
+          },
+          {
+            npcLines: [
+              "I see. I'll send maintenance up right away. Would you like to wait in the room, or would you prefer a room change?",
+              "Got it. Maintenance is on the way! Want to wait it out, or should I move you to another room?",
+              "Understood! I'll dispatch maintenance now. Stay and wait, or switch rooms — your call.",
+            ],
+            npcZh: "明白了。我马上派维修上去。您想在房间等，还是换一间房？",
+            task: "先试试维修，如果修不好再换房",
+            options: [
+              { text: "Let's try the repair first. If it can't be fixed tonight, I'd like to change rooms.", ok: true,  tip: "先 A 后 B 的条件句：If..., I'd like to...，表达清晰诉求" },
+              { text: "Fix it now quick fast please hurry.",                                              ok: false, tip: "说清先后：Let's try the repair first" },
+              { text: "Change room immediately biggest room upgrade free.",                                ok: false, tip: "合理表达：If it can't be fixed, I'd like to change rooms" },
+            ],
+            phrase: { en: "If it can't be fixed, I'd like to ___.", zh: "如果修不好，我想……", note: "条件表达法：给对方方案，也守住自己的底线" },
+          },
+          {
+            npcLines: [
+              "Perfectly reasonable. Maintenance will be there in ten minutes. Again, sorry for the trouble!",
+              "Absolutely fair. Someone will knock on your door within ten minutes. Apologies again!",
+              "No problem at all! Ten minutes, tops. Sorry for the inconvenience!",
+            ],
+            npcZh: "非常合理。维修人员十分钟内到您房间。再次为不便道歉！",
+            task: "接受道歉，询问空调修好后会不会太冷",
+            options: [
+              { text: "No worries. Quick question — is there a way to control the temperature in the room?", ok: true,  tip: "Quick question 附加小问题的自然引导语" },
+              { text: "Okay fine. Cold hot how to change it?",                                            ok: false, tip: "说 Is there a way to control the temperature?" },
+              { text: "AC too strong always freezing in hotels.",                                          ok: false, tip: "先问方法：Is there a way to control the temperature?" },
+            ],
+            phrase: { en: "Is there a way to ___?", zh: "有没有办法……？", note: "求方法的礼貌句式，比 How to? 更客气" },
+          },
+          {
+            npcLines: [
+              "Yes! There's a thermostat on the wall — just set it to your preferred temperature. Anything else?",
+              "Sure! Wall thermostat, set it to whatever you like. Anything else tonight?",
+              "Of course! The thermostat on the wall lets you dial in the perfect temp. Anything more?",
+            ],
+            npcZh: "有的！墙上有温控器——设定您喜欢的温度就行。还有别的吗？",
+            task: "顺便多要一条毛毯以防夜里冷",
+            options: [
+              { text: "Could I also get an extra blanket, just in case? Thank you!", ok: true,  tip: "just in case 以防万一——要备用物品的完美理由" },
+              { text: "Give blanket one more yes please thanks.",                   ok: false, tip: "更自然：Could I get an extra blanket, just in case?" },
+              { text: "Blanket cold night maybe need two three blankets.",          ok: false, tip: "一条备用即可：an extra blanket, just in case" },
+            ],
+            phrase: { en: "Could I get an extra ___, just in case?", zh: "能多给我一个……以防万一吗？", note: "毛毯/毛巾/枕头通用，just in case 显周全" },
+            adds: [{ emoji: "🛏️", label: "Extra Blanket", badge: true }],
+          },
+          {
+            npcLines: [
+              "Of course! Housekeeping will bring one up with the maintenance team. Have a good night, and sorry again!",
+              "Absolutely! We'll send a blanket up along with maintenance. Good night, and apologies once more!",
+              "You got it! Blanket's coming up with the repair crew. Rest well, and sorry again!",
+            ],
+            npcZh: "当然！客房部会随维修一起送一条上去。晚安，再次抱歉！",
+            task: "大度收尾，感谢高效处理",
+            options: [
+              { text: "Thanks for handling it so quickly. Good night!", ok: true,  tip: "Thanks for handling it 肯定处理效率，大度收尾" },
+              { text: "Bye front desk person good night sleep time.", ok: false, tip: "更有温度：Thanks for handling it so quickly" },
+              { text: "Next time no broken AC please okay?",          ok: false, tip: "得体道谢：Good night!" },
+            ],
+            phrase: { en: "Thanks for handling it so quickly.", zh: "谢谢你这么快就处理了", note: "感谢对方处理效率的万能句，投诉后修复必备" },
+          },
+        ],
+      },
+      // 酒店 第 5 轮：设施与服务（8 步）
+      {
+        id: "v5",
+        title: "第 5 次光顾 · 酒店设施与服务",
+        titleEn: "Hotel Amenities",
+        emoji: "🏊",
+        desc: "健身房几点开门？泳池要带房卡吗？怎么叫早、怎么送洗衣服？把酒店设施用个遍，住回本！",
+        reward: { en: "gym", zh: "你把酒店设施玩明白了，这一晚住得值！🏊" },
+        steps: [
+          {
+            npcLines: [
+              "Good morning! How can I help you today?",
+              "Morning! What can I do for you?",
+              "Hello, good morning! How may I assist?",
+            ],
+            npcZh: "早上好！今天有什么可以帮您？",
+            task: "询问健身房和泳池的开放时间",
+            options: [
+              { text: "Could you tell me the opening hours of the gym and the pool?", ok: true,  tip: "opening hours 营业时间，问任何设施都适用" },
+              { text: "Gym and swim time when open close?",                        ok: false, tip: "说 What are the opening hours?" },
+              { text: "Exercise room have or not this hotel?",                     ok: false, tip: "先问时间：Could you tell me the opening hours?" },
+            ],
+            phrase: { en: "What are the opening hours of ___?", zh: "……的开放时间是？", note: "健身房/泳池/餐厅/商场的通用问句" },
+          },
+          {
+            npcLines: [
+              "The gym is open 24 hours, and the pool is open from 7 a.m. to 10 p.m. Both are on the third floor.",
+              "Gym's around the clock, pool runs 7 to 10. Third floor for both!",
+              "Gym never closes! Pool's 7 a.m. till 10 p.m. Both up on three.",
+            ],
+            npcZh: "健身房 24 小时开放，泳池从早 7 点到晚 10 点。都在三楼。",
+            task: "询问使用泳池是否需要带房卡",
+            options: [
+              { text: "Great! Do I need to bring my room key card to use the pool?", ok: true,  tip: "Do I need to...? 问要求的万能句" },
+              { text: "Pool free for me or pay money extra?",                      ok: false, tip: "先问规则：Do I need to bring my key card?" },
+              { text: "Swim card important thing must have?",                      ok: false, tip: "说 Do I need to bring my key card?" },
+            ],
+            phrase: { en: "Do I need to ___?", zh: "我需要……吗？", note: "问规则/要求的万能句：带卡、预约、穿正装都能问" },
+          },
+          {
+            npcLines: [
+              "Yes, please bring your key card — the pool entrance requires it. Towels are provided there for free.",
+              "Key card's a must for the pool! Towels are on the house, though.",
+              "Bring your card, yes! Pool door won't open without it. Towels are free at the desk.",
+            ],
+            npcZh: "需要的，泳池入口要刷房卡。毛巾那边免费提供。",
+            task: "表示了解，接着预约明早的叫醒服务",
+            options: [
+              { text: "Got it, thanks! Also, could I schedule a wake-up call for 6:30 tomorrow morning?", ok: true,  tip: "wake-up call 叫醒服务，schedule 预约" },
+              { text: "Morning tomorrow 6:30 call phone me please.",                                    ok: false, tip: "说 a wake-up call for 6:30 tomorrow" },
+              { text: "I want alarm clock service wake early.",                                         ok: false, tip: "专业说法：a wake-up call" },
+            ],
+            phrase: { en: "Could I schedule a wake-up call for ___?", zh: "能预约……点的叫醒服务吗？", note: "酒店特色服务；也可说 Can I get a wake-up call?" },
+          },
+          {
+            npcLines: [
+              "Of course — wake-up call at 6:30 tomorrow morning, confirmed! Is this the right room number, 1208?",
+              "Done! 6:30 a.m. wake-up call for Room 1208 — that's correct, yes?",
+              "You got it — 6:30 tomorrow, Room 1208. Confirm?",
+            ],
+            npcZh: "当然——明早 6:30 叫醒服务已确认！房号是 1208 对吧？",
+            task: "确认房号，顺便问洗衣服务",
+            options: [
+              { text: "Yes, that's correct. By the way, do you have a laundry service?", ok: true,  tip: "laundry service 洗衣服务，长住酒店必备" },
+              { text: "Room number yes right. Clothes wash service have?",             ok: false, tip: "说 Do you have a laundry service?" },
+              { text: "Correct. My shirt dirty need clean fast tomorrow.",             ok: false, tip: "先问服务：Do you have a laundry service?" },
+            ],
+            phrase: { en: "Do you have a ___ service?", zh: "你们提供……服务吗？", note: "问服务万能模板：洗衣/送餐/寄存都能套" },
+          },
+          {
+            npcLines: [
+              "We do! Same-day service if you drop off before 9 a.m. Just leave the bag outside your door.",
+              "Yes indeed! Same-day laundry if it's in by 9 a.m. Bag goes outside your door.",
+              "Sure do! Before 9 a.m. means same-day. Just hang the bag on your door handle.",
+            ],
+            npcZh: "有的！早上 9 点前送洗可当日完成。把洗衣袋放门外即可。",
+            task: "确认洗衣袋位置和费用",
+            options: [
+              { text: "Perfect. Where can I find the laundry bag, and how much does it cost?", ok: true,  tip: "连问两件事：Where can I find...? + How much?" },
+              { text: "Bag where is it money how much cost?",                                 ok: false, tip: "拆成两句问：Where can I find the bag? How much is it?" },
+              { text: "Free washing or must pay price?",                                      ok: false, tip: "问全需求：Where's the bag and how much?" },
+            ],
+            phrase: { en: "Where can I find ___?", zh: "……在哪里能找到？", note: "找东西万能句，酒店任何物品都能问" },
+          },
+          {
+            npcLines: [
+              "The laundry bag and price list are in your closet. Shirts are $3 each, for example.",
+              "Check your closet — bag and full price list are in there. Shirts run $3 apiece.",
+              "Both are hanging in your closet! And just so you know, shirts are three bucks each.",
+            ],
+            npcZh: "洗衣袋和价目表在您的衣柜里。比如衬衫一件 3 美元。",
+            task: "接受价格，决定送洗两件衬衫",
+            options: [
+              { text: "That's reasonable. I'll send two shirts tomorrow morning. Thanks!", ok: true,  tip: "That's reasonable 价格公道——评价价格的地道说法" },
+              { text: "Three dollar too expensive my shirt!",                             ok: false, tip: "接受市场价即可：I'll send two shirts" },
+              { text: "Okay two shirt wash wash tomorrow yes.",                            ok: false, tip: "更自然：I'll send two shirts tomorrow morning" },
+            ],
+            phrase: { en: "That's reasonable.", zh: "价格挺合理", note: "对价格表示接受的常用语；嫌贵则说 That's a bit steep" },
+            adds: [{ emoji: "👕", label: "Laundry ×2", badge: true }],
+          },
+          {
+            npcLines: [
+              "Sounds good! By the way, breakfast is served until 10:30 on weekdays. Would you like me to note that down for your 6:30 wake-up?",
+              "Great! Oh — weekday breakfast runs till 10:30. Want me to add that reminder to your wake-up call?",
+              "Perfect! Quick tip: breakfast wraps at 10:30 on weekdays. Should I mention it during your wake-up call?",
+            ],
+            npcZh: "好的！对了，工作日早餐供应到 10:30。需要我在叫醒电话里加一句提醒吗？",
+            task: "接受贴心提醒，顺便问早餐位置",
+            options: [
+              { text: "Yes, please! And where is the breakfast served?", ok: true,  tip: "Yes, please 接受 + Where is...? 追问，连环沟通" },
+              { text: "Breakfast where is eat place at?",                ok: false, tip: "说 Where is breakfast served?" },
+              { text: "Reminder good but I sleep more maybe skip.",      ok: false, tip: "顺势问位置：Where is breakfast served?" },
+            ],
+            phrase: { en: "Where is breakfast served?", zh: "早餐在哪儿吃？", note: "be served 被供应——问餐厅/服务地点的正式说法" },
+          },
+          {
+            npcLines: [
+              "In the Crystal Restaurant, second floor. Enjoy your stay — and your early breakfast!",
+              "Second floor, Crystal Restaurant. Enjoy — and good luck with that early morning!",
+              "Crystal Restaurant on two. Have a wonderful stay — see you at breakfast, maybe!",
+            ],
+            npcZh: "二楼水晶餐厅。祝您入住愉快——早餐也吃得开心！",
+            task: "感谢全方位服务，收尾",
+            options: [
+              { text: "You've been super helpful. Thanks for everything!", ok: true,  tip: "You've been super helpful 对服务的综合致谢，收尾金句" },
+              { text: "Okay bye many questions I ask sorry.",              ok: false, tip: "不用抱歉，大方致谢：You've been super helpful" },
+              { text: "Thanks. This hotel is okay good fine.",             ok: false, tip: "更热情一点：Thanks for everything!" },
+            ],
+            phrase: { en: "You've been super helpful.", zh: "你帮了大忙", note: "综合致谢金句：问题越多，这句越值钱" },
+          },
+        ],
+      },
     ],
   },
   {
@@ -2794,7 +3608,18 @@ const SCENES = [
       { id: "boarding",     en: "boarding",     zh: "登机",   phon: "/ˈbɔːdɪŋ/",    emoji: "🛫", sent: "Boarding starts at 10:30." },
       { id: "delay",        en: "delay",        zh: "延误",   phon: "/dɪˈleɪ/",     emoji: "⏰", sent: "The flight is delayed." },
       { id: "bin",          en: "overhead bin", zh: "头顶行李架", phon: "/ˈəʊvəhed bɪn/", emoji: "🗄️", sent: "Put your bag in the overhead bin." },
-      { id: "crew",         en: "cabin crew",   zh: "乘务组", phon: "/ˈkæbɪn kruː/", emoji: "🙆", sent: "The cabin crew is very kind." },
+      { id: "crew",         en: "cabin crew",   zh: "乘务组", phon: "/ˈkæbɪn kruː/", emoji: "🙆", sent: "The cabin crew is very kind." },// 机场新词条（供 append 脚本用）
+      // 第 4 轮（延误改签）新词
+      { id: "delayed",  en: "delayed",   zh: "延误的", phon: "/dɪˈleɪd/", emoji: "⏰", sent: "The flight is delayed by three hours." },
+      { id: "rebook",   en: "rebook",    zh: "改签",   phon: "/ˌriːˈbʊk/", emoji: "🔄", sent: "I need to rebook my flight." },
+      { id: "voucher",  en: "meal voucher", zh: "餐券", phon: "/miːl ˈvaʊtʃə(r)/", emoji: "🎟️", sent: "The airline gave us meal vouchers." },
+      { id: "transfer", en: "transfer",  zh: "转运/转机", phon: "/ˈtrænsfɜː(r)/", emoji: "🔁", sent: "My luggage was transferred to the new flight." },
+      // 第 5 轮（入境海关）新词
+      { id: "customs",  en: "customs",   zh: "海关",   phon: "/ˈkʌstəmz/", emoji: "🛂", sent: "Go through customs after landing." },
+      { id: "purpose",  en: "purpose of visit", zh: "来访目的", phon: "/ˈpɜːpəs əv ˈvɪzɪt/", emoji: "🎯", sent: "The purpose of my visit is tourism." },
+      { id: "declare",  en: "declare",   zh: "申报",   phon: "/dɪˈkleə(r)/", emoji: "📢", sent: "Do you have anything to declare?" },
+      { id: "sightseeing", en: "sightseeing", zh: "观光", phon: "/ˈsaɪtsiːɪŋ/", emoji: "🗼", sent: "We spent the day sightseeing." },
+
     ],
     visits: [
       {
@@ -3147,6 +3972,269 @@ const SCENES = [
           },
         ],
       },
+      // 机场 第 4 轮：延误与改签（8 步）
+      {
+        id: "v4",
+        title: "第 4 次光顾 · 延误与改签",
+        titleEn: "Delay & Rebooking",
+        emoji: "⏰",
+        desc: "航班延误了！怎么确认信息、改签下一班、要补偿餐券？把最糟心的时刻变成最从容的表现。",
+        reward: { en: "rebook", zh: "你冷静搞定了延误改签，心态和英语都赢麻了！⏰" },
+        steps: [
+          {
+            npcLines: [
+              "Good afternoon! How can I help you today?",
+              "Afternoon! What can I do for you?",
+              "Hi there, what's going on? How can I help?",
+            ],
+            npcZh: "下午好！今天有什么可以帮您？",
+            task: "询问你的航班是否延误（CA981）",
+            options: [
+              { text: "Hi, could you check if flight CA981 is on time?", ok: true,  tip: "Could you check...? 请人核查信息的万能句" },
+              { text: "My plane CA981 late or not late?",                ok: false, tip: "说 Could you check if my flight is on time?" },
+              { text: "Flight number is CA981 where is it now?",         ok: false, tip: "先问准点与否：Is it on time?" },
+            ],
+            phrase: { en: "Is my flight on time?", zh: "我的航班准点吗？", note: "on time 准点；延误直接说 delayed" },
+          },
+          {
+            npcLines: [
+              "I'm afraid CA981 has been delayed by three hours due to weather. I'm so sorry about that.",
+              "Bad news, I'm afraid — CA981's running three hours late because of the weather. Sorry!",
+              "Unfortunately yes, CA981 is delayed three hours for weather. Apologies for that.",
+            ],
+            npcZh: "恐怕 CA981 因天气原因延误了三小时。非常抱歉。",
+            task: "确认新起飞时间，并问接下来怎么办",
+            options: [
+              { text: "Oh no. What's the new departure time? And what are my options?", ok: true,  tip: "What are my options? 我有哪些选择？——权益意识满分" },
+              { text: "Three hours?! Give me money back now!",                        ok: false, tip: "先问清选项：What are my options?" },
+              { text: "Weather delay bad luck. I wait here sit only.",                 ok: false, tip: "主动了解权益：What are my options?" },
+            ],
+            phrase: { en: "What are my options?", zh: "我有哪些选择？", note: "航班取消/延误时必问——改签、退票、补偿都要问出来" },
+          },
+          {
+            npcLines: [
+              "The new departure is 9:40 p.m. You can keep this flight, or I can rebook you on the 6:15 flight to the same city.",
+              "New time is 9:40 p.m. You could keep it, or hop on the 6:15 to the same destination instead.",
+              "You're looking at a 9:40 p.m. takeoff. Or — I can move you to the 6:15, same city.",
+            ],
+            npcZh: "新起飞时间是晚上 9:40。您可以继续等这班，或者我改签您到 6:15 飞同一城市的航班。",
+            task: "选择改签到 6:15 的航班",
+            options: [
+              { text: "The 6:15 sounds much better. Could you rebook me on that one, please?", ok: true,  tip: "rebook 改签；Could you rebook me...? 改签标准句" },
+              { text: "Early plane yes put me inside it.",                                   ok: false, tip: "说 Could you rebook me on that flight?" },
+              { text: "6:15 airplane change my ticket do it fast.",                          ok: false, tip: "更礼貌：Could you rebook me on that one, please?" },
+            ],
+            phrase: { en: "Could you rebook me on ___?", zh: "能帮我改签到……吗？", note: "rebook = 重新预订；on 后接航班/日期" },
+          },
+          {
+            npcLines: [
+              "Done! You're now on the 6:15 flight, same seat assignment, window seat 21A. Here's your new boarding pass.",
+              "All switched! 6:15 flight, keeping your window seat — 21A. New boarding pass, coming up!",
+              "You're rebooked! 6:15 departure, seat 21A by the window still. Here you go!",
+            ],
+            npcZh: "改好了！您现在在 6:15 的航班上，座位不变，还是 21A 靠窗。这是您的新登机牌。",
+            task: "收好新登机牌，询问延误补偿餐券",
+            options: [
+              { text: "Thank you! Since the delay was long, is there any meal voucher or compensation?", ok: true,  tip: "meal voucher 餐券；is there any compensation? 问补偿的礼貌版" },
+              { text: "Free food give me, I am hungry now.",                                          ok: false, tip: "更专业：Is there a meal voucher or compensation?" },
+              { text: "Delayed flight must pay me money yes?",                                        ok: false, tip: "先问有没有：Is there any compensation?" },
+            ],
+            phrase: { en: "Is there any compensation?", zh: "有补偿吗？", note: "compensation 补偿；餐券是 meal voucher，住宿券是 hotel voucher" },
+          },
+          {
+            npcLines: [
+              "Yes! Here's a $15 meal voucher for the airport restaurants — valid until 8 p.m. today.",
+              "You bet! $15 meal voucher, good at any airport restaurant until 8 tonight.",
+              "Sure! Here's $15 for food — any restaurant in the terminal, expires at 8 p.m.",
+            ],
+            npcZh: "有的！这是 15 美元餐券，机场餐厅通用，今天晚 8 点前有效。",
+            task: "感谢并确认新登机口",
+            options: [
+              { text: "That's very kind. Which gate is the 6:15 flight departing from?", ok: true,  tip: "Which gate...? 确认登机口——改签后必问" },
+              { text: "Gate number for new airplane tell me.",                          ok: false, tip: "说 Which gate is it departing from?" },
+              { text: "Where my airplane door is at which number?",                      ok: false, tip: "更自然：Which gate is the flight departing from?" },
+            ],
+            phrase: { en: "Which gate is it departing from?", zh: "从哪个登机口出发？", note: "gate 登机口；改签后登机口常变，务必重新确认" },
+            adds: [{ emoji: "🎫", label: "New Boarding Pass", wordId: "boardingpass" }],
+          },
+          {
+            npcLines: [
+              "Gate C22 — but heads up, gates can change, so keep an eye on the departure board. Boarding starts at 5:40.",
+              "C22 is your gate! Fair warning: gates do shift, so watch the boards. Boarding at 5:40.",
+              "You'll be at C22. Gates change sometimes though — check the departure screens. Boarding begins 5:40.",
+            ],
+            npcZh: "C22 登机口——但注意登机口可能变动，留意出发信息屏。5:40 开始登机。",
+            task: "理解提醒，确认登机时间",
+            options: [
+              { text: "Got it — keep an eye on the board, boarding at 5:40. Thank you so much!", ok: true,  tip: "keep an eye on 留意——复述提醒确认理解" },
+              { text: "Board what time again? I forget already sorry.",                        ok: false, tip: "复述要点：Boarding at 5:40, keep an eye on the board" },
+              { text: "Screen watch yes. What is boarding board?",                             ok: false, tip: "departure board = 出发信息屏，复述一遍加深记忆" },
+            ],
+            phrase: { en: "Keep an eye on the board.", zh: "留意信息屏", note: "keep an eye on = 留意/盯着，机场/排队/等位都好用" },
+          },
+          {
+            npcLines: [
+              "You're welcome! Is there anything else I can help you with before your flight?",
+              "Happy to help! Anything else you need tonight?",
+              "My pleasure! Anything else before you head off?",
+            ],
+            npcZh: "不客气！登机前还有其他需要帮忙的吗？",
+            task: "顺便问行李是否直挂（之前延误那班托运的）",
+            options: [
+              { text: "Yes — will my checked luggage be transferred to the new flight automatically?", ok: true,  tip: "transfer 转移；行李直挂问题改签后必问" },
+              { text: "My bag old plane or new plane which one?",                                    ok: false, tip: "说 Will my luggage be transferred automatically?" },
+              { text: "Suitcase worry lost. Where it goes now?",                                     ok: false, tip: "更专业：Will my checked luggage be transferred?" },
+            ],
+            phrase: { en: "Will my luggage be transferred?", zh: "我的行李会转运吗？", note: "改签后行李直挂问题，checked luggage 托运行李" },
+          },
+          {
+            npcLines: [
+              "Yes, your bags are already re-routed to the 6:15 flight. Everything's taken care of. Have a safe trip!",
+              "All set — luggage's been moved to your new flight. Nothing to worry about. Safe travels!",
+              "Yes indeed! Bags are on the 6:15 with you. All handled. Have a great flight!",
+            ],
+            npcZh: "会的，您的行李已改挂到 6:15 航班。一切都安排好了。祝您旅途平安！",
+            task: "完整总结今天所学，道别",
+            options: [
+              { text: "Rebooked, voucher in hand, luggage sorted. You've been a huge help. Thank you!", ok: true,  tip: "三项总结确认 + 致谢——危机处理的完美收官" },
+              { text: "Okay many things done bye now thank you.",                                    ok: false, tip: "列举成果更有力：Rebooked, voucher in hand, luggage sorted" },
+              { text: "Finally finished. Worst day ever but okay.",                                  ok: false, tip: "正面收尾：You've been a huge help!" },
+            ],
+            phrase: { en: "Everything's taken care of.", zh: "一切都已经安排好了", note: "万事俱备的安心表达，听懂它=放心登机" },
+          },
+        ],
+      },
+      // 机场 第 5 轮：入境海关（8 步）
+      {
+        id: "v5",
+        title: "第 5 次光顾 · 入境海关",
+        titleEn: "Immigration & Customs",
+        emoji: "🛂",
+        desc: "落地了！海关官员问你来干什么、待多久、有没有要申报的东西。学会通关问答，稳稳开启旅程！",
+        reward: { en: "customs", zh: "你从容通过了入境海关，旅程正式开始！🛂" },
+        steps: [
+          {
+            npcLines: [
+              "Next, please! Passport, please.",
+              "Next in line! May I see your passport?",
+              "Come on up — passport, please.",
+            ],
+            npcZh: "下一位！请出示护照。",
+            task: "递交护照并问好",
+            options: [
+              { text: "Good afternoon. Here's my passport.", ok: true,  tip: "问好 + Here's... 递证件，第一印象满分" },
+              { text: "Passport yes here take it.",          ok: false, tip: "加个问好更得体：Good afternoon. Here's my passport" },
+              { text: "Why you need my passport?",           ok: false, tip: "入境查验是常规流程，礼貌递上即可" },
+            ],
+            phrase: { en: "Here's my passport.", zh: "这是我的护照", note: "入境第一句；配合微笑使用效果更佳" },
+          },
+          {
+            npcLines: [
+              "Thank you. What's the purpose of your visit?",
+              "Thanks. So — business or pleasure? What brings you here?",
+              "Got it. And what's the purpose of your trip?",
+            ],
+            npcZh: "谢谢。您此行的目的是什么？",
+            task: "回答：旅游观光",
+            options: [
+              { text: "I'm here for tourism. I'll be sightseeing for two weeks.", ok: true,  tip: "tourism 旅游观光；顺带说时长，减少追问" },
+              { text: "Just look around walk see things.",                       ok: false, tip: "说 I'm here for tourism" },
+              { text: "No purpose, just came random country.",                   ok: false, tip: "清晰作答：I'm here for tourism" },
+            ],
+            phrase: { en: "I'm here for tourism / business / study.", zh: "我来旅游/出差/留学", note: "purpose of visit 的三大标准回答，务必流利" },
+          },
+          {
+            npcLines: [
+              "Tourism, wonderful! And how long do you plan to stay?",
+              "Great! And how long will you be with us?",
+              "Lovely. What's the length of your stay?",
+            ],
+            npcZh: "旅游，很好！您计划停留多久？",
+            task: "回答：两周",
+            options: [
+              { text: "Two weeks. My return flight is on the 24th.", ok: true,  tip: "时长 + 返程日期，海关最爱听的完整答案" },
+              { text: "Long time maybe short time not sure.",         ok: false, tip: "说具体时长：Two weeks" },
+              { text: "Until my money finish then I go.",             ok: false, tip: "明确日期：My return flight is on the 24th" },
+            ],
+            phrase: { en: "I'll be staying for ___.", zh: "我将停留……", note: "停留时长直接答；附带返程信息更专业" },
+          },
+          {
+            npcLines: [
+              "Perfect. Where will you be staying during your visit?",
+              "Great. And where are you staying while you're here?",
+              "Alright. What's your accommodation while in town?",
+            ],
+            npcZh: "很好。您期间住在哪里？",
+            task: "回答：市中心的 Grand 酒店，已预订",
+            options: [
+              { text: "At the Grand Hotel downtown. I have a reservation.", ok: true,  tip: "具体酒店名 + 已有预订 = 答疑一次通过" },
+              { text: "Hotel I think some hotel yes.",                     ok: false, tip: "说清名字：At the Grand Hotel downtown" },
+              { text: "Sleep somewhere find later when tired.",             ok: false, tip: "海关需具体住址：I have a reservation" },
+            ],
+            phrase: { en: "I'll be staying at ___.", zh: "我将住在……", note: "住宿应答：酒店名或地址，提前记住英文写法" },
+          },
+          {
+            npcLines: [
+              "Great. Are you carrying any food, plants, or more than $10,000 in cash?",
+              "Okay — anything to declare? Any food, plants, or over ten grand in cash?",
+              "Alright, last couple: any food items, plants, or more than $10,000 cash?",
+            ],
+            npcZh: "好的。您携带食物、植物或超过 1 万美元现金吗？",
+            task: "如实回答：带了些零食（饼干）",
+            options: [
+              { text: "I have some cookies in my carry-on, just for the trip.", ok: true,  tip: "如实申报少量零食，通常可带入但必须说明" },
+              { text: "No nothing at all absolutely zero things.",              ok: false, tip: "如实回答：有零食就说明，撒谎后果严重" },
+              { text: "Maybe food maybe not I don't remember bags.",            ok: false, tip: "清楚回答：I have some cookies in my carry-on" },
+            ],
+            phrase: { en: "I have some snacks in my carry-on.", zh: "我随身带了一些零食", note: "declare 申报；有食品务必主动说明，隐瞒会被罚款" },
+          },
+          {
+            npcLines: [
+              "Cookies are fine — enjoy! Could you place your fingers on the scanner for me?",
+              "No problem with cookies! Now, fingers on the scanner, please.",
+              "Cookies are allowed! Just need your fingerprints on the scanner.",
+            ],
+            npcZh: "饼干没问题——享用吧！请把手指放在扫描仪上。",
+            task: "配合采集指纹",
+            options: [
+              { text: "Sure. Like this?", ok: true,  tip: "Like this? 确认动作是否正确，配合检查的自然表达" },
+              { text: "Finger machine scary what it do to me?", ok: false, tip: "例行程序无需紧张：Sure. Like this?" },
+              { text: "Which finger you want all ten?",           ok: false, tip: "按提示操作，问一句 Like this? 即可" },
+            ],
+            phrase: { en: "Like this?", zh: "是这样吗？", note: "确认动作/姿势的万能短句，配合指令时超好用" },
+          },
+          {
+            npcLines: [
+              "Perfect, all done. Welcome to our country — enjoy your stay!",
+              "That's it! Welcome in — have a fantastic trip!",
+              "All set! Welcome, and enjoy your time here!",
+            ],
+            npcZh: "好了，完成了。欢迎来到我们国家——祝您玩得愉快！",
+            task: "取回护照，礼貌道谢",
+            options: [
+              { text: "Thank you very much. Have a great day!", ok: true,  tip: "通关收尾标准句：致谢 + 祝好" },
+              { text: "Give passport back now please hurry.",   ok: false, tip: "官员会主动归还，微笑致谢即可" },
+              { text: "Finally finished I can go yes bye.",     ok: false, tip: "更有礼貌：Thank you very much. Have a great day!" },
+            ],
+            phrase: { en: "Enjoy your stay!", zh: "祝您逗留愉快！", note: "官员说的最后一句话；你也可以回 Thank you, you too" },
+          },
+          {
+            npcLines: [
+              "Next, please! Welcome to the United States.",
+              "Next! Enjoy your visit.",
+              "Next in line, please — welcome!",
+            ],
+            npcZh: "下一位！欢迎来到美国。",
+            task: "通关成功，最后一题：绿色通道 Nothing to declare 是什么意思？",
+            options: [
+              { text: "Nothing to declare = 无需申报，走绿色通道；有物品申报才走红色通道。", ok: true,  tip: "绿色=无申报，红色=有申报，通道别走错！" },
+              { text: "绿色通道 = 免费快速 VIP 通道，人人都可以走。",                        ok: false, tip: "绿色通道是无申报通道，有食品/超额物品必须走红色" },
+              { text: "Nothing to declare = 没带行李的人走的门。",                           ok: false, tip: "是无需申报物品，不是没有行李" },
+            ],
+            phrase: { en: "Nothing to declare.", zh: "无需申报", note: "海关通道二选一：绿色 Nothing to declare / 红色 Goods to declare" },
+          },
+        ],
+      },
     ],
   },
 
@@ -3187,7 +4275,18 @@ const SCENES = [
     { id: "better",      en: "better",      zh: "好转", phon: "/ˈbetə(r)/", emoji: "😊", sent: "I feel much better than last week." },
     { id: "bloodpressure", en: "blood pressure", zh: "血压", phon: "/ˈblʌd preʃə(r)/", emoji: "🩸", sent: "Your blood pressure is normal." },
     { id: "allergic",    en: "allergic",    zh: "过敏的", phon: "/əˈlɜːdʒɪk/", emoji: "⚠️", sent: "Are you allergic to any medicine?" },
-    { id: "recovered",   en: "recovered",   zh: "康复", phon: "/rɪˈkʌvəd/", emoji: "🎉", sent: "You have fully recovered. Well done!" },
+    { id: "recovered",   en: "recovered",   zh: "康复", phon: "/rɪˈkʌvəd/", emoji: "🎉", sent: "You have fully recovered. Well done!" },// 医院新词条（供 append 脚本用）
+    // 第 4 轮（急诊保险）新词
+    { id: "walkin",    en: "walk-in clinic", zh: "免预约诊所", phon: "/ˈwɔːk ɪn ˈklɪnɪk/", emoji: "🚶", sent: "A walk-in clinic takes patients without appointments." },
+    { id: "copay",     en: "copay",     zh: "自付额", phon: "/ˈkəʊpeɪ/", emoji: "💵", sent: "There's a $30 copay for each visit." },
+    { id: "cover",     en: "cover",     zh: "承保",   phon: "/ˈkʌvə(r)/", emoji: "🛡️", sent: "My insurance covers prescription medicine." },
+    { id: "network",   en: "in-network", zh: "保险网络内", phon: "/ɪn ˈnetwɜːk/", emoji: "🕸️", sent: "In-network doctors cost less." },
+    // 第 5 轮（疫苗体检）新词
+    { id: "vaccine",   en: "flu shot",  zh: "流感疫苗", phon: "/fluː ʃɒt/", emoji: "💉", sent: "I got my flu shot today." },
+    { id: "penicillin",en: "penicillin", zh: "青霉素", phon: "/ˌpenɪˈsɪlɪn/", emoji: "🧪", sent: "I'm allergic to penicillin." },
+    { id: "checkup2",  en: "routine check-up", zh: "常规体检", phon: "/ruːˈtiːn ˈtʃekʌp/", emoji: "🩺", sent: "I'm here for a routine check-up." },
+    { id: "result",    en: "results",   zh: "检查结果", phon: "/rɪˈzʌlts/", emoji: "📊", sent: "The blood test results came back." },
+
   ],
   visits: [
     {
@@ -3561,6 +4660,272 @@ const SCENES = [
     },
     ],
   },
+      // 医院 第 4 轮：急诊与保险（8 步）
+      {
+        id: "v4",
+        title: "第 4 次光顾 · 急诊与保险",
+        titleEn: "Emergency & Insurance",
+        emoji: "🚨",
+        desc: "深夜发烧必须看医生！没预约直接去 clinic 行不行？copay 是什么？保险怎么用？搞定美国看病最头疼的一环。",
+        reward: { en: "copay", zh: "你搞定了没预约看病 + 保险支付，美国就医最难的一关！🚨" },
+        steps: [
+          {
+            npcLines: [
+              "Good evening, this is City Care Clinic. How can I help you?",
+              "Evening, City Care Clinic — what's going on?",
+              "Hi, City Care Clinic. How may I help you tonight?",
+            ],
+            npcZh: "晚上好，这里是 City Care 诊所。有什么可以帮您？",
+            task: "没预约，问今晚能否直接看病",
+            options: [
+              { text: "Hi, I don't have an appointment. Is it possible to see a doctor tonight?", ok: true,  tip: "walk-in = 无预约就诊；Is it possible to...? 礼貌请求" },
+              { text: "I sick very bad come now see doctor immediately.",                       ok: false, tip: "更清楚：I don't have an appointment. Is it possible tonight?" },
+              { text: "Appointment I have none. Doctor where?",                                 ok: false, tip: "说 Is it possible to see a doctor tonight?" },
+            ],
+            phrase: { en: "Is it possible to see a doctor without an appointment?", zh: "没预约能看病吗？", note: "walk-in clinic = 免预约诊所，急诊轻症首选" },
+          },
+          {
+            npcLines: [
+              "Yes, we accept walk-ins until 9 p.m. What brings you in tonight?",
+              "You're in luck — walk-ins welcome till 9! What seems to be the problem?",
+              "We do take walk-ins until nine. What's troubling you tonight?",
+            ],
+            npcZh: "可以的，晚上 9 点前都接受无预约就诊。您今晚怎么了？",
+            task: "描述症状：发烧 38.5 度，喉咙很痛",
+            options: [
+              { text: "I have a fever of 38.5 degrees and a really sore throat.", ok: true,  tip: "a fever of + 度数；症状 + 程度，一句话说清" },
+              { text: "Body very hot and throat pain much.",                     ok: false, tip: "说 I have a fever of 38.5 degrees" },
+              { text: "I am sick whole body bad feeling.",                        ok: false, tip: "具体描述：a fever and a really sore throat" },
+            ],
+            phrase: { en: "I have a fever of ___ degrees.", zh: "我发烧……度", note: "报体温标准句；美国用华氏，38.5°C ≈ 101°F" },
+          },
+          {
+            npcLines: [
+              "I'm sorry to hear that. Do you have your insurance card with you?",
+              "That sounds rough! Did you bring your insurance card?",
+              "Oh no! Okay — do you have insurance tonight?",
+            ],
+            npcZh: "很抱歉听到这个。您带保险卡了吗？",
+            task: "出示保险卡并问是否可用",
+            options: [
+              { text: "Yes, here's my insurance card. Do you accept this plan?", ok: true,  tip: "Do you accept this plan? 问诊所是否接受你的保险计划" },
+              { text: "Card here take it is good card yes?",                    ok: false, tip: "说 Do you accept this insurance plan?" },
+              { text: "Insurance I have maybe works here maybe not.",            ok: false, tip: "直接出示并询问：Do you accept this plan?" },
+            ],
+            phrase: { en: "Do you accept my insurance?", zh: "你们接受我的保险吗？", note: "就诊前必问；out-of-network = 不在保险网络内，费用高" },
+            adds: [{ emoji: "🪪", label: "Insurance ✓", wordId: "insurance" }],
+          },
+          {
+            npcLines: [
+              "Yes, we're in-network with your plan. There'll be a $30 copay for the visit today.",
+              "Good news — we take your plan! Just a $30 copay for today's visit.",
+              "You're covered! There's a $30 copay for tonight, though.",
+            ],
+            npcZh: "接受的，我们在您的保险网络内。今天就诊有 30 美元的自付额。",
+            task: "理解 copay，付款",
+            options: [
+              { text: "No problem. Here's $30. Can I pay by card?", ok: true,  tip: "copay = 每次就诊的固定自付额，保险覆盖其余部分" },
+              { text: "Copay word meaning what is this?",           ok: false, tip: "copay 是自付额，就诊时直接支付即可" },
+              { text: "Why extra money? Insurance should pay all.",  ok: false, tip: "copay 是保险常规设计：Here's $30" },
+            ],
+            phrase: { en: "copay", zh: "自付额", note: "保险术语三件套：copay 自付额 / deductible 免赔额 / premium 保费" },
+            adds: [{ emoji: "💵", label: "Copay $30", badge: true }],
+          },
+          {
+            npcLines: [
+              "Card works great, thank you. Please have a seat — the wait is about twenty minutes.",
+              "All paid up! Take a seat, doctor will see you in about twenty minutes.",
+              "Got it, thanks! Have a seat — roughly a twenty-minute wait tonight.",
+            ],
+            npcZh: "刷卡没问题，谢谢。请坐——大约等二十分钟。",
+            task: "等待时询问是否能先吃退烧药",
+            options: [
+              { text: "While I wait, is it okay to take ibuprofen for the fever?", ok: true,  tip: "is it okay to...? 请求许可；用药前确认是好习惯" },
+              { text: "I have pill in bag eat now okay?",                        ok: false, tip: "说 Is it okay to take ibuprofen?" },
+              { text: "Fever killing me, medicine time now yes?",                 ok: false, tip: "先问后吃：Is it okay to take ibuprofen?" },
+            ],
+            phrase: { en: "Is it okay to take ___?", zh: "可以服用……吗？", note: "用药询问模板；ibuprofen 布洛芬，acetaminophen 对乙酰氨基酚" },
+          },
+          {
+            npcLines: [
+              "Good question — a nurse will confirm with the doctor. But typically, yes, ibuprofen is fine for your symptoms.",
+              "Smart to ask! The nurse will double-check with the doctor, but ibuprofen should be safe for you.",
+              "Great instinct to ask! We'll confirm with the doctor, but usually ibuprofen is fine.",
+            ],
+            npcZh: "问得好——护士会跟医生确认。不过一般而言，布洛芬对您的症状是安全的。",
+            task: "表示感谢，配合等待",
+            options: [
+              { text: "Thank you. I'll wait for the nurse to confirm before taking it.", ok: true,  tip: "before taking it 先确认再用药——安全意识满分" },
+              { text: "Okay I eat pill right now immediately.",                       ok: false, tip: "等护士确认：I'll wait for the nurse to confirm" },
+              { text: "No need confirm I know my body best.",                          ok: false, tip: "专业确认更安全：I'll wait for the nurse to confirm" },
+            ],
+            phrase: { en: "I'll wait for confirmation.", zh: "我会等确认后再行动", note: "谨慎负责的表达，医疗场景尤其加分" },
+          },
+          {
+            npcLines: [
+              "The nurse will call your name shortly. Do you need anything else right now?",
+              "They'll call you soon! Anything else you need in the meantime?",
+              "You're up next-ish! Anything else before the doctor sees you?",
+            ],
+            npcZh: "护士马上会叫您的名字。现在还有其他需要吗？",
+            task: "问药费是否也在保险内",
+            options: [
+              { text: "Yes — if the doctor prescribes medicine, will my insurance cover it?", ok: true,  tip: "cover 承保；处方药费用提前问，拿药不踩坑" },
+              { text: "Medicine from doctor free or must pay?",                            ok: false, tip: "说 Will my insurance cover it?" },
+              { text: "Drug price how much cost money expensive?",                          ok: false, tip: "保险语境：Will my insurance cover it?" },
+            ],
+            phrase: { en: "Will my insurance cover it?", zh: "我的保险会覆盖吗？", note: "cover 承保；药费/检查费/治疗费都可以这样问" },
+          },
+          {
+            npcLines: [
+              "Most prescriptions are covered with a small copay, usually $5 to $15. The doctor will go over everything with you. Take care!",
+              "Typically yes — prescriptions run a $5–$15 copay. The doctor will explain all the details. Feel better!",
+              "Usually, yes! Small copay on meds, five to fifteen bucks. Doctor's got all the details. Hope you feel better soon!",
+            ],
+            npcZh: "大部分处方药都有小额自付，一般 5 到 15 美元。医生会跟您详细说明。保重！",
+            task: "总结今天学到的保险知识",
+            options: [
+              { text: "Got it: walk-in clinic, copay for visits, small copay for medicine. Thank you so much!", ok: true,  tip: "三项总结 = 闭环学习；Got it: + 列点复述" },
+              { text: "Too many insurance words confusing English hard.",                                    ok: false, tip: "复述要点巩固：copay for visits, small copay for medicine" },
+              { text: "Okay thanks. America healthcare very expensive bye.",                                  ok: false, tip: "总结成果：Got it: walk-in clinic, copay..." },
+            ],
+            phrase: { en: "The doctor will go over everything with you.", zh: "医生会跟你详细说明", note: "go over = 详细讲解；听懂这句就放心等叫号" },
+          },
+        ],
+      },
+      // 医院 第 5 轮：疫苗与体检（8 步）
+      {
+        id: "v5",
+        title: "第 5 次光顾 · 疫苗与体检",
+        titleEn: "Shots & Check-up",
+        emoji: "💉",
+        desc: "开学要打流感疫苗？公司要求年度体检？学会预约疫苗、看懂体检项目、听懂医生的健康建议！",
+        reward: { en: "flu shot", zh: "你完成了疫苗 + 体检双任务，健康管理英文全掌握！💉" },
+        steps: [
+          {
+            npcLines: [
+              "Good morning! Welcome to City Care Clinic. How can I help you?",
+              "Morning! City Care Clinic — what can I do for you?",
+              "Hi there! What brings you in today?",
+            ],
+            npcZh: "早上好！欢迎来到 City Care 诊所。有什么可以帮您？",
+            task: "预约流感疫苗",
+            options: [
+              { text: "Hi, I'd like to make an appointment for a flu shot, please.", ok: true,  tip: "flu shot 流感疫苗；make an appointment for + 项目" },
+              { text: "I want flu medicine injection thing.",                      ok: false, tip: "疫苗专业说法：a flu shot" },
+              { text: "Vaccine for sick season please give me.",                    ok: false, tip: "说 I'd like to make an appointment for a flu shot" },
+            ],
+            phrase: { en: "I'd like to make an appointment for ___.", zh: "我想预约……", note: "预约万能句：疫苗/体检/洗牙都能套" },
+          },
+          {
+            npcLines: [
+              "Of course! Flu shots are available every day this week. Do you have a preferred time?",
+              "No problem — flu shots all week! Morning or afternoon work better for you?",
+              "Sure thing! We're doing flu shots daily this week. When suits you best?",
+            ],
+            npcZh: "当然可以！这周每天都有流感疫苗。您有偏好的时间吗？",
+            task: "约明天上午，顺便问能不能同时体检",
+            options: [
+              { text: "Tomorrow morning works. Could I also get a routine check-up at the same time?", ok: true,  tip: "Could I also...? 一站式问法；routine check-up 常规体检" },
+              { text: "Tomorrow morning time good. Check body also maybe same day?",                ok: false, tip: "说 Could I also get a routine check-up?" },
+              { text: "Morning yes. Everything check all together fast do.",                        ok: false, tip: "更自然：Could I also get a routine check-up?" },
+            ],
+            phrase: { en: "Could I also get a ___ at the same time?", zh: "能同时做……吗？", note: "一次跑两件事的省时问法，办事效率拉满" },
+          },
+          {
+            npcLines: [
+              "Absolutely, that saves you a trip! Please fill out this form — medical history and current medications.",
+              "We can do both, easy! First, this form — medical history and any medications you take.",
+              "Of course! Kill two birds with one stone. Just fill this in — history and current meds.",
+            ],
+            npcZh: "当然，这样省您跑一趟！请填这张表——病史和正在服用的药物。",
+            task: "询问某栏不懂的地方（过敏史）",
+            options: [
+              { text: "Sure. Just to clarify — does \"allergies\" here mean medicine allergies or food allergies?", ok: true,  tip: "Just to clarify...? 澄清式提问模板" },
+              { text: "Form too difficult English medical words hard.",                                         ok: false, tip: "不懂就问：Does allergies mean medicine or food?" },
+              { text: "Allergy section I skip write nothing okay?",                                            ok: false, tip: "先问清楚再填：Does it mean medicine or food allergies?" },
+            ],
+            phrase: { en: "Just to clarify — does ___ mean ___?", zh: "想确认一下——……是指……吗？", note: "填表澄清神器；Just to clarify 听起来专业又礼貌" },
+          },
+          {
+            npcLines: [
+              "Great question — both! Medicine, food, and environmental allergies all go in that section.",
+              "Both! Meds, food, pollen — all of it belongs there.",
+              "All of the above! Medicine, food, seasonal — write them all in.",
+            ],
+            npcZh: "问得好——都算！药物、食物和环境过敏都填在那栏。",
+            task: "填写：青霉素过敏",
+            options: [
+              { text: "Got it. I'm allergic to penicillin, so I'll write that down.", ok: true,  tip: "be allergic to + 过敏原；青霉素 penicillin 必须主动申报" },
+              { text: "I write allergy doctor medicine bad reaction yes.",         ok: false, tip: "说 I'm allergic to penicillin" },
+              { text: "Penicillin sick me long ago maybe still problem.",          ok: false, tip: "明确填写：I'm allergic to penicillin" },
+            ],
+            phrase: { en: "I'm allergic to ___.", zh: "我对……过敏", note: "就医最重要的安全句，务必让每个医生都知道" },
+            adds: [{ emoji: "📋", label: "Form ✓", wordId: "form" }],
+          },
+          {
+            npcLines: [
+              "Perfect, thank you! The nurse will call you shortly for the flu shot first. Little pinch, that's all!",
+              "All filled out? Great! Nurse will grab you for the flu shot first — just a tiny pinch!",
+              "Thank you! We'll start with the flu shot — quick pinch and it's over!",
+            ],
+            npcZh: "填好了，谢谢！护士待会儿先叫您打流感疫苗——就轻轻一捏！",
+            task: "打针时表达紧张，问护士缓解方法",
+            options: [
+              { text: "I'm a little nervous about needles. Any tips to make it easier?", ok: true,  tip: "Any tips? 求建议万能句；承认紧张反而更放松" },
+              { text: "Needle scary no like. Do fast hide it from me.",                ok: false, tip: "更自然：I'm nervous about needles. Any tips?" },
+              { text: "Pain I fear fainting before maybe.",                            ok: false, tip: "大方沟通：I'm a little nervous. Any tips?" },
+            ],
+            phrase: { en: "I'm nervous about needles.", zh: "我有点怕打针", note: "承认紧张不丢人；护士会用聊天转移你的注意力" },
+          },
+          {
+            npcLines: [
+              "Totally normal! Look away, take a deep breath... and done! That was it — you survived!",
+              "Don't worry, happens all the time! Look away, big breath... and we're finished! Easy!",
+              "You're in good company! Deep breath, look away... all done! You didn't even flinch!",
+            ],
+            npcZh: "完全正常！看别处、深呼吸……好了！就这么快——你挺过来了！",
+            task: "惊讶于速度，感谢护士",
+            options: [
+              { text: "Wait, that's it? That was so quick. Thank you!", ok: true,  tip: "Wait, that's it? 表惊讶的口语神器" },
+              { text: "Finished already really no pain zero?",          ok: false, tip: "说 Wait, that's it? That was so quick!" },
+              { text: "You trick me no injection happened?",            ok: false, tip: "护士手速是真的快：Thank you!" },
+            ],
+            phrase: { en: "Wait, that's it?", zh: "等等，这就完了？", note: "惊讶于速度/简单程度的万能反应句" },
+            adds: [{ emoji: "💉", label: "Flu Shot ✓", badge: true }],
+          },
+          {
+            npcLines: [
+              "You're welcome! Now for the check-up: blood pressure, height, weight, and a blood test. Please follow me.",
+              "Anytime! Check-up time now — blood pressure, height, weight, and blood work. This way!",
+              "My pleasure! Now for the physical: BP, height, weight, and blood test. Right this way!",
+            ],
+            npcZh: "不客气！现在开始体检：血压、身高、体重和血液检查。请跟我来。",
+            task: "跟随体检，问血检多久出结果",
+            options: [
+              { text: "Sure. How long will it take to get the blood test results?", ok: true,  tip: "results 结果；体检/化验必问出报告时间" },
+              { text: "Blood result when come back to me?",                       ok: false, tip: "说 How long will it take to get the results?" },
+              { text: "Test finish today know everything?",                       ok: false, tip: "问时长：How long will it take to get the results?" },
+            ],
+            phrase: { en: "How long will it take to get the results?", zh: "多久能出结果？", note: "体检/化验/申请进度通用；results 复数=检查结果" },
+          },
+          {
+            npcLines: [
+              "Results in two days — we'll send them through your patient portal. Everything looks great so far. Stay healthy!",
+              "Two days, and it'll be on your patient portal! You look healthy as a horse. Take care!",
+              "Couple of days! Check your patient portal. All looks good from here — stay well!",
+            ],
+            npcZh: "两天后出结果——会发到您的患者门户。目前一切看起来都很好。保持健康！",
+            task: "完整总结今天的双任务",
+            options: [
+              { text: "Flu shot done, check-up done, results in two days. Thanks for making it painless!", ok: true,  tip: "三项成果总结 + 幽默收尾，任务闭环" },
+              { text: "Busy day today many things finished bye.",                                       ok: false, tip: "列成果更有收获感：Flu shot done, check-up done..." },
+              { text: "Pain less today good hospital nice people.",                                     ok: false, tip: "完整总结：Flu shot done, check-up done, results in two days" },
+            ],
+            phrase: { en: "Thanks for making it painless!", zh: "谢谢你让过程毫无痛苦！", note: "幽默致谢：双关 painless（不痛/不麻烦），好记好用" },
+          },
+        ],
+      },
     ],
   },
 ];

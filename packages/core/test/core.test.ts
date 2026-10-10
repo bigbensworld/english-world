@@ -33,7 +33,7 @@ ok(Object.keys(VLOG_DICT).length >= 100, "VLOG_DICT 词条 100+（实际 " + Obj
 ok(SCENES.every(s => (s as any).unlockCost === undefined), "无解锁成本字段");
 
 const apVisits = sceneVisits(scene("airport"));
-ok(apVisits.length === 3, "机场有 3 轮光顾");
+ok(apVisits.length === 5, "机场有 5 轮光顾");
 ok(apVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "机场每步恰好 1 个正确选项");
 ok(apVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "机场每步店员台词有 2+ 个随机变体");
 ok(apVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "机场每步都有语块 phrase");
@@ -42,18 +42,18 @@ ok(apVisits.every(v => v.reward && v.reward.en && scene("airport").items.find(it
 ok(["boardingpass", "luggage", "checkin", "windowseat", "aisleseat", "security", "tray", "liquids", "belt", "laptop", "gate", "boarding", "delay", "bin", "crew"].every(id => scene("airport").items.some(it => it.id === id)), "机场 15 个词条全部入库");
 
 const hotelVisits = sceneVisits(scene("hotel"));
-ok(hotelVisits.length === 3, "酒店有 3 轮光顾");
+ok(hotelVisits.length === 5, "酒店有 5 轮光顾");
 ok(hotelVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "酒店每步恰好 1 个正确选项");
 ok(hotelVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "酒店每步都有语块 phrase");
 ok(["reservation", "luggage", "keycard", "elevator", "lobby", "receptionist", "checkout", "bill", "minibar", "deposit", "ac", "towel", "noisy", "upgrade", "apology"].every(id => scene("hotel").items.some(it => it.id === id)), "酒店 15 个词条全部入库");
 
 const hospVisits = sceneVisits(scene("hospital"));
-ok(hospVisits.length === 3, "医院有 3 轮光顾");
+ok(hospVisits.length === 5, "医院有 5 轮光顾");
 ok(hospVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "医院每步恰好 1 个正确选项");
 ok(hospVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "医院每步都有语块 phrase");
 ok(["appointment", "fever", "sorethroat", "cough", "prescription", "medicine", "checkup", "recovered"].every(id => scene("hospital").items.some(it => it.id === id)), "医院核心词条全部入库");
 const restVisits = sceneVisits(scene("restaurant"));
-ok(restVisits.length === 4, "餐厅有 4 轮光顾");
+ok(restVisits.length === 6, "餐厅有 6 轮光顾");
 ok(scene("restaurant").items.length >= 30, "餐厅词汇量 30+");
 
 const cafeVisits = sceneVisits(scene("cafe"));
@@ -64,7 +64,7 @@ ok(cafeVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >
 ok(cafeVisits.reduce((n, v) => n + v.steps.filter(st => st.adds).length, 0) >= 20, "咖啡店 8 轮合计至少 20 步有订单素材");
 
 const marketVisits = sceneVisits(scene("market"));
-ok(marketVisits.length === 3, "超市已多轮化（3 轮光顾）");
+ok(marketVisits.length === 5, "超市已多轮化（5 轮光顾）");
 ok(marketVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "超市每步恰好 1 个正确选项");
 ok(["oatmeal", "aisle", "shelf", "brand", "expiration", "scale", "frozen", "receipt", "refund", "exchange"].every(id => scene("market").items.some(it => it.id === id)), "超市新增 10 个词条已入库");
 
@@ -129,7 +129,7 @@ console.log("== 6. 断点续玩订单恢复 ==");
   ok(order.length === expected.length && order.length > 0, "续玩恢复订单素材 " + order.length + " 项");
 }
 
-console.log("== 7. 超市 v3 通关封顶 ==");
+console.log("== 7. 超市 v3 通关解锁下一轮 ==");
 {
   const state = freshState();
   const sc = scene("market");
@@ -141,7 +141,7 @@ console.log("== 7. 超市 v3 通关封顶 ==");
   }
   const fin = applyFinish(state, sc, visit);
   ok(state.progress["market:v3"] === visit.steps.length, "第 3 轮通关进度记录");
-  ok(state.unlockedVisits.market === 2 && !fin.hasNext, "最后一轮通关后解锁数封顶");
+  ok(state.unlockedVisits.market === 3 && fin.hasNext, "第 3 轮通关后解锁第 4 轮（unlocked=3，5 轮不再封顶）");
 }
 
 console.log("== 8. 存档服务（MemoryStorageAdapter） ==");
