@@ -598,6 +598,9 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 .theme-gym { --scene-accent: #d2691e; --scene-accent-soft: #faeedd; background: #faeedd; }
 .theme-shopping { --scene-accent: #c2571a; --scene-accent-soft: #fbe8dc; background: #fbe8dc; }
 .theme-postoffice { --scene-accent: #8a4b2f; --scene-accent-soft: #f6e8de; background: #f6e8de; }
+.theme-library { --scene-accent: #3d6b5e; --scene-accent-soft: #e2efe9; background: #e2efe9; }
+.theme-vet { --scene-accent: #7a5a9e; --scene-accent-soft: #efe8f6; background: #efe8f6; }
+.theme-school { --scene-accent: #2f6fa3; --scene-accent-soft: #e3eef7; background: #e3eef7; }
 .vlog-entry .scene-cover { background: linear-gradient(135deg, #7c5cbf22, #7c5cbf44); }
 .vlog-list { display: flex; flex-direction: column; gap: 12px; }
 .vlog-sets { display: flex; flex-direction: column; gap: 10px; margin: 10px 0 16px; }

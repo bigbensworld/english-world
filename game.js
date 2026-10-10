@@ -112,9 +112,10 @@ function iconHtml(it, cls) {
 // 场景分组：频率 × 场景域（内容充足度标准：10~12 场景后分组）
 // 未在分组表里的场景归入「日常高频」，保证新增场景不丢卡
 const SCENE_GROUPS = [
-  { id: "daily", title: "🏠 日常高频", sub: "Daily Life · 天天都用得上的英语", scenes: ["cafe", "restaurant", "market", "transport", "barber", "gym", "shopping"] },
+  { id: "daily", title: "🏠 日常高频", sub: "Daily Life · 天天都用得上的英语", scenes: ["cafe", "restaurant", "market", "transport", "barber", "gym", "shopping", "vet"] },
   { id: "travel", title: "✈️ 旅行出行", sub: "Travel · 机场酒店一手搞定", scenes: ["airport", "hotel"] },
   { id: "emergency", title: "🚑 应急保障", sub: "Essentials · 医院银行邮局关键时刻", scenes: ["hospital", "bank", "postoffice"] },
+  { id: "campus", title: "🎓 校园生活", sub: "Campus · 图书馆学校新生必备", scenes: ["library", "school"] },
 ];
 
 function renderMap() {

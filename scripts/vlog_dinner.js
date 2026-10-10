@@ -1,0 +1,58 @@
+  {
+    id: "dinner",
+    title: "Cooking Dinner",
+    titleZh: "做晚餐",
+    emoji: "🍳",
+    desc: "切菜、下锅、翻炒、摆盘——一顿晚餐的厨房英语。",
+    linkedScene: "restaurant",
+    cards: [
+      {
+        emoji: "🧅", anim: "crackOpen",
+        en: "It's six o'clock — time to cook dinner. First, I chop an onion. Chop, chop, chop!",
+        zh: "六点了——该做晚饭了。首先，我切一个洋葱。切切切！",
+        words: ["chop", "onion"],
+      },
+      {
+        emoji: "🫒", anim: "tiltPour",
+        en: "I pour some olive oil into the pan and turn the heat to medium.",
+        zh: "我往锅里倒一点橄榄油，把火调到中火。",
+        words: ["pour", "olive oil", "medium"],
+      },
+      {
+        emoji: "🥕", anim: "dropDown",
+        en: "The onion goes in first. Then I add the carrots and stir everything together.",
+        zh: "洋葱先下锅。然后我加入胡萝卜，把所有东西搅拌在一起。",
+        words: ["add", "stir"],
+      },
+      {
+        emoji: "🍗", anim: "sizzleWiggle",
+        en: "Now the chicken! It sizzles in the hot pan. I season it with salt and pepper.",
+        zh: "现在放鸡肉！它在热锅里滋滋作响。我用盐和胡椒调味。",
+        words: ["sizzle", "season", "pepper"],
+      },
+      {
+        emoji: "🥦", anim: "washSwirl",
+        en: "While the chicken cooks, I wash the broccoli. Veggies make the meal healthy.",
+        zh: "趁鸡肉还在煎，我洗西兰花。蔬菜让这顿饭更健康。",
+        words: ["veggies", "healthy", "meal"],
+      },
+      {
+        emoji: "🍚", anim: "steam",
+        en: "Everything is ready. I scoop the rice onto plates and place the food on top. Dinner looks great!",
+        zh: "一切都准备好了。我把米饭盛到盘子里，把菜摆在上面。晚餐看起来棒极了！",
+        words: ["scoop", "on top"],
+      },
+      {
+        emoji: "😋", anim: "sipBob",
+        en: "Time to eat! I take a bite. Mmm — delicious! Nothing beats a home-cooked meal.",
+        zh: "开吃！我咬了一口。嗯——太香了！没有什么比得上家常菜。",
+        words: ["take a bite", "home-cooked"],
+      },
+      {
+        type: "fun-fact", emoji: "💡",
+        en: "Fun fact! In English, 'sizzle' sounds like what it means — the noise of food in a hot pan. Words that copy sounds are called onomatopoeia!",
+        zh: "冷知识！英语里 sizzle 的发音就像它的意思——食物在热锅里的声音。这种模仿声音的词叫拟声词！",
+        words: ["onomatopoeia", "imitate"],
+      },
+    ],
+  },

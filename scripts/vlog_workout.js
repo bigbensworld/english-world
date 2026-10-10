@@ -1,0 +1,58 @@
+  {
+    id: "workout",
+    title: "Home Workout",
+    titleZh: "居家健身",
+    emoji: "💪",
+    desc: "热身、深蹲、平板支撑、拉伸——客厅里的一整套训练。",
+    linkedScene: "gym",
+    cards: [
+      {
+        emoji: "🤸", anim: "stretch",
+        en: "No gym today — home workout time! I warm up first with some light stretching.",
+        zh: "今天不去健身房——居家训练时间！我先做些轻度拉伸热身。",
+        words: ["workout", "warm up", "stretching"],
+      },
+      {
+        emoji: "🦵", anim: "squish",
+        en: "First up: squats! Feet apart, back straight, down and up. I do twenty of them.",
+        zh: "第一项：深蹲！双脚分开，背部挺直，下蹲起立。我做二十个。",
+        words: ["squats", "apart", "straight"],
+      },
+      {
+        emoji: "💪", anim: "grindSpin",
+        en: "Next, push-ups. Lower, hold, push! My arms start to shake, but I keep going.",
+        zh: "接下来，俯卧撑。下降、保持、撑起！我的手臂开始发抖，但我坚持着。",
+        words: ["push-ups", "lower", "keep going"],
+      },
+      {
+        emoji: "🧘", anim: "leanIn",
+        en: "Plank time! I hold my body straight like a board. One minute feels like an hour!",
+        zh: "平板支撑时间！我把身体挺得像块板子。一分钟感觉像一小时！",
+        words: ["plank", "hold", "board"],
+      },
+      {
+        emoji: "💦", anim: "dripFall",
+        en: "I'm sweating a lot now. I grab my water bottle and take a quick break.",
+        zh: "我现在出汗出得厉害。我拿起水瓶，快速休息一下。",
+        words: ["sweating", "water bottle", "break"],
+      },
+      {
+        emoji: "📺", anim: "bounceIn",
+        en: "Last set! I follow a workout video and do some jumping jacks. Jump, clap, jump!",
+        zh: "最后一组！我跟着健身视频做开合跳。跳、拍手、跳！",
+        words: ["set", "jumping jacks", "follow"],
+      },
+      {
+        emoji: "🧘‍♂️", anim: "breathe",
+        en: "Workout complete! I cool down slowly and stretch again. My body feels tired but great.",
+        zh: "训练完成！我慢慢放松，再拉伸一下。身体感觉很累，但很舒服。",
+        words: ["cool down", "complete", "tired"],
+      },
+      {
+        type: "fun-fact", emoji: "💡",
+        en: "Fun fact! 'No pain, no gain' is a classic gym saying — it means results require effort. But real trainers say: good pain builds muscle, sharp pain means stop!",
+        zh: "冷知识！No pain, no gain（不劳无获）是健身房的经典格言——意思是想要效果就得付出。但真正的教练会说：酸胀感长肌肉，刺痛感要停下！",
+        words: ["gain", "saying", "sharp"],
+      },
+    ],
+  },

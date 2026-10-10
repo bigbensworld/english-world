@@ -1,0 +1,58 @@
+  {
+    id: "gardening",
+    title: "Gardening",
+    titleZh: "打理花园",
+    emoji: "🌱",
+    desc: "浇水、除草、种花、收获——花园里的一下午。",
+    linkedScene: "market",
+    cards: [
+      {
+        emoji: "🌤️", anim: "sunPulse",
+        en: "What a sunny afternoon! Perfect for gardening. I put on my gloves and grab my tools.",
+        zh: "多好的晴天下午！最适合打理花园了。我戴上手套，拿起工具。",
+        words: ["sunny", "gloves", "tools"],
+      },
+      {
+        emoji: "🌿", anim: "sweepSlide",
+        en: "First, I pull out the weeds. Weeds steal water from the flowers, so they have to go!",
+        zh: "首先，我拔掉杂草。杂草会抢花的水分，所以必须除掉！",
+        words: ["pull out", "weeds", "steal"],
+      },
+      {
+        emoji: "🌷", anim: "dropDown",
+        en: "I dig a small hole and plant a tulip bulb. In spring, it will bloom into a beautiful flower.",
+        zh: "我挖一个小坑，种下一颗郁金香球茎。到了春天，它会开出一朵美丽的花。",
+        words: ["dig", "plant", "bulb", "bloom"],
+      },
+      {
+        emoji: "💧", anim: "dripFall",
+        en: "Plants need water! I fill the watering can and give everything a good drink.",
+        zh: "植物需要水！我灌满浇水壶，给每株植物都好好喝一顿。",
+        words: ["watering can", "drink"],
+      },
+      {
+        emoji: "🐝", anim: "drift",
+        en: "A bee lands on the flowers. Bees are our little helpers — they carry pollen from plant to plant.",
+        zh: "一只蜜蜂落在花上。蜜蜂是我们的小帮手——它们在植物之间传递花粉。",
+        words: ["lands", "bee", "pollen", "helpers"],
+      },
+      {
+        emoji: "🍅", anim: "washSwirl",
+        en: "Look! My tomatoes are ripe and red. I pick a few for tonight's salad.",
+        zh: "看！我的西红柿熟了，红彤彤的。我摘几个做今晚的沙拉。",
+        words: ["ripe", "pick", "salad"],
+      },
+      {
+        emoji: "🧺", anim: "foldFlatten",
+        en: "Gardening done! I wipe my hands and put the tools back in the shed. Hard work, but so worth it.",
+        zh: "花园打理完毕！我擦擦手，把工具放回棚子里。很辛苦，但非常值得。",
+        words: ["wipe", "shed", "worth it"],
+      },
+      {
+        type: "fun-fact", emoji: "💡",
+        en: "Fun fact! A 'green thumb' means being good at growing plants. If your plants always die, you might say — jokingly — that you have a 'black thumb'!",
+        zh: "冷知识！green thumb 意思是很会种植物。如果你的植物总是养死，你可以开玩笑说自己有 black thumb！",
+        words: ["green thumb", "jokingly"],
+      },
+    ],
+  },
