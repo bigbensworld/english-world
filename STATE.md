@@ -98,11 +98,13 @@
 19. ✅ 第五批：图书馆/宠物医院/学校 3 场景各 5 轮 + vlog 3 集（Cooking Dinner / Gardening / Home Workout），VLOG_DICT 565 词条
 20. ⬜ 候选：更多场景（书店/药房独立/租车）、vlog 新主题（Meal Prep / Car Wash / Hiking）、Phase 1 Taro 重建 UI（内容已达 15 场景，架构迁移优先级上升）
 
-**跨端架构（2026-10-10 拍板，Phase 0 已落地）**：
+**跨端架构（2026-10-10 拍板，Phase 0 + Phase 1(H5) 已落地）**：
 - 目标：一套架构同时支持网站/微信小程序/App；三端统一**静态离线优先**（网站纯静态 CF Pages、小程序全资源分包零网络请求、App Capacitor 全本地）。
 - `packages/core/` 共享内核（TS）：types + 数据（_raw.js 从源提取）+ 场景引擎（去 DOM 纯逻辑）+ Storage/TTS 适配器接口。方案详见 `docs/cross-platform-architecture.md`。
+- **`packages/ui/` Taro UI 层（Phase 1，commit 917620b）**：Taro 4.0.9 + React 18，核心页面全移植（双 Tab/分组地图/对话/答错教学/订单托盘/vlog 逐词高亮查词/词汇册）；gameStore.ts hook 封装 core 引擎。构建：`scripts/taro-build.sh build --type h5`。**预览站 https://english-world-taro.pages.dev**（生产站仍是 vanilla 版，切换需拍板）。
+- **Phase 1 构建坑（重要）**：①Taro H5 的 webpack script rule 默认只编译项目 src——外部 core 包必须在 `h5.webpackChain` 里 `chain.module.rules.get('script').include.add(coreDir)`（webpack-chain 的 include 是 ChainedSet，用 `.add()` 不是赋值）；顶层 webpackChain 配置项在 h5 段内才稳定执行；②`src/index.html` 模板必填（含 `<%= htmlWebpackPlugin.options.script %>`），否则 dist 无 html；③Taro CLI 靠 process.cwd() 定位项目，WorkBuddy shell 不能 `cd`，用 `scripts/taro-build.sh` wrapper；④mini.postcss.pxtransform 不允许 selectorBlackList 属性；⑤需要额外装 @babel/preset-react + babel-preset-react-app。
 - **内容生产标准流程**：改 data.js/vlogs.js/vlog.js → `node scripts/extract_core_data.mjs` → 三组测试全过（core.test.ts + sync-guard.test.ts + test.js）。
-- 路线：Phase 1 Taro 重建 UI（建议医院+交通两批上线后启动）→ Phase 2 预生成音频 mp3+时间戳 → Phase 3 小程序 MVP + Capacitor App + 云同步。
+- 路线：Phase 1 ✅ H5 预览站 → **待办：H5 全功能对齐（vlog Quiz/隐藏测试模式/订单动画等细节）+ 小程序编译验证 → 切换生产站** → Phase 2 预生成音频 mp3+时间戳 → Phase 3 小程序 MVP + Capacitor App + 云同步。
 
 ## 四、开发与部署流程
 
