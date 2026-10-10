@@ -20,10 +20,11 @@ function makeEl(id) {
   });
   return el;
 }
-const ids = ["app","wordCount","sceneGrid","sceneTitle","stage","mapView","sceneView",
+const ids = ["app","wordCount","phraseCount","sceneGrid","sceneTitle","stage","mapView","sceneView",
   "wordOverlay","wordCard","bookOverlay","bookGrid","toast",
   "btnMap","btnBack","btnBook","btnCloseBook","chatBox","advActions","advOpts","advProgress",
-  "exploreGrid","exploreToggle","exploreCount","exploreArrow","advAgain","advDone","wcSpeak","wcClose"];
+  "exploreGrid","exploreToggle","exploreCount","exploreArrow","advAgain","advDone","wcSpeak","wcClose",
+  "orderTray"];
 const elements = {};
 ids.forEach((id) => elements[id] = makeEl(id));
 globalThis.document = {
@@ -51,6 +52,9 @@ ok(SCENES.length === 2, "共 2 个场景");
 ok(SCENES.every(s => s.unlockCost === undefined), "无解锁成本字段");
 ok(SCENES[0].steps.length === 10 && SCENES[1].steps.length === 11, "咖啡店 10 步 / 超市 11 步剧情");
 ok(SCENES.every(s => s.steps.every(st => st.options.filter(o => o.ok).length === 1)), "每步恰好 1 个正确选项");
+ok(SCENES.every(s => s.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "每步店员台词有 2+ 个随机变体");
+ok(SCENES.every(s => s.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "每步都有语块 phrase");
+ok(SCENES[0].steps.filter(st => st.adds).length >= 6, "咖啡店至少 6 步有订单素材");
 
 console.log("== 2. 咖啡店剧情全流程 ==");
 enterScene("cafe");
@@ -60,7 +64,7 @@ ok(typeof $("advActions") !== "undefined", "剧情操作区已渲染");
 // 模拟点击开始剧情按钮（advActions 里第一个按钮）
 startAdventure();
 ok(state.adventure.step === 0, "剧情从第 0 步开始");
-ok(state.advHistory.length === 1 && state.advHistory[0].role === "npc", "店员先开口说话");
+ok(state.advHistory.length === 1 && state.advHistory[0].role === "npc-typing", "店员先显示打字中气泡");
 
 // 逐步选正确答案走完全程
 function makeElBtn() {
@@ -91,6 +95,9 @@ finishAdventure();
 ok(state.adventure.step === SCENES[0].steps.length, "走完全部 10 步");
 ok(state.progress.cafe === 10, "进度记录 cafe=10");
 ok(state.advHistory.some(m => m.role === "me" && !m.wrong), "玩家正确回复已记录");
+ok(state.advHistory.filter(m => m.role === "phrase").length === 10, "聊天流含 10 张语块卡");
+ok(state.adventure.order.length >= 6, "订单托盘至少 6 项（实际 " + state.adventure.order.length + "）");
+ok(Object.keys(state.phrases).filter(k => k.startsWith("cafe:")).length === 10, "咖啡店 10 条语块全部入册");
 ok(state.collected["cafe:barista"] === true, "奖励词汇 barista 已收集");
 
 console.log("== 3. 答错重试机制 ==");
@@ -120,12 +127,14 @@ console.log("== 6. 词汇册 ==");
 openBook();
 const bookCount = Object.keys(state.collected).length;
 ok(bookCount >= 2, "词汇册至少含 2 词（实际 " + bookCount + "）");
+ok($("bookGrid").innerHTML.includes("常用表达") || Object.keys(state.phrases).length > 0, "词汇册含常用表达区");
 
 console.log("== 7. 持久化 ==");
 save();
 const saved = JSON.parse(localStorage.getItem("englishWorldV2"));
 ok(saved.progress.cafe === 10, "进度已保存");
 ok(saved.collected["cafe:barista"] === true, "词汇已保存");
+ok(Object.keys(saved.phrases).length >= 10, "语块已保存");
 ok(localStorage.getItem("englishWorld") === null, "旧金币存档不再写入");
 
 console.log("");
