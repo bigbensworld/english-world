@@ -4923,6 +4923,421 @@ const SCENES = [
       },
     ],
   },
+
+
+
+{
+  id: "transport",
+  name: "交通出行",
+  nameEn: "Transportation",
+  emoji: "🚌",
+  iconId: "transport",
+  cover: "🚌🗺️🚕",
+  theme: "transport",
+  accent: "#b8860b",
+  accentSoft: "#faf0dc",
+  deco: "🚏",
+  deco2: "🛣️",
+  intro: "你要穿过整座城市！坐公交、乘地铁、街头问路、打车赶时间——城市交通英语全流程通关。",
+  orderLabel: "🧭 出行进度",
+  items: [
+    // 第 1 轮（公交地铁）新词
+    { id: "subway",    en: "subway",    zh: "地铁",   phon: "/ˈsʌbweɪ/",    emoji: "🚇", sent: "Take the subway to downtown." },
+    { id: "bus",       en: "bus stop",  zh: "公交站", phon: "/bʌs stɒp/",   emoji: "🚏", sent: "Wait for the bus at the bus stop." },
+    { id: "line",      en: "line",      zh: "线路",   phon: "/laɪn/",       emoji: "〰️", sent: "Which line goes to the airport?" },
+    { id: "transfer",  en: "transfer",  zh: "换乘",   phon: "/ˈtrænsfɜː(r)/", emoji: "🔁", sent: "Transfer to the Red Line at Union Square." },
+    { id: "transitcard", en: "transit card", zh: "交通卡", phon: "/ˈtrænzɪt kɑːd/", emoji: "💳", sent: "Tap your transit card at the gate." },
+    { id: "eastbound", en: "eastbound", zh: "往东行", phon: "/ˈiːstbaʊnd/", emoji: "➡️", sent: "Take the Blue Line eastbound." },
+    { id: "gap",       en: "mind the gap", zh: "小心空隙", phon: "/maɪnd ðə ɡæp/", emoji: "⚠️", sent: "Mind the gap between the train and the platform." },
+    // 第 2 轮（街头问路）新词
+    { id: "directions", en: "directions", zh: "方向/指引", phon: "/dəˈrekʃnz/", emoji: "🧭", sent: "Can you give me directions to the museum?" },
+    { id: "block",     en: "block",      zh: "街区",   phon: "/blɒk/",       emoji: "🏙️", sent: "Walk two blocks and turn left." },
+    { id: "corner",    en: "corner",     zh: "拐角",   phon: "/ˈkɔːnə(r)/",  emoji: "↩️", sent: "The café is right at the corner." },
+    { id: "crosswalk", en: "crosswalk",  zh: "人行横道", phon: "/ˈkrɒswɔːk/", emoji: "🚸", sent: "Use the crosswalk to cross the street." },
+    { id: "underpass", en: "underpass",  zh: "地下通道", phon: "/ˈʌndəpɑːs/", emoji: "🚇", sent: "Take the underpass to cross the avenue." },
+    { id: "walkable",  en: "within walking distance", zh: "步行可达", phon: "/ˈwɔːkɪŋ ˈdɪstəns/", emoji: "🚶", sent: "The park is within walking distance." },
+    // 第 3 轮（打车网约车）新词
+    { id: "fare",      en: "fare",      zh: "车费",   phon: "/feə(r)/",     emoji: "💵", sent: "The bus fare is two dollars." },
+    { id: "meter",     en: "meter",     zh: "计价器", phon: "/ˈmiːtə(r)/",  emoji: "🔢", sent: "Check the meter for the fare." },
+    { id: "shortcut",  en: "shortcut",  zh: "近路",   phon: "/ˈʃɔːtkʌt/",   emoji: "📍", sent: "The driver knows a shortcut." },
+    { id: "rideshares", en: "rideshare app", zh: "网约车应用", phon: "/ˈraɪdʃeə(r) æp/", emoji: "📱", sent: "I booked a ride on a rideshare app." },
+    { id: "buckle",    en: "buckle up", zh: "系安全带", phon: "/ˈbʌkl ʌp/",  emoji: "🔗", sent: "Buckle up before the car starts." },
+    { id: "traffic",   en: "traffic",   zh: "交通",   phon: "/ˈtræfɪk/",    emoji: "🚗", sent: "There's heavy traffic on Main Street." },
+    { id: "hurry",     en: "in a hurry", zh: "赶时间", phon: "/ɪn ə ˈhʌri/", emoji: "⏰", sent: "I'm in a hurry — can we take the shortcut?" },
+    { id: "destination", en: "destination", zh: "目的地", phon: "/ˌdestɪˈneɪʃn/", emoji: "🏁", sent: "What's your final destination?" },
+    { id: "buckleup",  en: "exact change", zh: "精确零钱", phon: "/ɪɡˈzækt tʃeɪndʒ/", emoji: "🪙", sent: "The bus only takes exact change." },
+  ],
+  visits: [
+
+{
+  id: "v1",
+  title: "第 1 次光顾 · 公交与地铁",
+  titleEn: "Bus & Subway",
+  emoji: "🚌",
+  desc: "第一次坐国外的公交和地铁！问路线、看站牌、刷卡进闸、听报站——顺利抵达目的地。",
+  reward: { en: "subway", zh: "你搞定了英文公交地铁出行，城市任你穿行！🚌" },
+  steps: [
+    {
+      npcLines: [
+        "Good morning! How can I help you today?",
+        "Morning! Need some help with directions?",
+        "Hi there! You look a little lost — anything I can do?",
+      ],
+      npcZh: "早上好！今天有什么可以帮您？",
+      task: "询问去市中心图书馆坐几路公交",
+      options: [
+        { text: "Excuse me, which bus goes to the City Library?", ok: true,  tip: "Which bus goes to...? 问公交线路的万能句" },
+        { text: "Library bus where which number take?",          ok: false, tip: "说 Which bus goes to the City Library?" },
+        { text: "I want library, bus me there.",                ok: false, tip: "更礼貌：Excuse me, which bus goes to...?" },
+      ],
+      phrase: { en: "Which bus goes to ___?", zh: "去……坐几路公交？", note: "问公交线路标准句；地铁则问 Which line goes to...?" },
+    },
+    {
+      npcLines: [
+        "The Number 12 bus goes straight there. It stops right in front of the library!",
+        "You'll want the 12 — it drops you off right at the library door!",
+        "Hop on the Number 12, it stops right outside the library!",
+      ],
+      npcZh: "12 路公交直达。就停在图书馆门口！",
+      task: "询问在哪一站上车、多久一班",
+      options: [
+        { text: "Great! Where's the nearest stop, and how often does it run?", ok: true,  tip: "how often does it run? 问发车频率" },
+        { text: "Bus stop where is? Bus come many time?",                     ok: false, tip: "说 Where's the stop, and how often does it run?" },
+        { text: "12 bus stop near here find for me.",                          ok: false, tip: "两个问题一起问：Where's the stop + how often?" },
+      ],
+      phrase: { en: "How often does it run?", zh: "多久一班？", note: "run 指车辆运行；公交/地铁/班车都这么问" },
+    },
+    {
+      npcLines: [
+        "The stop is just around the corner. Buses run every ten minutes. Do you have a transit card?",
+        "Right around the corner! A bus every ten minutes or so. Got a transit card?",
+        "Corner right there — buses every ten minutes. You have a transit card with you?",
+      ],
+      npcZh: "站台就在拐角处。公交每十分钟一班。您有交通卡吗？",
+      task: "没有交通卡，问怎么买票",
+      options: [
+        { text: "No, I don't. Where can I buy a ticket or a transit card?", ok: true,  tip: "transit card 交通卡；买票/办卡一次问清" },
+        { text: "No card. Give ticket to me please.",                      ok: false, tip: "问地点：Where can I buy a ticket?" },
+        { text: "I have money cash only, work on bus?",                    ok: false, tip: "先问购买点：Where can I buy a ticket or card?" },
+      ],
+      phrase: { en: "Where can I buy a transit card?", zh: "哪里能买交通卡？", note: "transit card 泛指公交卡；纽约叫 MetroCard，伦敦叫 Oyster" },
+    },
+    {
+      npcLines: [
+        "There's a vending machine right at the stop. You can also pay exact cash when you board. Just have coins ready!",
+        "Vending machine at the stop, or exact change on board. Keep some coins handy!",
+        "Machine's at the stop — or exact cash as you get on. Coins are key!",
+      ],
+      npcZh: "站台就有自动售票机。上车投币（需精确金额）也行。备好硬币！",
+      task: "在售票机买票时遇到问题，找人帮忙",
+      options: [
+        { text: "Excuse me, could you show me how to use this machine? It's my first time.", ok: true,  tip: "It's my first time 说明新手身份，获得耐心讲解" },
+        { text: "Machine broken? My money not go in.",                                     ok: false, tip: "求助模板：Could you show me how to use it?" },
+        { text: "Help me buy ticket do it for me fast.",                                    ok: false, tip: "求指导而非代劳：Could you show me how?" },
+      ],
+      phrase: { en: "Could you show me how to use this?", zh: "能教我怎么用吗？", note: "机器求助万能句（售票机/自助机/闸机通用）" },
+      adds: [{ emoji: "🎫", label: "Ticket ✓", badge: true }],
+    },
+    {
+      npcLines: [
+        "Sure! Tap where you want to go, insert coins here, and your ticket prints. Easy!",
+        "No problem! Choose your stop, pop in the coins, and out comes the ticket!",
+        "Happy to help! Destination first, coins second, ticket third. You got this!",
+      ],
+      npcZh: "当然！点目的地、投币、出票。很简单！",
+      task: "上车后向司机确认到站提醒",
+      options: [
+        { text: "Thank you! Could you let me know when we get to the City Library?", ok: true,  tip: "Could you let me know when...? 请人到站提醒的礼貌句" },
+        { text: "Driver, library time you tell me yes?",                            ok: false, tip: "说 Could you let me know when we get there?" },
+        { text: "Wake me library stop shout loudly.",                                ok: false, tip: "更自然：Could you let me know when we get to...?" },
+      ],
+      phrase: { en: "Could you let me know when we get to ___?", zh: "到……站能叫我一下吗？", note: "公交/火车请人提醒到站，听不懂报站时的保命句" },
+    },
+    {
+      npcLines: [
+        "Of course! It's the ninth stop — about twenty minutes. I'll give you a shout!",
+        "You got it! Ninth stop, roughly twenty minutes. I'll holler when we're there!",
+        "Sure thing! Nine stops, twenty minutes. I'll let you know!",
+      ],
+      npcZh: "当然！第九站，大约二十分钟。到时我叫您！",
+      task: "换乘地铁时看不懂线路图，问工作人员",
+      options: [
+        { text: "Excuse me, which line should I take for Central Station, and where do I transfer?", ok: true,  tip: "transfer 换乘；line 线路——地铁问路两大关键词" },
+        { text: "Central Station where? Which train I go?",                                        ok: false, tip: "说 Which line should I take, and where do I transfer?" },
+        { text: "Subway map too confusing, just tell me everything.",                              ok: false, tip: "精准提问：Which line + where to transfer" },
+      ],
+      phrase: { en: "Which line should I take, and where do I transfer?", zh: "该坐哪条线，在哪换乘？", note: "地铁问路黄金句，一次问清线路 + 换乘点" },
+    },
+    {
+      npcLines: [
+        "Take the Blue Line eastbound, then transfer to the Red Line at Union Square. It's four stops from there.",
+        "Blue Line heading east, switch to the Red at Union Square. Four more stops and you're there!",
+        "Blue Line east, Red Line at Union Square, then just four stops. Easy peasy!",
+      ],
+      npcZh: "坐蓝线往东，在联合广场换红线。再坐四站就到。",
+      task: "确认理解路线（复述一遍）",
+      options: [
+        { text: "Got it — Blue Line east, transfer to Red at Union Square. Thank you!", ok: true,  tip: "复述路线确认理解，问路最稳的一步" },
+        { text: "Blue red square union okay I remember maybe.",                        ok: false, tip: "完整复述：Blue Line east, transfer to Red at Union Square" },
+        { text: "Too many words, write it down for me paper.",                         ok: false, tip: "口头复述巩固记忆：Got it — Blue Line east..." },
+      ],
+      phrase: { en: "Got it — ___. Thank you!", zh: "明白了——……。谢谢！", note: "复述确认 + 致谢，问路闭环句式" },
+      adds: [{ emoji: "🚇", label: "Blue Line ✓", badge: true }],
+    },
+    {
+      npcLines: [
+        "That's right! Mind the gap when boarding, and have a great day!",
+        "Exactly! Watch the gap as you board. Enjoy your ride!",
+        "Perfect! Mind the gap now — safe travels!",
+      ],
+      npcZh: "没错！上车注意站台空隙。祝您愉快！",
+      task: "总结今天学到的交通要点",
+      options: [
+        { text: "Which bus, how often, where to transfer — I've got the full toolkit now. Thanks a lot!", ok: true,  tip: "要点串联总结：问线路/频率/换乘三大件" },
+        { text: "Bus subway English very hard but okay finished.",                                     ok: false, tip: "列要点更有收获感：Which bus, how often, where to transfer" },
+        { text: "Thank you I go now goodbye see you never.",                                            ok: false, tip: "带着知识走：I've got the full toolkit now!" },
+      ],
+      phrase: { en: "Mind the gap.", zh: "小心站台空隙", note: "地铁广播名句；mind = 小心，通用警示语" },
+    },
+  ],
+},
+
+{
+  id: "v2",
+  title: "第 2 次光顾 · 街头问路",
+  titleEn: "Asking for Directions",
+  emoji: "🗺️",
+  desc: "在陌生街区迷路了！找路人问方向、听懂 left/right/直行、确认距离——做个礼貌的问路达人。",
+  reward: { en: "directions", zh: "你学会了英文问路，从此走到哪都不慌！🗺️" },
+  steps: [
+    {
+      npcLines: [
+        "Oh, hi! You look like you're searching for something. Can I help?",
+        "Hi there! Lost? I know this neighborhood pretty well!",
+        "Hello! You've got the map-upside-down look — need a hand?",
+      ],
+      npcZh: "哦，你好！您看起来在找什么。需要帮忙吗？",
+      task: "礼貌开口：找 Central 咖啡馆但迷路了",
+      options: [
+        { text: "Excuse me, I'm looking for the Central Café. Am I going in the right direction?", ok: true,  tip: "I'm looking for... 说明目标 + 确认方向，问路开场白" },
+        { text: "Coffee place Central where is it tell me now.",                                  ok: false, tip: "礼貌版：Excuse me, I'm looking for the Central Café" },
+        { text: "I am lost completely help me please everything.",                                ok: false, tip: "说具体目标：I'm looking for the Central Café" },
+      ],
+      phrase: { en: "I'm looking for ___. Am I going in the right direction?", zh: "我在找……，我走的方向对吗？", note: "问路开场双连问：目标 + 方向确认" },
+    },
+    {
+      npcLines: [
+        "Hmm, the Central Café... you're actually going the wrong way! You need to turn around and go back to the corner.",
+        "Oh, the Central Café? Wrong direction, I'm afraid! Turn around and head back to the corner.",
+        "Ha, you've wandered off! The café's the other way — back to the corner you go!",
+      ],
+      npcZh: "嗯，Central 咖啡馆……您走反了！需要掉头回到那个路口。",
+      task: "理解指路信息，确认怎么走",
+      options: [
+        { text: "Oh no! So I should turn around and walk back to the corner?", ok: true,  tip: "So I should...? 复述确认方向，别走第二次冤枉路" },
+        { text: "Turn around means what exactly? Show me.",                  ok: false, tip: "turn around = 掉头；复述确认即可" },
+        { text: "Wrong way?! I walk so far already so tired.",                ok: false, tip: "确认路线：So I should turn around and go back?" },
+      ],
+      phrase: { en: "So I should ___?", zh: "所以我应该……？", note: "复述指路信息求确认，问路人必备安全阀" },
+    },
+    {
+      npcLines: [
+        "Exactly! Then turn left at the corner and walk two blocks. You'll see the café on your right, next to a bookstore.",
+        "That's it! Left at the corner, two blocks down, and it's on your right — right by the bookstore.",
+        "You got it! Hang a left at the corner, two blocks, café on your right next to the bookshop!",
+      ],
+      npcZh: "没错！路口左转，走两个街区。咖啡馆就在右手边，书店旁边。",
+      task: "完整复述路线确认",
+      options: [
+        { text: "Turn left at the corner, two blocks, and it's on my right next to the bookstore. Got it!", ok: true,  tip: "完整复述 = 路线刻进脑子，问路最稳一步" },
+        { text: "Left corner two blocks right side near books yes.",                                    ok: false, tip: "完整版：Turn left at the corner, two blocks, on my right" },
+        { text: "I remember maybe left maybe right I will see.",                                        ok: false, tip: "确定每个方位词：left at the corner, on my right" },
+      ],
+      phrase: { en: "Turn left at ___, and it's on your ___.", zh: "在……左转，就在你的……边", note: "指路核心句型：turn left/right + on your left/right" },
+    },
+    {
+      npcLines: [
+        "Perfect! Is it far from here? Oh wait, that's your next question, isn't it? It's about a ten-minute walk.",
+        "You've got it! And yes, it's walkable — ten minutes, give or take.",
+        "Nailed it! Just a ten-minute stroll from here.",
+      ],
+      npcZh: "完全正确！走路大概十分钟就到。",
+      task: "询问步行距离确认",
+      options: [
+        { text: "Is it within walking distance?", ok: true,  tip: "within walking distance 步行可达——问距离的地道表达" },
+        { text: "Far or near? Legs tired question.", ok: false, tip: "说 Is it within walking distance?" },
+        { text: "How many minutes more walking time exactly?", ok: false, tip: "经典问法：Is it within walking distance?" },
+      ],
+      phrase: { en: "Is it within walking distance?", zh: "步行能到吗？", note: "距离问句首选；回答常见 It's a ten-minute walk" },
+    },
+    {
+      npcLines: [
+        "Totally walkable! But heads-up — the crosswalk on Fifth Avenue is closed for construction. Use the underpass instead.",
+        "Oh yes, walkable! One thing though — the Fifth Avenue crosswalk's closed for construction. Take the underpass.",
+        "Sure, on foot! Just know the Fifth Avenue crossing is shut for construction — underpass is your friend!",
+      ],
+      npcZh: "完全可以走到！不过提醒您——第五大道的人行横道因施工关闭了。请走地下通道。",
+      task: "理解提醒并询问地下通道位置",
+      options: [
+        { text: "Thanks for the heads-up! Where's the underpass?", ok: true,  tip: "heads-up 提醒；Thanks for the heads-up! 回应提醒的地道说法" },
+        { text: "Underpass? What is this word meaning?",          ok: false, tip: "underpass = 地下通道；回应提醒先说 Thanks!" },
+        { text: "Closed road annoying, other way good fine.",      ok: false, tip: "先致谢再追问：Thanks for the heads-up! Where's it?" },
+      ],
+      phrase: { en: "Thanks for the heads-up!", zh: "多谢提醒！", note: "heads-up = 提前告知；美式口语高频词" },
+    },
+    {
+      npcLines: [
+        "The underpass entrance is right after the corner — you'll see a yellow sign. You can't miss it!",
+        "Right past the corner, look for the yellow sign. Impossible to miss!",
+        "Just beyond the corner there's a big yellow sign — that's your underpass!",
+      ],
+      npcZh: "地下通道入口就在路口过去一点——有黄色标识，不会错过的！",
+      task: "最后确认并致谢",
+      options: [
+        { text: "You can't miss it — got it! Thank you so much for your help!", ok: true,  tip: "You can't miss it 很显眼——连指路人常用语都学会了" },
+        { text: "Yellow sign okay bye thank you person.",                     ok: false, tip: "活用刚学的表达：You can't miss it — got it!" },
+        { text: "Hope sign really yellow not lie to me.",                      ok: false, tip: "信任指路：You can't miss it — got it!" },
+      ],
+      phrase: { en: "You can't miss it.", zh: "很好找，不会错过的", note: "指路收尾金句；听懂它 = 放心走" },
+    },
+    {
+      npcLines: [
+        "You're welcome! Enjoy the café — their blueberry muffins are amazing!",
+        "Anytime! Oh, and try the blueberry muffins at the café. Life-changing!",
+        "No problem at all! Pro tip: blueberry muffin. Thank me later!",
+      ],
+      npcZh: "不客气！享受咖啡时光——他们家的蓝莓玛芬超好吃！",
+      task: "问路任务完成，友好收尾",
+      options: [
+        { text: "A muffin tip and directions in one — you're the best! Have a great day!", ok: true,  tip: "风趣总结 + 祝好，问路的完美谢幕" },
+        { text: "Muffin okay I will eat maybe if hungry.",                              ok: false, tip: "更有温度：You're the best! Have a great day!" },
+        { text: "Bye strange street person who knows muffins.",                          ok: false, tip: "热情道谢：You're the best!" },
+      ],
+      phrase: { en: "You're the best!", zh: "你人真好！", note: "对帮助者的最高口语致谢，配上微笑满分" },
+    },
+  ],
+},
+
+{
+  id: "v3",
+  title: "第 3 次光顾 · 打车与网约车",
+  titleEn: "Taxi & Rideshare",
+  emoji: "🚕",
+  desc: "赶时间只能打车！街头拦出租车、报目的地、看计价器、用 App 叫车、给小费——现代出行一网打尽。",
+  reward: { en: "fare", zh: "你解锁了打车全套英语，赶时间也不慌！🚕" },
+  steps: [
+    {
+      npcLines: [
+        "Taxi! Where to, my friend?",
+        "Hey there! Hop in — where are you headed?",
+        "Taxi's free! Where you going?",
+      ],
+      npcZh: "出租车！去哪儿，朋友？",
+      task: "报目的地：中央车站，越快越好",
+      options: [
+        { text: "Central Station, please. I'm in a bit of a hurry.", ok: true,  tip: "in a hurry 赶时间——报目的地 + 说明紧迫度" },
+        { text: "Station central go fast fast now!",                 ok: false, tip: "说 Central Station, please. I'm in a hurry" },
+        { text: "Drive me train station quick quick.",               ok: false, tip: "更自然：Central Station, please. I'm in a bit of a hurry." },
+      ],
+      phrase: { en: "___, please. I'm in a bit of a hurry.", zh: "去……，我有点赶时间。", note: "打车报目的地 + 赶时间说明，司机立马踩油门" },
+    },
+    {
+      npcLines: [
+        "Central Station it is! Buckle up, please. There's some traffic on Main Street, but I know a shortcut.",
+        "You got it! Strap in! Main Street's jammed, but I've got a secret route.",
+        "Central Station, coming up! Seatbelt, please — Main Street's a mess, but don't worry, I know the back ways!",
+      ],
+      npcZh: "中央车站！请系好安全带。主街有点堵，但我知道一条近路。",
+      task: "听懂后询问预计车程",
+      options: [
+        { text: "Thanks! How long will the ride take?", ok: true,  tip: "How long will the ride take? 问车程——ride 指这趟行程" },
+        { text: "Arrive time what hour minute?",        ok: false, tip: "说 How long will the ride take?" },
+        { text: "Traffic bad? My train leaves soon panic!", ok: false, tip: "先问时长：How long will the ride take?" },
+      ],
+      phrase: { en: "How long will the ride take?", zh: "车程大概多久？", note: "打车必问句；ride = 打的一趟，trip 泛指旅程" },
+    },
+    {
+      npcLines: [
+        "Usually twenty minutes, fifteen with my shortcut. You'll catch your train, no worries!",
+        "Twenty minutes the normal way, fifteen my way. That train of yours is safe!",
+        "Fifteen, maybe twenty max. Plenty of time for your train!",
+      ],
+      npcZh: "平时二十分钟，走我的近路十五分钟。您能赶上火车，别担心！",
+      task: "途中司机闲聊，礼貌回应",
+      options: [
+        { text: "That's a relief! Is this your favorite shortcut?", ok: true,  tip: "That's a relief 松了口气——回应好消息的标准句" },
+        { text: "Good good. Be quiet now I stress.",              ok: false, tip: "礼貌回应闲聊：That's a relief!" },
+        { text: "Fifteen or twenty? Numbers confuse me, both bad.", ok: false, tip: "松口气式回应：That's a relief!" },
+      ],
+      phrase: { en: "That's a relief!", zh: "那就放心了！", note: "听到好消息的松气反应，聊天神句" },
+    },
+    {
+      npcLines: [
+        "Haha, yes! Been driving this city for twenty years — I know every nook and cranny. Here we are, Central Station!",
+        "Twenty years behind the wheel here — every alley's my old friend! And... we're here! Central Station!",
+        "Favorite? More like my office! Twenty years in this city. Anyway — Central Station, arrived!",
+      ],
+      npcZh: "哈哈，是的！在这城市开了二十年车——每个角落我都熟。到了，中央车站！",
+      task: "看计价器，询问车费",
+      options: [
+        { text: "That was fast! How much is the fare?", ok: true,  tip: "fare 车费——打车付费核心词" },
+        { text: "Money how much I owe you driving man?", ok: false, tip: "说 How much is the fare?" },
+        { text: "Price screen I don't understand number.", ok: false, tip: "计价器读数就是 fare：How much is the fare?" },
+      ],
+      phrase: { en: "How much is the fare?", zh: "车费多少？", note: "fare 车费（出租车/公交/火车通用）；meter 是计价器" },
+      adds: [{ emoji: "🚕", label: "Arrived ✓", badge: true }],
+    },
+    {
+      npcLines: [
+        "Eighteen fifty. Card or cash?",
+        "That'll be eighteen fifty. Card? Cash? Either works!",
+        "Eighteen fifty even. Pay however you like!",
+      ],
+      npcZh: "18.5 美元。刷卡还是现金？",
+      task: "刷卡支付并询问是否含小费",
+      options: [
+        { text: "Card, please. Should I add a tip on the machine?", ok: true,  tip: "add a tip on the machine 刷卡机加小费——付费环节的关键问句" },
+        { text: "Card pay. Extra money mandatory or free choice?", ok: false, tip: "说 Should I add a tip on the machine?" },
+        { text: "Eighteen fifty very expensive why so much money.", ok: false, tip: "正常付费即可：Card, please" },
+      ],
+      phrase: { en: "Should I add a tip?", zh: "需要加小费吗？", note: "打车小费美国惯例 10%~15%，刷卡机上会问" },
+    },
+    {
+      npcLines: [
+        "That's totally up to you! Most folks add a couple of dollars. Thank you either way!",
+        "Whatever you feel like! A couple bucks is typical, but no pressure at all!",
+        "Your call, my friend! Most people round up a bit. Thanks regardless!",
+      ],
+      npcZh: "完全看您！大多数人加两美元左右。无论如何都谢谢！",
+      task: "加小费完成支付，下车道谢",
+      options: [
+        { text: "I'll add three dollars — that was a great ride. Thank you!", ok: true,  tip: "爽快加小费 + 致谢，爽利收尾" },
+        { text: "Three dollar extra take it bye bye now.",                  ok: false, tip: "更完整：I'll add three dollars. Thank you!" },
+        { text: "No tip today sorry money tight week.",                     ok: false, tip: "服务好可大方些：I'll add three dollars" },
+      ],
+      phrase: { en: "I'll add ___ dollars.", zh: "我加……美元（小费）", note: "刷卡机加小费直接说金额，干脆利落" },
+      adds: [{ emoji: "💳", label: "Paid + Tip", badge: true }],
+    },
+    {
+      npcLines: [
+        "You're too kind! Oh — one more thing. If you ever need a ride in this city, try the rideshare apps. Sometimes cheaper than us!",
+        "Wow, thank you! Hey, a tip from a cabbie: those rideshare apps can be cheaper sometimes. Just saying!",
+        "Much appreciated! Pro tip from a twenty-year driver: check the rideshare apps too — deals to be found!",
+      ],
+      npcZh: "您太客气了！对了——以后在这城市需要用车，可以试试网约车 App，有时比我们出租还便宜！",
+      task: "好奇询问网约车怎么用",
+      options: [
+        { text: "Good to know! I've never used a rideshare app — do I just book a car in the app?", ok: true,  tip: "Good to know! 接纳建议 + book in the app 问用法" },
+        { text: "App car phone thing how work explain.",                                            ok: false, tip: "说 Do I just book a car in the app?" },
+        { text: "Taxi driver promoting competitor app? Suspicious!",                                 ok: false, tip: "真诚建议值得听：Good to know!" },
+      ],
+      phrase: { en: "Good to know!", zh: "知道了，有用！", note: "接收新信息的高频回应，万能礼貌句" },
+    },
+  ],
+},
+
+  ],
+},
 ];
 
 const VLOGS = [
