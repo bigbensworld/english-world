@@ -714,3 +714,12 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 }
 .home-pane { animation: bounceIn .3s var(--bounce); }
 .home-vlog-sets { max-width: 560px; margin: 0 auto; }
+
+/* ---------- vlog 体验优化：过场/点击查词/自动播放提示 ---------- */
+.vlog-enter { animation: bounceIn .5s var(--bounce); }
+.vlog-tappable .v-word { cursor: pointer; border-bottom: 2px dotted #c9b8ec; }
+.vlog-tappable .v-word:hover { background: #f3ecfd; color: #7c5cbf; }
+.auto-play-hint {
+  text-align: center; font-size: 13px; color: #7c5cbf; font-weight: 600;
+  padding: 8px 0 2px; animation: bounceIn .3s var(--bounce);
+}

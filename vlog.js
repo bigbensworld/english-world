@@ -25,6 +25,96 @@ function vlogLoad() {
   } catch (e) { /* fresh */ }
 }
 
+// ---------- 内置轻量词典（vlog 高频词释义） ----------
+const VLOG_DICT = {
+  "alarm": "n. 闹钟；警报", "clock": "n. 钟，时钟", "morning": "n. 早晨，上午",
+  "wake": "v. 醒来（wake up 起床）", "time": "n. 时间",
+  "curtains": "n. 窗帘（curtain 的复数）", "open": "v. 打开 adj. 开着的",
+  "sun": "n. 太阳", "coming": "v. come 的现在分词，来临", "beautiful": "adj. 美丽的",
+  "brush": "v. 刷 n. 刷子（brush my teeth 刷牙）", "teeth": "n. 牙齿（tooth 的复数）",
+  "squeeze": "v. 挤，捏", "toothpaste": "n. 牙膏", "onto": "prep. 到……上面",
+  "breakfast": "n. 早餐", "slices": "n. 薄片（slice 的复数）", "bread": "n. 面包",
+  "toaster": "n. 烤面包机", "pour": "v. 倒，倾倒", "myself": "pron. 我自己",
+  "cup": "n. 杯子", "coffee": "n. 咖啡", "smell": "n./v. 气味；闻",
+  "better": "adv./adj. 更好（good/well 的比较级）", "than": "conj. 比",
+  "jacket": "n. 外套，夹克", "grab": "v. 抓起，拿走（口语）", "keys": "n. 钥匙（key 的复数）",
+  "almost": "adv. 几乎，差不多", "ready": "adj. 准备好的", "shoes": "n. 鞋子",
+  "step": "v./n. 迈步；台阶（step outside 走出门）", "outside": "adv./n. 外面",
+  "great": "adj. 极好的", "day": "n. 一天", "grumpy": "adj. 脾气坏的",
+  "wrong": "adj. 错误的", "side": "n. 一侧，边", "bed": "n. 床",
+  "crack": "v. 打裂，敲开（crack eggs 打蛋）", "eggs": "n. 鸡蛋", "bowl": "n. 碗",
+  "careful": "adj. 小心的", "shells": "n. 壳（shell 的复数）", "stir": "v. 搅拌",
+  "fork": "n. 叉子", "round": "n./adv. 圈（round and round 一圈又一圈）",
+  "until": "conj./prep. 直到", "they're": "they are 的缩写", "yellow": "adj. 黄色的",
+  "heat": "v./n. 加热（heat up 热起来）", "pan": "n. 平底锅", "add": "v. 加入",
+  "butter": "n. 黄油", "listen": "v. 听", "sizzles": "v. 滋滋作响",
+  "watch": "v. 观看", "turn": "v. 变成；转动", "liquid": "n. 液体",
+  "solid": "n. 固体", "magic": "n. 魔法", "flip": "v. 翻转（flip the omelette 翻蛋）",
+  "omelette": "n. 煎蛋卷", "chef": "n. 厨师", "okay": "adj./adv. 好的",
+  "bacon": "n. 培根", "frying": "v. fry 的现在分词，煎炸", "gets": "v. 变得（get 的第三人称单数）",
+  "crispy": "adj. 酥脆的", "whole": "adj. 整个的", "kitchen": "n. 厨房",
+  "amazing": "adj. 令人惊叹的", "everything": "pron. 一切，所有东西",
+  "plate": "v. 装盘 n. 盘子", "served": "v. serve 的过去分词，上菜", "chefs": "n. 厨师（复数）",
+  "say": "v. 说", "phrase": "n. 短语", "means": "v. 意味着（mean 的三单）",
+  "place": "n. 地方", "start": "v. 开始", "cooking": "n./v. 烹饪",
+  "beans": "n. 豆子（coffee beans 咖啡豆）", "grind": "v. 磨（过去式 ground）",
+  "powder": "n. 粉末", "fresh": "adj. 新鲜的", "best": "adj. 最好的", "part": "n. 部分",
+  "while": "conj. 当……的时候", "boil": "v. 煮沸", "water": "n. 水",
+  "hot": "adj. 热的", "just": "adv. 只是；正好", "below": "prep./adv. 低于",
+  "paper": "n. 纸", "filter": "n. 滤纸；过滤器", "dripper": "n. 滤杯",
+  "rinse": "v. 冲洗，润湿", "fun": "adj. 有趣的", "slow": "adj. 慢的",
+  "circles": "n. 圆圈（in circles 绕圈）", "over": "prep. 在……上方",
+  "wait": "v. 等待", "drips": "v. 滴落", "slowly": "adv. 慢慢地",
+  "drop": "n. 滴（drop by drop 一滴一滴）", "things": "n. 东西（thing 的复数）",
+  "take": "v. 花费（时间）", "mmm": "int. 嗯（品尝声）", "nutty": "adj. 坚果香的",
+  "little": "adj. 小的；一点", "sweet": "adj. 甜的", "going": "v. go 的现在分词",
+  "good": "adj. 好的", "finally": "adv. 最后", "sip": "n./v. 一小口；啜饮",
+  "warm": "adj. 温暖的", "smooth": "adj. 顺滑的", "perfect": "adj. 完美的",
+  "people": "n. 人们", "balance": "n. 平衡", "bitter": "adj. 苦的",
+  "sour": "adj. 酸的", "right": "adv./adj. 正好；对的",
+};
+
+// 查词：返回释义（未命中返回 null）
+function lookupWord(raw) {
+  const w = raw.toLowerCase().replace(/[^a-z'-]/g, "");
+  if (!w) return null;
+  if (VLOG_DICT[w]) return VLOG_DICT[w];
+  // 简单词形还原
+  const tries = [
+    w.replace(/'s$/, ""), w.replace(/'re$/, ""),
+    w.replace(/s$/, ""), w.replace(/es$/, ""), w.replace(/ing$/, ""), w.replace(/ed$/, ""),
+    w.replace(/d$/, ""), w.replace(/ies$/, "y"),
+  ];
+  for (const t of tries) {
+    if (t && t.length > 2 && VLOG_DICT[t]) return VLOG_DICT[t] + "（原形 " + t + "）";
+  }
+  return null;
+}
+
+// 单词点击：发音 + 弹出解释卡
+function onVlogWordClick(evt) {
+  const span = evt.target.closest(".v-word");
+  if (!span || !span.classList.contains("v-word")) return;
+  const raw = span.textContent;
+  const clean = raw.toLowerCase().replace(/[^a-z'-]/g, "");
+  if (!clean) return;
+  speakSlow(clean, 0.6);
+  const def = lookupWord(raw);
+  const card = $("wordCard");
+  card.innerHTML = `
+    <div class="word-emoji">🔤</div>
+    <div class="word-en">${raw}</div>
+    <div class="word-zh" style="margin-top:10px">${def ? def : "📖 暂无内置释义<br><span style='font-size:13px;font-weight:400'>这个词还没收录进小词典，先听发音跟读吧</span>"}</div>
+    <div class="word-actions">
+      <button class="btn btn-big btn-primary" id="wcSpeak">🔊 再听一次</button>
+      <button class="btn btn-big" id="wcClose">关闭</button>
+    </div>
+  `;
+  $("wordOverlay").classList.remove("hidden");
+  $("wcSpeak").onclick = () => speakSlow(clean, 0.6);
+  $("wcClose").onclick = () => $("wordOverlay").classList.add("hidden");
+}
+
 // ---------- 慢速朗读（带逐词高亮） ----------
 function speakSlow(text, rate, onWord, onEnd) {
   if (!("speechSynthesis" in window)) { if (onEnd) onEnd(); return; }
@@ -149,7 +239,7 @@ function openVlog(id) {
       <div class="adv-title">${v.emoji} ${v.title} · ${v.titleZh}</div>
       <button class="btn btn-ghost" id="vlogExit">✕ 退出</button>
     </div>
-    <div class="vlog-cardstage" id="vlogStage"></div>
+    <div class="vlog-cardstage vlog-enter" id="vlogStage"></div>
     <div class="vlog-nav" id="vlogNav"></div>
   `;
   stage.appendChild(box);
@@ -188,7 +278,7 @@ function openVlog(id) {
           ${!isFact && card.anim === "curtain" ? '<span class="vlog-sun">☀️</span>' : ""}
           ${isFact ? '<div class="fact-tag">💡 冷知识</div>' : ""}
         </div>
-        <div class="vlog-en" id="vlogEn">${wordSpans.join(" ")}</div>
+        <div class="vlog-en vlog-tappable" id="vlogEn" title="点击任意单词：听发音 + 看释义">${wordSpans.join(" ")}</div>
         <details class="vlog-zh"><summary>🇨🇳 中文</summary>${card.zh}</details>
         <div class="vlog-words">${(card.words || []).map((w) => `<span class="vlog-word-chip">🔑 ${w}</span>`).join("")}</div>
         <div class="vlog-actions">
@@ -203,6 +293,8 @@ function openVlog(id) {
     $("vlogNormal").onclick = () => {
       speakSlow(card.en, 0.85, (ci) => highlightWordByChar($("vlogEn"), ci));
     };
+    // 单词点击学习：发音 + 释义卡
+    $("vlogEn").onclick = onVlogWordClick;
     seen(idx);
 
     // 导航
@@ -218,14 +310,23 @@ function openVlog(id) {
     if ($("vlogNext")) $("vlogNext").onclick = () => { idx++; renderCard(); };
     if ($("vlogQuiz")) $("vlogQuiz").onclick = () => startVlogQuiz(v);
 
-    // 自动朗读第一遍（慢速）
+    // 首张卡延迟自动朗读：给用户 1.2s 看清界面，并显示提示
     setTimeout(() => {
       if (vlogState.currentVlog === v && $("vlogEn")) {
+        const hint = document.createElement("div");
+        hint.className = "auto-play-hint";
+        hint.textContent = "🔊 自动慢速播放中…（点击单词可查释义）";
+        $("vlogStage").appendChild(hint);
         speakSlow(card.en, 0.55, (ci) => highlightWordByChar($("vlogEn"), ci));
+        setTimeout(() => hint.remove(), 4000);
       }
-    }, 400);
+    }, 1200);
   }
   renderCard();
+
+  // 正确切换视图（修复地图未隐藏的 bug）
+  $("mapView").classList.add("hidden");
+  $("sceneView").classList.remove("hidden");
 }
 
 // ---------- 听音选图 Quiz ----------
