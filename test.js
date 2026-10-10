@@ -51,13 +51,13 @@ ok(state.coins === undefined, "金币体系已移除");
 ok(SCENES.length === 2, "共 2 个场景");
 ok(SCENES.every(s => s.unlockCost === undefined), "无解锁成本字段");
 const cafeVisits = sceneVisits(SCENES[0]);
-ok(cafeVisits.length === 4, "咖啡店有 4 轮光顾");
+ok(cafeVisits.length === 8, "咖啡店有 8 轮光顾");
 ok(sceneVisits(SCENES[1]).length === 1, "超市保持单轮（向后兼容）");
 ok(cafeVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "每步恰好 1 个正确选项");
 ok(cafeVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "每步店员台词有 2+ 个随机变体");
 ok(cafeVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "每步都有语块 phrase");
-ok(SCENES[0].items.length >= 26, "咖啡店词汇量 26+（实际 " + SCENES[0].items.length + "）");
-ok(cafeVisits.reduce((n, v) => n + v.steps.filter(st => st.adds).length, 0) >= 10, "4 轮合计至少 10 步有订单素材");
+ok(SCENES[0].items.length >= 46, "咖啡店词汇量 46+（实际 " + SCENES[0].items.length + "）");
+ok(cafeVisits.reduce((n, v) => n + v.steps.filter(st => st.adds).length, 0) >= 20, "8 轮合计至少 20 步有订单素材");
 ok(Object.keys(state.npcLastLines).length === 0, "初始没有店员台词历史");
 
 console.log("== 2. 咖啡店第 1 轮剧情全流程 ==");
