@@ -103,7 +103,7 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 ## 七、近期 commit 索引（倒序）
 
 ```
-TBD 内容扩展: 新增机场场景（值机/安检/登机 3 轮光顾，15 词条）
+782ee36 内容扩展: 新增机场场景（值机/安检/登机 3 轮光顾，15 词条）
 be49dfb 节奏修复: 选项延后至店员台词后渲染（防剧透）+ 答对间隔 1100ms→2400ms
 7220752 内容扩展: 新增酒店场景（入住/退房/投诉房间 3 轮光顾，15 词条）
 a4ae963 文档: STATE.md commit 索引同步 rebase 后 hash
