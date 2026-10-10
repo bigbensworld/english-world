@@ -290,7 +290,24 @@ function enterScene(id, visitIndex) {
   $("sceneView").classList.remove("hidden");
   renderAdvProgress(sc);
   speak("Welcome to the " + sc.nameEn + "!");
+
+  // 隐藏测试模式：连点场景标题 5 次解锁全部轮次（方便验收内容）
+  const titleEl = $("sceneTitle");
+  titleEl.style.cursor = "pointer";
+  titleEl.onclick = () => {
+    titleClicks = (titleClicks || 0) + 1;
+    if (titleClicks >= 5) {
+      titleClicks = 0;
+      const visitsAll = sceneVisits(sc);
+      state.unlockedVisits[sc.id] = visitsAll.length - 1;
+      save();
+      toast("🔓 测试模式：已解锁全部 " + visitsAll.length + " 轮");
+      enterScene(sc.id, state.currentVisit ? visits.findIndex((v) => v.id === state.currentVisit.id) : undefined);
+    }
+  };
 }
+
+let titleClicks = 0;
 
 function updateExploreCount(sc) {
   const learned = sc.items.filter((it) => state.collected[sc.id + ":" + it.id]).length;
