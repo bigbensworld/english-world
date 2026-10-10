@@ -589,6 +589,8 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 
 /* ================= 慢速生活频道 Slow Vlog ================= */
 .stage.theme-vlog { --scene-accent: #7c5cbf; --scene-accent-soft: #efe9fb; background: #efe9fb; }
+.theme-bank { --scene-accent: #2f6b4f; --scene-accent-soft: #e2f0e8; background: #e2f0e8; }
+.theme-barber { --scene-accent: #8a4fbd; --scene-accent-soft: #f0e6fa; background: #f0e6fa; }
 .vlog-entry .scene-cover { background: linear-gradient(135deg, #7c5cbf22, #7c5cbf44); }
 .vlog-list { display: flex; flex-direction: column; gap: 12px; }
 .vlog-sets { display: flex; flex-direction: column; gap: 10px; margin: 10px 0 16px; }
@@ -682,6 +684,9 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 @keyframes dripFall { 0% { transform: translateY(-18px) scale(.6); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(24px) scale(1); opacity: 0; } }
 @keyframes leanIn { 0%,100% { transform: translate(0); } 50% { transform: translate(8px, -6px) scale(1.05); } }
 @keyframes sipBob { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-6px) rotate(-6deg); } }
+@keyframes washSwirl { 0% { transform: rotate(0) scale(1); } 50% { transform: rotate(18deg) scale(.92); } 100% { transform: rotate(0) scale(1); } }
+@keyframes foldFlatten { 0% { transform: scaleY(1) rotate(0); } 45% { transform: scaleY(.35) rotate(-8deg); } 100% { transform: scaleY(1) rotate(0); } }
+@keyframes sweepSlide { 0%,100% { transform: translateX(-14px) rotate(-10deg); } 50% { transform: translateX(14px) rotate(10deg); } }
 
 .anim-ring .vlog-emoji { animation: ringShake .45s ease-in-out 4; }
 .anim-curtain .vlog-emoji { animation: slideOpen 1.6s ease-out; }
@@ -698,6 +703,10 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 .anim-smell .vlog-emoji { animation: leanIn 1.4s ease-in-out 3; }
 .anim-sip .vlog-emoji { animation: sipBob 1.2s ease-in-out 3; }
 .anim-step .vlog-emoji { animation: toastJump 1s ease-in-out 3; }
+.anim-wash .vlog-emoji { animation: washSwirl 1.2s ease-in-out 3; }
+.anim-spin .vlog-emoji { animation: spinRound 2.2s linear 3; }
+.anim-fold .vlog-emoji { animation: foldFlatten 1.6s ease-in-out 2; }
+.anim-sweep .vlog-emoji { animation: sweepSlide 1.1s ease-in-out 4; }
 
 /* ---------- 首页 Tab（慢速生活 / 场景冒险） ---------- */
 .home-tabs {
