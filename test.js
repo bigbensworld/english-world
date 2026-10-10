@@ -48,9 +48,20 @@ function ok(cond, name) {
 
 console.log("== 1. 初始状态 ==");
 ok(state.coins === undefined, "金币体系已移除");
-ok(SCENES.length === 4, "共 4 个场景");
+ok(SCENES.length === 5, "共 5 个场景");
 ok(SCENES.some(s => s.id === "restaurant"), "餐厅场景已加入");
 ok(SCENES.some(s => s.id === "hotel"), "酒店场景已加入");
+ok(SCENES.some(s => s.id === "airport"), "机场场景已加入");
+const apScene = SCENES.find(s => s.id === "airport");
+const apVisits = sceneVisits(apScene);
+ok(apVisits.length === 3, "机场有 3 轮光顾");
+ok(apVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "机场每步恰好 1 个正确选项");
+ok(apVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "机场每步店员台词有 2+ 个随机变体");
+ok(apVisits.every(v => v.steps.every(st => st.phrase && st.phrase.en && st.phrase.note)), "机场每步都有语块 phrase");
+ok(apVisits.every(v => v.steps.every(st => (st.adds || []).every(a => !a.wordId || apScene.items.find(it => it.id === a.wordId)))), "机场订单素材 wordId 全部能对上词条");
+ok(apVisits.every(v => v.reward && v.reward.en && apScene.items.find(it => it.en === v.reward.en)), "机场每轮奖励词在 items 里");
+ok(["boardingpass", "luggage", "checkin", "windowseat", "aisleseat", "security", "tray", "liquids", "belt", "laptop", "gate", "boarding", "delay", "bin", "crew"].every(id => apScene.items.some(it => it.id === id)), "机场 15 个词条全部入库");
+ok(apVisits.reduce((n, v) => n + v.steps.filter(st => st.adds).length, 0) >= 4, "机场 3 轮合计至少 4 步有订单素材");
 const hotelVisits = sceneVisits(SCENES.find(s => s.id === "hotel"));
 ok(hotelVisits.length === 3, "酒店有 3 轮光顾");
 ok(hotelVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "酒店每步恰好 1 个正确选项");
