@@ -1,5 +1,6 @@
 // 英语世界 - 场景与剧情对话数据
-// 核心玩法：真实场景连续对话，一步步完成整个任务链（不是孤立背单词）
+// 核心玩法：真实场景连续对话，一步步完成整个任务链
+// 每步含：店员台词（多随机变体）+ 任务提示 + 3 选项 + 关键语块（phrase）+ 订单可视化素材（adds）
 
 const SCENES = [
   {
@@ -15,6 +16,7 @@ const SCENES = [
     deco: "🎶",
     deco2: "🫧",
     intro: "你走进一家咖啡店，店员微笑着看向你。跟着引导，完成一次完整的英文点单吧！",
+    orderLabel: "🧾 你的订单",
     items: [
       { id: "coffee",   en: "coffee",       zh: "咖啡",   phon: "/ˈkɒfi/",   emoji: "☕", sent: "I'd like a cup of coffee." },
       { id: "latte",    en: "latte",        zh: "拿铁",   phon: "/ˈlɑːteɪ/", emoji: "🥛", sent: "A latte with milk, please." },
@@ -31,7 +33,11 @@ const SCENES = [
     ],
     steps: [
       {
-        npc: "Good morning! Welcome to Sunny Café. How are you today?",
+        npcLines: [
+          "Good morning! Welcome to Sunny Café. How are you today?",
+          "Hi there, welcome in! How's it going today?",
+          "Morning! Welcome to Sunny Café — how are you doing?",
+        ],
         npcZh: "早上好！欢迎来到 Sunny 咖啡店。你今天怎么样？",
         task: "先和店员打个招呼，礼貌地回应",
         options: [
@@ -39,9 +45,14 @@ const SCENES = [
           { text: "Give me coffee.",                   ok: false, tip: "太直接啦，先友好问候会更有礼貌" },
           { text: "I don't know.",                     ok: false, tip: "店员在问你今天如何，可以回答 I'm good" },
         ],
+        phrase: { en: "I'm good, thank you. How are you?", zh: "我很好，谢谢。你呢？", note: "万能寒暄回应：回答+回问，一来一回最自然" },
       },
       {
-        npc: "I'm doing great, thanks! What can I get for you today?",
+        npcLines: [
+          "I'm doing great, thanks! What can I get for you today?",
+          "Doing well, thanks! What'll it be today?",
+          "Glad to hear! So, what can I get started for you?",
+        ],
         npcZh: "我很好，谢谢！今天想来点什么？",
         task: "点一杯拿铁",
         options: [
@@ -49,9 +60,15 @@ const SCENES = [
           { text: "I want eat latte.",            ok: false, tip: "喝的用 drink，latte 前不用 eat" },
           { text: "Latte!!!",                     ok: false, tip: "加上 I'd like a ... please 更礼貌" },
         ],
+        phrase: { en: "I'd like a ___, please.", zh: "我想要一个……", note: "点单万能句式：饮料食物都能套，比 I want 礼貌得多" },
+        adds: [{ emoji: "☕", label: "Latte" }],
       },
       {
-        npc: "Great choice! What size would you like? We have small, medium, and large.",
+        npcLines: [
+          "Great choice! What size would you like? We have small, medium, and large.",
+          "Nice pick! What size — small, medium, or large?",
+          "Good taste! Which size can I get you? Small, medium, or large?",
+        ],
         npcZh: "好选择！您要什么杯型？我们有小杯、中杯和大杯。",
         task: "要一个大杯",
         options: [
@@ -59,9 +76,15 @@ const SCENES = [
           { text: "A big big one.",             ok: false, tip: "杯型标准说法是 large，不是 big big" },
           { text: "Give me the biggest cup!",   ok: false, tip: "店员提供的是 small / medium / large 三种" },
         ],
+        phrase: { en: "A large one, please.", zh: "要大杯的", note: "large/medium/small 点单三连，加 one 指代饮品更地道" },
+        adds: [{ emoji: "📏", label: "Large", badge: true }],
       },
       {
-        npc: "Large latte, got it. Would you like that with whole milk, skim milk, or oat milk?",
+        npcLines: [
+          "Large latte, got it. Would you like that with whole milk, skim milk, or oat milk?",
+          "Large latte coming up! For the milk — whole, skim, or oat?",
+          "One large latte! And which milk would you like? We have whole, skim, and oat.",
+        ],
         npcZh: "大杯拿铁，记下了。您要全脂奶、脱脂奶还是燕麦奶？",
         task: "选燕麦奶",
         options: [
@@ -69,9 +92,15 @@ const SCENES = [
           { text: "Milk of oat I want.",          ok: false, tip: "语序不对，直接说 oat milk 就好" },
           { text: "I don't drink milk tea.",      ok: false, tip: "店员问的是选哪种奶，不是奶茶" },
         ],
+        phrase: { en: "Oat milk, please.", zh: "要燕麦奶", note: "选奶直接说奶名+please：whole / skim / oat milk" },
+        adds: [{ emoji: "🌾", label: "Oat", badge: true }],
       },
       {
-        npc: "Oat milk it is. Would you like anything to eat? Our croissants are fresh out of the oven!",
+        npcLines: [
+          "Oat milk it is. Would you like anything to eat? Our croissants are fresh out of the oven!",
+          "Oat milk, great! Anything to eat with that? The croissants just came out of the oven!",
+          "Nice! And can I tempt you with something to eat? Fresh croissants, just baked!",
+        ],
         npcZh: "燕麦奶拿铁。要不要来点吃的？我们的牛角包刚出炉！",
         task: "来一个牛角包",
         options: [
@@ -79,9 +108,15 @@ const SCENES = [
           { text: "I want eat croissant one.",                ok: false, tip: "说 I'll take a croissant 就好" },
           { text: "No hungry.",                               ok: false, tip: "想拒绝可以说 No, thanks. 但这次来一个吧" },
         ],
+        phrase: { en: "I'll take one.", zh: "我要一个", note: "对方刚提过的东西，用 one 指代即可，简洁地道" },
+        adds: [{ emoji: "🥐", label: "Croissant" }],
       },
       {
-        npc: "Excellent! So that's a large oat milk latte and a croissant. Anything else?",
+        npcLines: [
+          "Excellent! So that's a large oat milk latte and a croissant. Anything else?",
+          "Perfect! So we've got a large oat milk latte and a croissant — anything else for you?",
+          "Great! That's a large oat latte plus a croissant. Can I get you anything else?",
+        ],
         npcZh: "好嘞！一个大杯燕麦奶拿铁和一个牛角包。还需要别的吗？",
         task: "确认不用了",
         options: [
@@ -89,9 +124,14 @@ const SCENES = [
           { text: "Nothing nothing.",         ok: false, tip: "更自然的说法是 That's all / That's it" },
           { text: "Give me everything.",      ok: false, tip: "哈哈那要花好多钱，说 That's all 即可" },
         ],
+        phrase: { en: "That's all, thank you.", zh: "就这些，谢谢", note: "点单收尾句：店员问 Anything else? 的标准回答" },
       },
       {
-        npc: "Perfect. Your total is seven dollars fifty.",
+        npcLines: [
+          "Perfect. Your total is seven dollars fifty.",
+          "Alright, that'll be seven fifty.",
+          "Great! So your total comes to seven dollars fifty.",
+        ],
         npcZh: "完美。您一共消费 7 美元 50 美分。",
         task: "用卡付款",
         options: [
@@ -99,9 +139,15 @@ const SCENES = [
           { text: "I pay with my card money.",     ok: false, tip: "自然说法是 pay by card 或 with my card" },
           { text: "Here is my card, take it!",     ok: false, tip: "可以说 Can I pay by card? 更礼貌清楚" },
         ],
+        phrase: { en: "Can I pay by card?", zh: "可以刷卡吗？", note: "付款方式问法：by card / in cash / with my phone" },
+        adds: [{ emoji: "💳", label: "Paid $7.50", badge: true }],
       },
       {
-        npc: "Of course, card is fine... Approved! Here's your receipt. For here or to go?",
+        npcLines: [
+          "Of course, card is fine... Approved! Here's your receipt. For here or to go?",
+          "Sure thing... approved! Here you go. Is that for here or to go?",
+          "No problem... all set! Receipt's in the bag. Are you staying in or taking it to go?",
+        ],
         npcZh: "当然可以，刷卡没问题……扣款成功！这是您的小票。您在这儿吃还是带走？",
         task: "选择带走",
         options: [
@@ -109,9 +155,15 @@ const SCENES = [
           { text: "I go with coffee.",         ok: false, tip: "外带的固定说法是 to go" },
           { text: "Take it to my home.",       ok: false, tip: "店员问堂食还是外带，回答 to go 即可" },
         ],
+        phrase: { en: "To go, please.", zh: "带走，谢谢", note: "咖啡店灵魂拷问 For here or to go? 的标准答案" },
+        adds: [{ emoji: "🥡", label: "To go", badge: true }],
       },
       {
-        npc: "No problem, I'll get that ready for you. Oh, would you like a cookie? It's on the house today!",
+        npcLines: [
+          "No problem, I'll get that ready for you. Oh, would you like a cookie? It's on the house today!",
+          "You got it! Oh wait — would you like a free cookie? It's on the house today!",
+          "Sure thing! Hey, one more thing — can I offer you a cookie? On the house!",
+        ],
         npcZh: "没问题，我帮您准备。对了，要来块曲奇吗？今天免费赠送！",
         task: "开心地接受免费曲奇",
         options: [
@@ -119,9 +171,15 @@ const SCENES = [
           { text: "Free? Why?",                ok: false, tip: "这是店家的好意，开心说谢谢就好" },
           { text: "I no want cookie.",         ok: false, tip: "免费的好意，Why not? Thank you! 更友好" },
         ],
+        phrase: { en: "Thank you so much!", zh: "非常感谢！", note: "接受好意时的热情道谢，so much 加强感谢程度" },
+        adds: [{ emoji: "🍪", label: "Cookie 🆓" }],
       },
       {
-        npc: "You're welcome! Here you go — one large oat milk latte, a croissant, and a cookie. Enjoy!",
+        npcLines: [
+          "You're welcome! Here you go — one large oat milk latte, a croissant, and a cookie. Enjoy!",
+          "My pleasure! Here's everything — large oat latte, croissant, and a cookie. Enjoy your day!",
+          "Anytime! One large oat milk latte, one croissant, one cookie — all yours. Enjoy!",
+        ],
         npcZh: "不客气！给您——大杯燕麦奶拿铁、牛角包和曲奇。请慢用！",
         task: "接过餐点并感谢",
         options: [
@@ -129,6 +187,7 @@ const SCENES = [
           { text: "Bye bye shop.",               ok: false, tip: "说 Have a nice day / See you 更自然" },
           { text: "Money good bye.",             ok: false, tip: "哈哈，简单说 Thank you! Have a nice day!" },
         ],
+        phrase: { en: "Have a nice day!", zh: "祝你有美好的一天！", note: "离店告别祝福，店员对你说的也可以回赠给他" },
       },
     ],
     reward: { en: "barista", zh: "你完成了一次完整的英文点单！☕" },
@@ -142,10 +201,11 @@ const SCENES = [
     cover: "🛒🍎🥦",
     theme: "market",
     accent: "#4d8b3a",
-    accentSoft: "e4f2dc",
+    accentSoft: "#e4f2dc",
     deco: "🍃",
     deco2: "🦋",
     intro: "你带着一张英文购物清单走进超市。跟着引导，把清单上的东西买齐吧！",
+    orderLabel: "🧾 购物清单",
     items: [
       { id: "apple",  en: "apple",  zh: "苹果",   phon: "/ˈæpl/",  emoji: "🍎", sent: "An apple a day." },
       { id: "banana", en: "banana", zh: "香蕉",   phon: "/bəˈnɑːnə/", emoji: "🍌", sent: "Monkeys love bananas." },
@@ -162,7 +222,11 @@ const SCENES = [
     ],
     steps: [
       {
-        npc: "Hi there! Welcome to Fresh Mart. Do you need a shopping cart?",
+        npcLines: [
+          "Hi there! Welcome to Fresh Mart. Do you need a shopping cart?",
+          "Hello, welcome to Fresh Mart! Can I get you a shopping cart?",
+          "Welcome in! Would you like a cart for your shopping?",
+        ],
         npcZh: "您好！欢迎来到 Fresh 超市。您需要购物车吗？",
         task: "要一辆购物车",
         options: [
@@ -170,9 +234,15 @@ const SCENES = [
           { text: "I want car.",             ok: false, tip: "是购物车 cart 不是 car，说 a cart please" },
           { text: "No, I am cart.",          ok: false, tip: "哈哈，说自己要一辆：Yes, please" },
         ],
+        phrase: { en: "Yes, please.", zh: "好的，麻烦了", note: "接受提议的标准回答，和 No, thanks 配对使用" },
+        adds: [{ emoji: "🛒", label: "Cart", badge: true }],
       },
       {
-        npc: "Here you go. If you need anything, just ask! What are you looking for today?",
+        npcLines: [
+          "Here you go. If you need anything, just ask! What are you looking for today?",
+          "There you go! Just holler if you need help. What are you shopping for today?",
+          "You're all set! I'm around if you need me. What can I help you find?",
+        ],
         npcZh: "给您。有任何需要随时问我！您今天想买什么？",
         task: "问苹果在哪个通道",
         options: [
@@ -180,9 +250,14 @@ const SCENES = [
           { text: "Apple where where?",                 ok: false, tip: "用 Where can I find the apples? 提问" },
           { text: "Give me apples now.",                ok: false, tip: "先问位置：Where can I find...?" },
         ],
+        phrase: { en: "Where can I find the ___?", zh: "……在哪里能找到？", note: "超市/商场找东西万能句，套任何商品" },
       },
       {
-        npc: "The apples are in aisle 3, right next to the bananas. How many would you like?",
+        npcLines: [
+          "The apples are in aisle 3, right next to the bananas. How many would you like?",
+          "You'll find the apples in aisle 3, by the bananas. How many can I get you?",
+          "Apples are in aisle 3, next to the bananas. How many would you like?",
+        ],
         npcZh: "苹果在 3 号通道，就在香蕉旁边。您要几个？",
         task: "要六个苹果",
         options: [
@@ -190,9 +265,15 @@ const SCENES = [
           { text: "Apple six number.",     ok: false, tip: "语序：Six apples, please" },
           { text: "I want apple many.",    ok: false, tip: "说清楚数量：Six apples, please" },
         ],
+        phrase: { en: "Six ___, please.", zh: "请给我六个……", note: "报数量直说：数字 + 名词复数 + please" },
+        adds: [{ emoji: "🍎", label: "Apples ×6" }],
       },
       {
-        npc: "Great! Our bread is on sale today — fresh from the bakery. Would you like a loaf?",
+        npcLines: [
+          "Great! Our bread is on sale today — fresh from the bakery. Would you like a loaf?",
+          "Good pick! Hey, our bread's on sale today, fresh from the bakery. Want a loaf?",
+          "Nice! Just so you know, today's bread is on sale — bakery fresh. Care for a loaf?",
+        ],
         npcZh: "好的！我们的面包今天特价——烘焙区新鲜出炉的。您要来一条吗？",
         task: "要一条面包",
         options: [
@@ -200,9 +281,15 @@ const SCENES = [
           { text: "I want one bread.",              ok: false, tip: "面包的量词是 loaf：a loaf of bread" },
           { text: "Bread yes give.",                ok: false, tip: "说 A loaf of bread, please" },
         ],
+        phrase: { en: "A loaf of bread, please.", zh: "请给我一条面包", note: "loaf 是面包的量词，切片面包叫 a slice" },
+        adds: [{ emoji: "🍞", label: "Bread" }],
       },
       {
-        npc: "Good choice! The milk is in the dairy section, aisle 5. Do you also need eggs?",
+        npcLines: [
+          "Good choice! The milk is in the dairy section, aisle 5. Do you also need eggs?",
+          "Nice! Milk's in aisle 5, dairy section. Would you like some eggs too?",
+          "You got it! For milk, head to aisle 5, dairy section. Need any eggs while you're at it?",
+        ],
         npcZh: "好选择！牛奶在乳制品区，5 号通道。您还需要鸡蛋吗？",
         task: "需要一打鸡蛋",
         options: [
@@ -210,9 +297,15 @@ const SCENES = [
           { text: "Twelve egg please.",          ok: false, tip: "对的说法：a dozen eggs，注意复数" },
           { text: "I need egg one.",             ok: false, tip: "一打鸡蛋说 a dozen eggs" },
         ],
+        phrase: { en: "A dozen ___, please.", zh: "请给我一打……", note: "a dozen = 12 个，鸡蛋/甜甜圈等都这么数" },
+        adds: [{ emoji: "🥚", label: "Eggs ×12" }],
       },
       {
-        npc: "Sure thing. Is there anything else on your list? We have fresh fish and cheese today.",
+        npcLines: [
+          "Sure thing. Is there anything else on your list? We have fresh fish and cheese today.",
+          "No problem. Anything else you need? Today we've got fresh fish and cheese in stock.",
+          "You bet! What else is on your list? Fresh fish and cheese just came in today.",
+        ],
         npcZh: "没问题。您清单上还有别的吗？我们今天有新鲜的鱼和奶酪。",
         task: "问奶酪多少钱",
         options: [
@@ -220,9 +313,14 @@ const SCENES = [
           { text: "Cheese money how?",         ok: false, tip: "问价格用 How much is the cheese?" },
           { text: "What price cheese has?",    ok: false, tip: "自然说法：How much is the cheese?" },
         ],
+        phrase: { en: "How much is the ___?", zh: "……多少钱？", note: "问价万能句；复数用 How much are..." },
       },
       {
-        npc: "The cheese is five dollars. And there's a 20% discount on all vegetables today!",
+        npcLines: [
+          "The cheese is five dollars. And there's a 20% discount on all vegetables today!",
+          "That cheese is five bucks. Oh, and all vegetables are 20% off today!",
+          "Cheese's five dollars. Heads up — every vegetable is 20% off today!",
+        ],
         npcZh: "奶酪 5 美元。而且今天所有蔬菜都有 8 折优惠！",
         task: "趁打折买西兰花",
         options: [
@@ -230,9 +328,15 @@ const SCENES = [
           { text: "Discount me broccoli.",                            ok: false, tip: "说 I'll take the broccoli 就好" },
           { text: "I buy cheap vegetable now.",                       ok: false, tip: "更自然：I'll take the broccoli" },
         ],
+        phrase: { en: "It's a good deal!", zh: "真划算！", note: "deal = 交易，a good deal 买到就是赚到的感觉" },
+        adds: [{ emoji: "🥦", label: "Broccoli −20%" }],
       },
       {
-        npc: "Excellent! You've got apples, bread, eggs, cheese, and broccoli. Is that everything?",
+        npcLines: [
+          "Excellent! You've got apples, bread, eggs, cheese, and broccoli. Is that everything?",
+          "Great haul! Apples, bread, eggs, cheese, broccoli — is that everything on your list?",
+          "Perfect! So that's apples, bread, eggs, cheese, and broccoli. Did you get everything?",
+        ],
         npcZh: "太好了！您买了苹果、面包、鸡蛋、奶酪和西兰花。就这些了吗？",
         task: "确认买齐了，准备结账",
         options: [
@@ -240,9 +344,14 @@ const SCENES = [
           { text: "Finish buy me.",                                   ok: false, tip: "说 I'm ready to check out" },
           { text: "No more thing.",                                   ok: false, tip: "更自然：That's everything" },
         ],
+        phrase: { en: "I'm ready to check out.", zh: "我可以结账了", note: "check out 超市结账；退货说 return / exchange" },
       },
       {
-        npc: "Great! The checkout is right over there. Did you bring your own bag, or would you like to buy one?",
+        npcLines: [
+          "Great! The checkout is right over there. Did you bring your own bag, or would you like to buy one?",
+          "Perfect! Checkout's just over there. Did you bring a bag, or would you like to purchase one?",
+          "Awesome! The registers are right there. Got your own bag, or do you need to buy one today?",
+        ],
         npcZh: "好的！收银台就在那边。您自带购物袋了吗，还是需要买一个？",
         task: "需要买一个袋子",
         options: [
@@ -250,9 +359,15 @@ const SCENES = [
           { text: "Bag me one give.",                ok: false, tip: "说 I'd like to buy a bag, please" },
           { text: "I have bag no.",                  ok: false, tip: "更自然：I'd like to buy one, please" },
         ],
+        phrase: { en: "I'd like to buy a ___, please.", zh: "我想买一个……", note: "I'd like to buy 万能购物句，后接任何商品" },
+        adds: [{ emoji: "👜", label: "Bag", badge: true }],
       },
       {
-        npc: "No problem, that's one bag. Your total comes to twenty-three dollars. How would you like to pay?",
+        npcLines: [
+          "No problem, that's one bag. Your total comes to twenty-three dollars. How would you like to pay?",
+          "Sure, one bag it is! That'll be twenty-three dollars altogether. How are you paying today?",
+          "Got it, one bag. Your total is twenty-three dollars. Will that be cash or card?",
+        ],
         npcZh: "没问题，一个袋子。您一共消费 23 美元。您想怎么付款？",
         task: "用现金付款",
         options: [
@@ -260,9 +375,15 @@ const SCENES = [
           { text: "Cash money give you.",            ok: false, tip: "说 I'll pay in cash" },
           { text: "Here is paper.",                  ok: false, tip: "纸币不是 paper，说 I'll pay in cash" },
         ],
+        phrase: { en: "I'll pay in cash.", zh: "我付现金", note: "in cash 现金 / by card 刷卡，付款二选一" },
+        adds: [{ emoji: "💵", label: "Paid $23", badge: true }],
       },
       {
-        npc: "Thank you! Here's your change and receipt. Have a great day, and see you next time!",
+        npcLines: [
+          "Thank you! Here's your change and receipt. Have a great day, and see you next time!",
+          "Thanks a bunch! Here's your change and receipt. Have a wonderful day — see you again!",
+          "Appreciate it! Your change and receipt, right here. Great seeing you — come back soon!",
+        ],
         npcZh: "谢谢！这是找您的零钱和小票。祝您有美好的一天，下次再见！",
         task: "道谢告别",
         options: [
@@ -270,6 +391,7 @@ const SCENES = [
           { text: "Bye market person.",             ok: false, tip: "说 See you next time 更自然" },
           { text: "Money bye.",                     ok: false, tip: "简单说 Thank you! See you!" },
         ],
+        phrase: { en: "See you next time!", zh: "下次再见！", note: "告别 + 表达再来意向，店员听了会很开心" },
       },
     ],
     reward: { en: "cart", zh: "你完成了一次完整的英文超市购物！🛒" },
