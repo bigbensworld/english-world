@@ -109,10 +109,35 @@ function iconHtml(it, cls) {
 }
 
 // ---------- 地图 ----------
+// 场景分组：频率 × 场景域（内容充足度标准：10~12 场景后分组）
+// 未在分组表里的场景归入「日常高频」，保证新增场景不丢卡
+const SCENE_GROUPS = [
+  { id: "daily", title: "🏠 日常高频", sub: "Daily Life · 天天都用得上的英语", scenes: ["cafe", "restaurant", "market", "transport", "barber", "gym", "shopping"] },
+  { id: "travel", title: "✈️ 旅行出行", sub: "Travel · 机场酒店一手搞定", scenes: ["airport", "hotel"] },
+  { id: "emergency", title: "🚑 应急保障", sub: "Essentials · 医院银行关键时刻", scenes: ["hospital", "bank"] },
+];
+
 function renderMap() {
   const grid = $("sceneGrid");
   grid.innerHTML = "";
-  SCENES.forEach((sc, i) => {
+  // 分组渲染：已知分组顺序优先，未分组场景按原顺序归入末尾
+  const grouped = [];
+  const seen = new Set();
+  for (const g of SCENE_GROUPS) {
+    const scenes = SCENES.filter((sc) => g.scenes.includes(sc.id));
+    if (!scenes.length) continue;
+    grouped.push({ ...g, scenes });
+    scenes.forEach((sc) => seen.add(sc.id));
+  }
+  const rest = SCENES.filter((sc) => !seen.has(sc.id));
+  if (rest.length) grouped.push({ id: "more", title: "🧭 更多场景", sub: "More Places", scenes: rest });
+  let i = 0;
+  grouped.forEach((g) => {
+    const head = document.createElement("div");
+    head.className = "scene-group-head";
+    head.innerHTML = `<div class="scene-group-title">${g.title}<span class="scene-group-count">${g.scenes.length} 个场景</span></div><div class="scene-group-sub">${g.sub}</div>`;
+    grid.appendChild(head);
+    g.scenes.forEach((sc) => {
     const visits = sceneVisits(sc);
     const multi = visits.length > 1;
     const finished = finishedVisits(sc);
@@ -149,6 +174,8 @@ function renderMap() {
     `;
     card.onclick = () => enterScene(sc.id);
     grid.appendChild(card);
+    i++;
+    });
   });
 }
 

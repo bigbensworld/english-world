@@ -9,6 +9,10 @@ if (!sceneId || !visitsFile || !itemsFile) {
   process.exit(1);
 }
 let src = readFileSync(`${ROOT}/data.js`, 'utf8');
+// 注入前快照：各场景 items 数（防误注校验基线）
+const beforeScenes = new Function(src.replace(/^\/\/.*$/gm, '') + '; return SCENES;')();
+const beforeItems = beforeScenes.find(s => s.id === sceneId)?.items?.length;
+if (typeof beforeItems !== 'number') throw new Error('scene not found in pre-snapshot');
 
 // 1. 解析并校验新轮次（文件可含多个 visit 对象，逗号分隔）
 const visitsSrc = readFileSync(visitsFile, 'utf8');
@@ -31,8 +35,15 @@ if (!newItems.length || newItems.some(x => !x.id || !x.en)) throw new Error('ite
 console.log(`new items: ${newItems.length}`);
 
 // 3. 括号深度定位场景对象
-const sceneStart = src.indexOf(`id: "${sceneId}"`);
-if (sceneStart < 0) throw new Error('scene not found');
+// 注意：不能只搜 `id: "<sceneId>"` —— 词条的 id 可能与场景 id 撞名（如 hotel 场景的词条 id "gym"）。
+// 场景对象的标志是后面紧跟 name: 字段，逐个候选校验。
+const candidates = [...src.matchAll(new RegExp(`id: "${sceneId}"`, 'g'))].map(m => m.index);
+let sceneStart = -1;
+for (const pos of candidates) {
+  const after = src.slice(pos, pos + 300);
+  if (/name: "/.test(after)) { sceneStart = pos; break; }
+}
+if (sceneStart < 0) throw new Error('scene not found (no candidate with name field)');
 const objStart = src.lastIndexOf('{', sceneStart);
 let depth = 0, sceneEnd = -1;
 for (let i = objStart; i < src.length; i++) {
@@ -53,16 +64,33 @@ const insertion = ',\n' + reindent(cleaned.split('\n').map(l => l).join('\n')).r
 const insertionText = ',\n' + cleaned.split('\n').map(l => l ? '    ' + l : l).join('\n') + '\n';
 let out = src.slice(0, insertAt) + insertionText + src.slice(insertAt);
 
-// 5. items 追加
-const itemsArrIdx = out.indexOf('items: [', out.indexOf(`id: "${sceneId}"`));
-const itemsOpen = out.indexOf('[', itemsArrIdx);
-let d2 = 0, itemsEnd = -1;
-for (let j = itemsOpen; j < out.length; j++) {
-  if (out[j] === '[') d2++;
-  else if (out[j] === ']') { d2--; if (d2 === 0) { itemsEnd = j; break; } }
+// 5. items 追加——必须在目标场景对象的文本范围内找 items: [
+//    （重新定位场景：插入 visits 后位置变了；用与步骤 3 相同的 name: 校验法）
+const candidates2 = [...out.matchAll(new RegExp(`id: "${sceneId}"`, 'g'))].map(m => m.index);
+let sceneStart2 = -1;
+for (const pos of candidates2) {
+  if (/name: "/.test(out.slice(pos, pos + 300))) { sceneStart2 = pos; break; }
 }
-if (itemsEnd < 0) throw new Error('items end not found');
-const itemsText = '\n' + newItems.map(x => {
+if (sceneStart2 < 0) throw new Error('scene not re-found after visits insert');
+const objStart2 = out.lastIndexOf('{', sceneStart2);
+let d1 = 0, sceneEnd2 = -1;
+for (let i2 = objStart2; i2 < out.length; i2++) {
+  if (out[i2] === '{') d1++;
+  else if (out[i2] === '}') { d1--; if (d1 === 0) { sceneEnd2 = i2; break; } }
+}
+if (sceneEnd2 < 0) throw new Error('scene end re-find failed');
+const sceneSlice = out.slice(objStart2, sceneEnd2 + 1);
+const itemsArrIdx = sceneSlice.indexOf('items: [');
+if (itemsArrIdx < 0) throw new Error('items not found inside target scene!');
+const itemsOpen = sceneSlice.indexOf('[', itemsArrIdx);
+let d2 = 0, itemsEndRel = -1;
+for (let j = itemsOpen; j < sceneSlice.length; j++) {
+  if (sceneSlice[j] === '[') d2++;
+  else if (sceneSlice[j] === ']') { d2--; if (d2 === 0) { itemsEndRel = j; break; } }
+}
+if (itemsEndRel < 0) throw new Error('items end not found');
+const itemsEnd = objStart2 + itemsEndRel;
+const itemsText = ',\n' + newItems.map(x => {
   return `    { id: ${JSON.stringify(x.id)}, en: ${JSON.stringify(x.en)}, zh: ${JSON.stringify(x.zh)}, phon: ${JSON.stringify(x.phon)}, emoji: ${JSON.stringify(x.emoji)}, sent: ${JSON.stringify(x.sent)} },`;
 }).join('\n');
 out = out.slice(0, itemsEnd) + itemsText + out.slice(itemsEnd);
@@ -80,6 +108,16 @@ for (const v of sc.visits) {
 }
 // 重复 id 检查
 const ids = sc.visits.map(v => v.id);
+// 防呆：目标场景 items 应恰好增加 newItems.length（防止误注到别的场景）
+const expectedItems = beforeItems + newItems.length;
+if (sc.items.length !== expectedItems) throw new Error(`items count ${sc.items.length} != expected ${expectedItems}（可能注错场景！）`);
+// 防呆：其他场景 items 数必须与快照一致
+for (const bs of beforeScenes) {
+  const now = SCENES.find(s => s.id === bs.id);
+  const bLen = bs.items?.length ?? 0;
+  const nLen = now?.items?.length ?? 0;
+  if (bs.id !== sceneId && bLen !== nLen) throw new Error(`scene ${bs.id} items changed ${bLen}->${nLen}（误注泄漏！）`);
+}
 if (new Set(ids).size !== ids.length) throw new Error('duplicate visit ids!');
 const itemIds = sc.items.map(x => x.id);
 if (new Set(itemIds).size !== itemIds.length) throw new Error('duplicate item ids!');

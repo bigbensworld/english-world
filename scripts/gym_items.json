@@ -1,0 +1,18 @@
+[
+  { id: "sharp", en: "a sharp pain", zh: "刺痛", phon: "/ə ʃɑːp peɪn/", emoji: "⚡", sent: "I felt a sharp pain in my wrist." },
+  { id: "ice", en: "ice pack", zh: "冰袋", phon: "/aɪs pæk/", emoji: "🧊", sent: "Put an ice pack on it." },
+  { id: "swollen", en: "swollen", zh: "肿胀的", phon: "/ˈswəʊlən/", emoji: "🤕", sent: "If it's still swollen tomorrow, see a doctor." },
+  { id: "firstaid", en: "first aid kit", zh: "急救箱", phon: "/ˌfɜːst ˈeɪd kɪt/", emoji: "⛑️", sent: "The first aid kit is at the front desk." },
+  { id: "outorder", en: "out of order", zh: "故障停用", phon: "/aʊt əv ˈɔːdə/", emoji: "🚫", sent: "The treadmill is out of order." },
+  { id: "maintenance", en: "maintenance", zh: "维修", phon: "/ˈmeɪntənəns/", emoji: "🔧", sent: "Maintenance is coming to fix it." },
+  { id: "speakup", en: "speak up", zh: "说出来，发声", phon: "/spiːk ʌp/", emoji: "📣", sent: "Speak up if equipment acts up." },
+  { id: "gymnod", en: "the gym nod", zh: "健身房点头礼", phon: "/ðə dʒɪm nɒd/", emoji: "🙂", sent: "The gym nod means mutual respect." },
+  { id: "wipe", en: "wipe down", zh: "擦干净（器械）", phon: "/waɪp daʊn/", emoji: "🧴", sent: "Always wipe down the equipment after use." },
+  { id: "failrep", en: "failed rep", zh: "力竭组（举不动）", phon: "/feɪld rep/", emoji: "💀", sent: "Dropping the bar on a failed rep is okay." },
+  { id: "rack", en: "squat rack", zh: "深蹲架", phon: "/skwɒt ræk/", emoji: "🏋️", sent: "Don't hog the squat rack." },
+  { id: "hog", en: "hog (equipment)", zh: "长时间占用", phon: "/hɒɡ/", emoji: "🐷", sent: "Don't hog the machines with phone breaks." },
+  { id: "deathstare", en: "death stare", zh: "死亡凝视", phon: "/deθ steə/", emoji: "👀", sent: "Rack hoggers get the death stare." },
+  { id: "thankcard", en: "thank-you card", zh: "感谢卡", phon: "/ˈθæŋk juː kɑːd/", emoji: "💌", sent: "A thank-you card goes a long way." },
+  { id: "gymthing", en: "a gym thing", zh: "健身房的规矩", phon: "/ə dʒɪm θɪŋ/", emoji: "❓", sent: "Is that a gym thing?" },
+  { id: "gymfluent", en: "gym fluent", zh: "健身房老鸟（精通行话）", phon: "/dʒɪm ˈfluːənt/", emoji: "🏅", sent: "You're basically gym fluent now!" }
+]

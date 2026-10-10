@@ -1,0 +1,18 @@
+[
+  { id: "delivered", en: "delivered", zh: "已签收/已送达", phon: "/dɪˈlɪvəd/", emoji: "📬", sent: "The tracking says delivered, but there's no package." },
+  { id: "carrier", en: "carrier", zh: "承运公司", phon: "/ˈkæriə/", emoji: "🚚", sent: "Check with the carrier about the GPS photo." },
+  { id: "gpshot", en: "proof of delivery", zh: "签收凭证", phon: "/pruːf əv dɪˈlɪvəri/", emoji: "📸", sent: "The proof-of-delivery photo shows the wrong house." },
+  { id: "misdeliver", en: "misdelivered", zh: "送错了", phon: "/ˌmɪsdɪˈlɪvəd/", emoji: "🏠", sent: "My package was misdelivered to number 42." },
+  { id: "claim2", en: "claim", zh: "索赔，核查申请", phon: "/kleɪm/", emoji: "📋", sent: "I'll open a claim with the carrier." },
+  { id: "retrieve", en: "retrieve", zh: "取回", phon: "/rɪˈtriːv/", emoji: "↩️", sent: "Will the carrier retrieve the package?" },
+  { id: "replacement", en: "replacement", zh: "补发，替换品", phon: "/rɪˈpleɪsmənt/", emoji: "📦", sent: "We'll ship a replacement free of charge." },
+  { id: "byday", en: "by + 时间", zh: "最晚到……", phon: "/baɪ/", emoji: "📅", sent: "I need it by Friday." },
+  { id: "extramile", en: "go the extra mile", zh: "格外用心", phon: "/ɡəʊ ði ˈekstrə maɪl/", emoji: "🚶", sent: "She really went the extra mile to help." },
+  { id: "followup", en: "follow up", zh: "跟进", phon: "/ˈfɒləʊ ʌp/", emoji: "📮", sent: "I'll follow up with you in 48 hours." },
+  { id: "sizingnote", en: "runs small", zh: "偏小（尺码）", phon: "/rʌnz smɔːl/", emoji: "📏", sent: "These shoes run small — size up half." },
+  { id: "fivestars", en: "five stars", zh: "五星好评", phon: "/faɪv stɑːz/", emoji: "⭐", sent: "A genuine five-star review made his month." },
+  { id: "genuine", en: "genuine", zh: "真实的，真诚的", phon: "/ˈdʒenjuɪn/", emoji: "💯", sent: "Only genuine reviews, please." },
+  { id: "retaliate", en: "retaliate", zh: "报复", phon: "/rɪˈtælieɪt/", emoji: "🚫", sent: "Companies can't retaliate against honest reviews." },
+  { id: "flagged", en: "get flagged", zh: "被（系统）标记", phon: "/ɡet flæɡd/", emoji: "🚩", sent: "Accounts get flagged for too many returns." },
+  { id: "saga", en: "saga", zh: "漫长的故事", phon: "/ˈsɑːɡə/", emoji: "📖", sent: "What a saga — wrong item, lost package, and a review!" }
+]

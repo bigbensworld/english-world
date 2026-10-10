@@ -130,6 +130,10 @@ main { max-width: 980px; margin: 0 auto; padding: 26px 18px 60px; }
 .map-sub { text-align: center; color: var(--muted); margin: 8px 0 30px; font-size: 14px; animation: bounceIn .5s var(--bounce) .1s backwards; }
 
 .scene-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.scene-group-head { grid-column: 1 / -1; margin-top: 6px; animation: bounceIn .5s var(--bounce); }
+.scene-group-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.scene-group-count { font-size: 12px; font-weight: 500; color: var(--muted); background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; }
+.scene-group-sub { font-size: 12px; color: var(--muted); margin: 4px 0 2px; }
 .scene-card {
   width: 100%; text-align: left; font: inherit; color: var(--ink);
   background: var(--card); border: 1px solid var(--border);
