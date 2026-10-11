@@ -2,6 +2,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
 import { useGame, speak, stopSpeak, VLOG_DICT } from "../../gameStore";
+import { pgLoadIndex, pgPlay, pgStop } from "../../pgAudio";
 // 吉祥物状态：对齐原站 vlog.js 调用点
 //   764 happy 1200（打开某一集）、906 happy 800（Quiz 答对）、733 idle（返回频道列表）
 import { setMascotState } from "../../mascotStore";
@@ -34,27 +35,38 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
 
   // 打开某一集 → happy 1200（对齐原站 vlog.js:764 openVlog）；
   // 返回频道列表 → idle（对齐 vlog.js:733 openVlogChannel）
+  // 预生成音频索引懒加载（失败静默降级 Web Speech）
   useEffect(() => {
     setMascotState("happy", 1200);
+    pgLoadIndex();
     return () => setMascotState("idle");
   }, [vlog.id]);
-  const backToHome = () => { setMascotState("idle"); stopSpeak(); onBack(); };
+  const backToHome = () => { setMascotState("idle"); stopSpeak(); pgStop(); onBack(); };
 
-  // 卡片进入自动慢速播放 + 标记已看
+  // 统一播放入口：预生成音频优先（词序高亮），降级 Web Speech（charIndex → 词序）
+  const playCard = (text: string, rate: number, cardIdx: number) => {
+    const key = vlog.id + "_" + cardIdx;
+    const ok = pgPlay(key, (wi) => setHi(wi));
+    if (!ok) {
+      speak(text, rate, (ci) => {
+        const words = text.split(/\s+/);
+        let pos = 0, wi = -1;
+        for (let i = 0; i < words.length; i++) {
+          if (ci >= pos && ci < pos + words[i].length) { wi = i; break; }
+          pos += words[i].length + 1;
+        }
+        setHi(wi);
+      });
+    }
+  };
+
+  // 卡片进入自动慢速播放 + 标记已看（预生成优先）
   useEffect(() => {
     if (mode !== "cards") return;
     setHi(-1);
-    const t = setTimeout(() => speak(card.en, 0.55, (ci) => {
-      const words = card.en.split(/\s+/);
-      let pos = 0, wi = -1;
-      for (let i = 0; i < words.length; i++) {
-        if (ci >= pos && ci < pos + words[i].length) { wi = i; break; }
-        pos += words[i].length + 1;
-      }
-      setHi(wi);
-    }), 800);
+    const t = setTimeout(() => playCard(card.en, 0.55, idx), 800);
     game.update((d) => { d.vlogSeen[vlog.id + ":" + idx] = true; });
-    return () => { clearTimeout(t); stopSpeak(); };
+    return () => { clearTimeout(t); stopSpeak(); pgStop(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vlog.id, idx, mode]);
 
@@ -108,7 +120,7 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
               </View>
             )}
             <View style={{ display: "flex", gap: 10, marginTop: 16 }}>
-              <View className="btn btn-primary" style={{ flex: 1 }} onClick={() => speak(card.en, 0.55, (ci) => setHi(ci))}>🔊 慢速播放</View>
+              <View className="btn btn-primary" style={{ flex: 1 }} onClick={() => playCard(card.en, 0.55, idx)}>🔊 慢速播放</View>
               <View className="btn" style={{ flex: 1 }} onClick={() => speak(card.en, 0.85)}>🏃 常速</View>
             </View>
           </View>
@@ -170,10 +182,13 @@ function VlogQuiz({ vlog, onFinish }: { vlog: Vlog; onFinish: () => void }) {
     return [target, ...others].sort(() => Math.random() - 0.5);
   }, [qIdx, target]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 播放目标句
+  // 播放目标句（预生成优先：需找回卡片索引作 key）
   useEffect(() => {
     if (!target || done) return;
-    const t = setTimeout(() => speak(target.en, 0.55), 900);
+    const cardIdx = vlog.cards.indexOf(target);
+    const t = setTimeout(() => {
+      if (!pgPlay(vlog.id + "_" + cardIdx, () => {})) speak(target.en, 0.55);
+    }, 900);
     return () => clearTimeout(t);
   }, [qIdx, target, done]);
 
@@ -223,7 +238,7 @@ function VlogQuiz({ vlog, onFinish }: { vlog: Vlog; onFinish: () => void }) {
     <View className="vlog-stage">
       <View className="vlog-count">🎬 QUIZ TIME · {qIdx + 1}/{total}</View>
       <View style={{ fontSize: 17, fontWeight: 700, margin: "12px 0" }}>🔊 听声音——刚才是哪个动作？</View>
-      <View className="btn btn-primary" style={{ maxWidth: 220, margin: "0 auto 14px" }} onClick={() => target && speak(target.en, 0.55)}>🔊 再听一次</View>
+      <View className="btn btn-primary" style={{ maxWidth: 220, margin: "0 auto 14px" }} onClick={() => target && (pgPlay(vlog.id + "_" + vlog.cards.indexOf(target), () => {}) || speak(target.en, 0.55))}>🔊 再听一次</View>
       <View style={{ display: "flex", gap: 10 }}>
         {opts.map((c, i) => {
           const cls = picked ? (c === picked.target ? "option ok" : "option wrong") : "option";

@@ -766,6 +766,61 @@ function speakSlow(text, rate, onWord, onEnd) {
   }, 150);
 }
 
+// ---------- Phase 2: 预生成音频（mp3 + 词级时间戳，三端统一逐词高亮） ----------
+// 音频索引懒加载；索引或 mp3 缺失时降级回 speechSynthesis（原 speakSlow 路径不变）
+let PG_AUDIO = null;           // { key: { vlog, card, dur, words: [{w,s,e}] } }
+let pgLoading = null;
+function pgLoadIndex() {
+  if (PG_AUDIO || pgLoading) return pgLoading || Promise.resolve(PG_AUDIO);
+  pgLoading = fetch("audio/vlog/index.json")
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => { PG_AUDIO = d || {}; pgLoading = null; return PG_AUDIO; })
+    .catch(() => { PG_AUDIO = {}; pgLoading = null; return PG_AUDIO; });
+  return pgLoading;
+}
+// 播放一条预生成句子；返回 false 表示无预生成（调用方降级）
+// 与 highlightWordByChar 协作：预生成音频用词序高亮（onWordIndex），旧 TTS 用 charIndex
+let pgAudioEl = null;
+function pgPlay(key, onWordIndex, onEnd) {
+  if (!PG_AUDIO || !PG_AUDIO[key]) return false;
+  const entry = PG_AUDIO[key];
+  const src = "audio/vlog/" + key + ".mp3";
+  if (pgAudioEl) { try { pgAudioEl.pause(); } catch (e) {} }
+  if (window.__ttsFallback) { try { speechSynthesis.cancel(); } catch (e) {} }
+  pgAudioEl = new Audio(src);
+  pgAudioEl.play().catch(() => { if (onEnd) onEnd(); return; });
+  let raf = null;
+  const tick = () => {
+    const t = pgAudioEl.currentTime;
+    // 找当前时间落在哪个词（词序，供高亮）
+    let cur = -1;
+    for (let i = 0; i < entry.words.length; i++) {
+      if (t >= entry.words[i].s - 0.02) cur = i; else break;
+    }
+    if (onWordIndex) onWordIndex(cur);
+    if (!pgAudioEl.ended && !pgAudioEl.paused) raf = requestAnimationFrame(tick);
+  };
+  pgAudioEl.addEventListener("play", () => { if (raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); });
+  pgAudioEl.addEventListener("ended", () => { if (raf) cancelAnimationFrame(raf); if (onEnd) onEnd(); });
+  return true;
+}
+// 统一入口：优先预生成音频（词序高亮），否则 Web Speech（字符高亮）
+function vlogSpeak(vlogId, cardIdx, text, rate, onWordIndexByChar) {
+  const key = vlogId + "_" + cardIdx;
+  if (PG_AUDIO && PG_AUDIO[key]) {
+    // onWordIndexByChar 兼容两种：预生成传词序，降级传 charIndex（旧回调签名）
+    const spans = () => document.querySelectorAll("#vlogEn .v-word");
+    return pgPlay(key, (wi) => {
+      // 词序 → 旧 charIndex 高亮：直接按词序 toggle active
+      const els = spans();
+      els.forEach((el, i) => el.classList.toggle("active", i === wi));
+    }, null);
+  }
+  window.__ttsFallback = true;
+  speakSlow(text, rate, onWordIndexByChar);
+  return false;
+}
+
 // 高亮当前朗读到的词：根据 charIndex 找到第几个词
 function highlightWordByChar(container, charIndex) {
   const spans = container.querySelectorAll(".v-word");
@@ -882,6 +937,8 @@ function openVlog(id) {
   `;
   stage.appendChild(box);
   $("vlogExit").onclick = openVlogChannel;
+  // 预生成音频索引懒加载（失败静默降级 Web Speech）
+  pgLoadIndex();
 
   let idx = 0;
   const seen = (i) => {
@@ -926,10 +983,12 @@ function openVlog(id) {
       </div>
     `;
     $("vlogPlay").onclick = () => {
-      speakSlow(card.en, 0.55, (ci) => highlightWordByChar($("vlogEn"), ci));
+      vlogSpeak(v.id, idx, card.en, 0.55, (ci) => highlightWordByChar($("vlogEn"), ci));
     };
     $("vlogNormal").onclick = () => {
-      speakSlow(card.en, 0.85, (ci) => highlightWordByChar($("vlogEn"), ci));
+      // 预生成音频为固定慢速；常速回退 Web Speech
+      if (PG_AUDIO && PG_AUDIO[v.id + "_" + idx]) { speakSlow(card.en, 0.85, (ci) => highlightWordByChar($("vlogEn"), ci)); }
+      else speakSlow(card.en, 0.85, (ci) => highlightWordByChar($("vlogEn"), ci));
     };
     // 单词点击学习：发音 + 释义卡
     $("vlogEn").onclick = onVlogWordClick;
@@ -948,13 +1007,13 @@ function openVlog(id) {
     if ($("vlogNext")) $("vlogNext").onclick = () => { idx++; renderCard(); };
     if ($("vlogQuiz")) $("vlogQuiz").onclick = () => startVlogQuiz(v);
 
-    // 每张卡自动慢速朗读：进入/切换卡片即播（speakSlow 内部已有 150ms 防吞音延迟）
+    // 每张卡自动慢速朗读：进入/切换卡片即播（预生成音频优先，150ms 防吞音在降级路径内）
     if (vlogState.currentVlog === v) {
       const hint = document.createElement("div");
       hint.className = "auto-play-hint";
       hint.textContent = "🔊 自动慢速播放中…（点击单词可查释义）";
       $("vlogStage").appendChild(hint);
-      speakSlow(card.en, 0.55, (ci) => highlightWordByChar($("vlogEn"), ci));
+      vlogSpeak(v.id, idx, card.en, 0.55, (ci) => highlightWordByChar($("vlogEn"), ci));
       setTimeout(() => hint.remove(), 4000);
     }
   }
@@ -991,8 +1050,13 @@ function startVlogQuiz(v) {
         <div class="quiz-result" id="quizResult"></div>
       </div>
     `;
-    $("quizPlay").onclick = () => speakSlow(target.en, 0.55);
-    speakSlow(target.en, 0.55);
+    const playQuiz = () => {
+      // Quiz 的 target 是原卡数组里的对象，需找回其索引（预生成 key 依赖索引）
+      const cardIdx = v.cards.indexOf(target);
+      if (!vlogSpeak(v.id, cardIdx, target.en, 0.55)) { /* 降级已处理 */ }
+    };
+    $("quizPlay").onclick = playQuiz;
+    playQuiz();
 
     const optsBox = $("quizOpts");
     let answered = false;

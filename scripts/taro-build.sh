@@ -17,4 +17,12 @@ if [[ "$*" == *"--type weapp"* ]]; then
   exit $rc
 fi
 
-exec node node_modules/.bin/taro "$@"
+# H5 构建：完成后拷入 Phase 2 预生成音频（不走 Taro copy 插件——外部路径会卡死）
+node node_modules/.bin/taro "$@"
+rc=$?
+if [[ $rc -eq 0 && -d ../../audio/vlog ]]; then
+  rm -rf dist/audio
+  cp -R ../../audio dist/audio
+  echo "[taro-build] 预生成音频已拷入 dist/audio（$(ls dist/audio/vlog/*.mp3 | wc -l | tr -d ' ') 个 mp3）"
+fi
+exit $rc
