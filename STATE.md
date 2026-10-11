@@ -96,7 +96,8 @@
 17. ✅ 新场景：邮局 5 轮（寄包裹/寄信与邮票/取件与查询 + v4 出错意外/v5 文化潜规则）——第 12 个场景，应急保障组成 3 个
 18. ✅ vlog 新主题集 3 集（The Morning Commute / Walking the Dog / Weekend Errands），VLOG_DICT 448 词条
 19. ✅ 第五批：图书馆/宠物医院/学校 3 场景各 5 轮 + vlog 3 集（Cooking Dinner / Gardening / Home Workout），VLOG_DICT 565 词条
-20. ⬜ 候选：更多场景（书店/药房独立/租车）、vlog 新主题（Meal Prep / Car Wash / Hiking）、Phase 1 Taro 重建 UI（内容已达 15 场景，架构迁移优先级上升）
+20. ✅ 第六批：书店 5 轮（找书买书/求推荐/买错退换/书店文化/签售会）+ 租车 6 轮（柜台取车/绕车验车/延期问价/高速爆胎/租车文化/还车风波）+ 药店 5 轮（感冒买药/柜台规矩/创可贴急救/买一送一/咳嗽糖浆换货）——**全站 18 场景 95 轮 662 步 619 词条**（commit 76fb782）
+21. ⬜ 候选：更多场景（咖啡馆职场线/干洗店/税务局）、vlog 新主题（Meal Prep / Car Wash / Hiking）、Phase 2 预生成音频
 
 **跨端架构（2026-10-10 拍板，Phase 0 + Phase 1(H5) 已落地）**：
 - 目标：一套架构同时支持网站/微信小程序/App；三端统一**静态离线优先**（网站纯静态 CF Pages、小程序全资源分包零网络请求、App Capacitor 全本地）。
@@ -164,6 +165,9 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 ## 七、近期 commit 索引（倒序）
 
 ```
+bb19c63 merge: 远端 API sync 提交合并（第三次分叉处理，merge -X ours）
+76fb782 内容扩展第六批: 新增书店/租车/药店 3 场景（18 场景 95 轮 662 步 619 词条）
+5d8e2a4 文档: STATE.md 同步吉祥物还原 + 答错重选修 bug（含两条新坑：Taro transform 劫持 fixed、dist 残留致构建挂起）
 5a1fe95 Taro: 还原吉祥物悬浮球（4 状态+气泡+TTS）+ 修复答错后无法重选
 5a527d7 文档: STATE.md 同步视觉根因修复（变量作用域/box-sizing/布局对齐/Fluent图标 + 验证数据）
 ad6da61 Taro: 按钮字重对齐原站 .btn（500→400）
