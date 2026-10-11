@@ -104,8 +104,18 @@
 - **`packages/ui/` Taro UI 层（Phase 1，commit 917620b）**：Taro 4.0.9 + React 18，核心页面全移植（双 Tab/分组地图/对话/答错教学/订单托盘/vlog 逐词高亮查词/词汇册）；gameStore.ts hook 封装 core 引擎。构建：`scripts/taro-build.sh build --type h5`。**预览站 https://english-world-taro.pages.dev**（生产站仍是 vanilla 版，切换需拍板）。
 - **Phase 1 构建坑（重要）**：①Taro H5 的 webpack script rule 默认只编译项目 src——外部 core 包必须在 `h5.webpackChain` 里 `chain.module.rules.get('script').include.add(coreDir)`（webpack-chain 的 include 是 ChainedSet，用 `.add()` 不是赋值）；顶层 webpackChain 配置项在 h5 段内才稳定执行；②`src/index.html` 模板必填（含 `<%= htmlWebpackPlugin.options.script %>`），否则 dist 无 html；③Taro CLI 靠 process.cwd() 定位项目，WorkBuddy shell 不能 `cd`，用 `scripts/taro-build.sh` wrapper；④mini.postcss.pxtransform 不允许 selectorBlackList 属性；⑤需要额外装 @babel/preset-react + babel-preset-react-app。
 - **移动端适配坑（2026-10-10 晚修复，0e13e4c）**：①**designWidth 必须 375**——app.css 的 px 按 375 视觉稿（原站 web 实际像素）编写；750 会让真机所有尺寸减半（根字号 20px 时 16px 只渲染 8px），桌面预览因根字号 clamp 40px 看不出问题；②**weapp 构建会覆盖同一个 dist/**——曾导致 H5 部署拿到小程序文件（线上 404），现 wrapper 自动把 weapp 产物移至 `dist-weapp/`，H5 留 `dist/`；③weapp 端 storage 用 `TaroStorageAdapter`（Taro.setStorageSync，gameStore.ts 按 `process.env.TARO_ENV` 分流），TTS 在 weapp 无 speechSynthesis 时优雅降级静音（音频属 Phase 2）；④headless Chrome 验证移动端 viewport 要用 CDP `Emulation.setDeviceMetricsOverride`（--window-size 有约 500px 最小窗口限制）；⑤GitHub API sync 逐文件追加曾把 app.css 写坏（动画块重复 15 次 + `--bounce` 变量丢失）——大文件 sync 后务必检查重复块。
+- **视觉根因修复（2026-10-11，70df5db + 5182de8 + ad6da61，部署 https://bb9766fe.english-world-taro.pages.dev）**：多轮「背景/字号/布局/图标都不对」打补丁无效后，改用 CDP **实测元素尺寸**定位真凶，一次性解决三个根因：
+  - **①【最关键】CSS 变量作用域失效 → 白底/纯黑字/动画失效**：app.css 原写 `page, .app-root { --bg/--ink/--bounce... }`，但 H5 里 `page` 不是真实元素、`.app-root` 从未挂到 DOM → **所有主题变量未定义**（`--bg` 实测为空字符串）。后果：`background: var(--bg)` 解析失败变透明（显示白）、文字纯黑（应 #2c2c2a）、`animation: bounceIn var(--bounce)` 缓动函数为空 → 动画失效。修复：改 `:root, page`（H5 走 :root + 小程序走 page）。
+  - **附带坑**：Taro 路由运行时向 head **append** `.taro_router > .taro_page{background-color:#fff}`（@tarojs/router/dist/style.js 的 loadAnimateStyle），**晚于**项目样式表，同特异性下胜出。必须用 `html:root .taro_router > .taro_page`（特异性 0,3,0）覆盖。
+  - **②全局 box-sizing 缺失**：原站 style.css 首行 `* { box-sizing:border-box }` 迁移时漏了 → 实测 **190/190 元素全 content-box**，带 padding/border 的元素整体偏大。补 `* { box-sizing:border-box }`。
+  - **③floaty 关键帧缺失**：`.sc-art` 引用 `animation: floaty` 但 Taro 版从未定义 → 场景卡浮动动效失效。补回。
+  - **布局对齐**：vlog 列表 max-width 560（原站 home-vlog-sets）、场景网格 minmax(260,1fr)/gap18、封面 130px、图标 88px、名称 17px、tab 区 max-width 400/font15、btn(min-height44/pad8-14/font14/w400)、brand-bar(pad14/22/logo18px600)、桌面子页容器 1016/760 宽度约束。
+  - **附带修复**：`.brand-zh` 作 flex item 被压扁成 18px 宽 → 中文竖排换行、header 撑到 144px；加 `white-space:nowrap; flex-shrink:0` → 63px 单行。
+  - **场景卡接入 Fluent Emoji 3D PNG 图标**：新增 `SceneArt` 组件（iconId 命中渲染 `<Image src=/static/icons/x.png>`，失败降级 emoji）；图标源 `assets/icons/*.png` 复制到 `packages/ui/src/static/icons/`（24 张），Taro config 加 copy 规则。**⚠️ copy.from 指向项目外绝对路径会让构建卡死**（实测 7 分钟不结束、只拷 9 个）——必须放项目内 `src/static/`。
+  - **验证（CDP 实测）**：`.taro_page` 背景 `rgb(246,244,238)`、body 同色、变量均有值；190/190 border-box；vlog 卡 560=560；mapTitle 26px=26px；btn-primary big 16px/w400/h52 与原站完全一致；场景卡 15 张、图标 IMG 88x88(natural 256x256, HTTP 200)；**320/360/375/390/414 五档无横向溢出**、控制台 0 错误；test.js 92/92。
+  - 新增可复用脚本：`scripts/measure_sites.py`（两站尺寸对比）、`check_scroll.py`（滚动容器）、`inspect_taro_dom.py`（DOM dump）。
 - **内容生产标准流程**：改 data.js/vlogs.js/vlog.js → `node scripts/extract_core_data.mjs` → 三组测试全过（core.test.ts + sync-guard.test.ts + test.js）。
-- 路线：Phase 1 ✅ + **Phase 1.5 ✅（f523b3f：vlog Quiz + emoji 舞台动画 + 隐藏测试模式 + weapp 编译验证通过 1.2MB）** → **移动端适配修复 ✅（0e13e4c：designWidth 375 + weapp storage + 构建隔离 + CDP 375 视口 9/9 验证）** → **待办：用户浏览器/真机验收 Taro 版 → 拍板切换生产站** → Phase 2 预生成音频 mp3+时间戳 → Phase 3 小程序 MVP + Capacitor App + 云同步。
+- 路线：Phase 1 ✅ + **Phase 1.5 ✅（f523b3f）** → **移动端适配修复 ✅（0e13e4c）** → **视觉根因修复 ✅（70df5db/5182de8/ad6da61：变量作用域 + box-sizing + 布局对齐 + Fluent 图标，CDP 全档验证）** → **待办：用户浏览器/真机验收 Taro 版 → 拍板切换生产站** → Phase 2 预生成音频 mp3+时间戳 → Phase 3 小程序 MVP + Capacitor App + 云同步。
 
 ## 四、开发与部署流程
 
@@ -147,6 +157,12 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 ## 七、近期 commit 索引（倒序）
 
 ```
+ad6da61 Taro: 按钮字重对齐原站 .btn（500→400）
+5182de8 Taro config: 图标静态资源改为项目内 src/static（外部绝对路径会卡死）
+70df5db Taro首页根因修复: CSS变量作用域失效 + box-sizing缺失 + 布局对齐原站 + Fluent图标
+961de55 Taro首页整体重设计：hero分区+学习路径三步卡+媒体式vlog卡+场景卡动效与CTA
+212e092 Taro首页第二轮视觉对齐字体背景与布局
+9cb197f Taro首页视觉对齐原站品牌与卡片布局
 0e13e4c 移动端适配修复: designWidth 750→375 + app.css 去重 + weapp storage 适配 + 构建输出隔离 dist-weapp
 63e2ac9 内容扩展: 新增图书馆/宠物医院/学校场景 15 场景 79 轮 564 步 538 词条 + vlog 补 3 集（12 集）
 ce90770 文档: STATE.md 同步第四批内容（12 场景 64 轮 471 步 431 词条，vlog 9 集）（API 逐文件上传等价提交）
