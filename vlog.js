@@ -763,7 +763,10 @@ function speakSlow(text, rate, onWord, onEnd) {
         if (e.name === "word" || e.charIndex !== undefined) onWord(e.charIndex);
       };
     }
-    if (onEnd) u.onend = onEnd;
+    if (onEnd) {
+      u.onend = onEnd;
+      u.onerror = onEnd;
+    }
     speechSynthesis.speak(u);
   }, 150);
 }

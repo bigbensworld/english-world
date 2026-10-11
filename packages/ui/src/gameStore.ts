@@ -25,7 +25,10 @@ export function speak(text: string, rate = 1, onWord?: (charIndex: number) => vo
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "en-US"; u.rate = rate;
     if (onWord) u.onboundary = (e: any) => onWord(e.charIndex ?? 0);
-    if (onEnd) u.onend = onEnd;
+    if (onEnd) {
+      u.onend = onEnd;
+      u.onerror = onEnd;
+    }
     synth.speak(u);
     try { synth.resume(); } catch { /* noop */ }
   }, 150);

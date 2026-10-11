@@ -29,6 +29,7 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
   const [idx, setIdx] = useState(0);
   const [wordDef, setWordDef] = useState<{ word: string; def: string | null } | null>(null);
   const [hi, setHi] = useState(-1);
+  const [replayBusy, setReplayBusy] = useState(false);
   const [mode, setMode] = useState<"cards" | "quiz">("cards");
   const card = vlog.cards[idx];
   const isFact = card.type === "fun-fact";
@@ -83,6 +84,7 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
     pgStop();
     stopSpeak();
     speak(clean, 0.6);
+    setReplayBusy(false);
     setWordDef({ word: raw, def: lookupWord(raw) });
   };
 
@@ -139,11 +141,12 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
               <View style={{ marginTop: 12, display: "flex", gap: 10 }}>
                 <View className="btn btn-primary" onClick={() => {
                   const clean = wordDef.word.toLowerCase().replace(/[^a-z'-]/g, "");
-                  if (!clean) return;
+                  if (!clean || replayBusy) return;
+                  setReplayBusy(true);
                   pgStop();
                   stopSpeak();
-                  speak(clean, 0.6);
-                }}>🔊 再听一次</View>
+                  speak(clean, 0.6, undefined, () => setReplayBusy(false));
+                }}>{replayBusy ? "🔊 播放中…" : "🔊 再听一次"}</View>
                 <View className="btn" onClick={() => setWordDef(null)}>关闭</View>
               </View>
             </View>
