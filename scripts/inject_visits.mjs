@@ -90,7 +90,11 @@ for (let j = itemsOpen; j < sceneSlice.length; j++) {
 }
 if (itemsEndRel < 0) throw new Error('items end not found');
 const itemsEnd = objStart2 + itemsEndRel;
-const itemsText = ',\n' + newItems.map(x => {
+// 防双逗号：检查 items 数组末项是否已带尾逗号（`},\s*$` 后接 `]`）。
+// 若末项带尾逗号，itemsText 就不再前置逗号——否则 `},\n,\n{` 会解析成稀疏数组多一个洞。
+const beforeItemsEnd = out.slice(0, itemsEnd);
+const lastItemHasTrailingComma = /,\s*$/.test(beforeItemsEnd.slice(beforeItemsEnd.lastIndexOf('}')));
+const itemsText = (lastItemHasTrailingComma ? '' : ',\n') + newItems.map(x => {
   return `    { id: ${JSON.stringify(x.id)}, en: ${JSON.stringify(x.en)}, zh: ${JSON.stringify(x.zh)}, phon: ${JSON.stringify(x.phon)}, emoji: ${JSON.stringify(x.emoji)}, sent: ${JSON.stringify(x.sent)} },`;
 }).join('\n');
 out = out.slice(0, itemsEnd) + itemsText + out.slice(itemsEnd);

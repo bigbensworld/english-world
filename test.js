@@ -48,7 +48,7 @@ function ok(cond, name) {
 
 console.log("== 1. 初始状态 ==");
 ok(state.coins === undefined, "金币体系已移除");
-ok(SCENES.length === 18, "共 18 个场景");
+ok(SCENES.length === 20, "共 20 个场景");
 ok(SCENES.some(s => s.id === "restaurant"), "餐厅场景已加入");
 ok(SCENES.some(s => s.id === "hotel"), "酒店场景已加入");
 ok(SCENES.some(s => s.id === "airport"), "机场场景已加入");
@@ -83,7 +83,7 @@ ok(hospVisits.every(v => v.reward && v.reward.en && SCENES.find(s => s.id === "h
 ok(["appointment", "reception", "symptom", "fever", "sorethroat", "cough", "doctor", "insurance", "pharmacy", "prescription", "medicine", "dosage", "checkup", "bloodpressure", "recovered"].every(id => SCENES.find(s => s.id === "hospital").items.some(it => it.id === id)), "医院 15 个核心词条全部入库");
 ok(SCENES.every(s => s.unlockCost === undefined), "无解锁成本字段");
 const cafeVisits = sceneVisits(SCENES[0]);
-ok(cafeVisits.length === 8, "咖啡店有 8 轮光顾");
+ok(cafeVisits.length === 10, "咖啡店有 10 轮光顾");
 ok(sceneVisits(SCENES.find(s => s.id === "market")).length === 5, "超市已多轮化（5 轮光顾）");
 const marketVisits = sceneVisits(SCENES.find(s => s.id === "market"));
 ok(marketVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "超市每步恰好 1 个正确选项");

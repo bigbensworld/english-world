@@ -23,7 +23,7 @@ function scene(id: string): Scene {
 }
 
 console.log("== 1. 数据完整性（迁移自 test.js 断言） ==");
-ok(SCENES.length === 18, "共 18 个场景");
+ok(SCENES.length === 20, "共 20 个场景");
 ok(VLOGS.length === 12, "慢速生活 12 集 vlog");
 ok(VLOGS.every(v => v.cards.filter(c => !c.type).length >= 6), "每集至少 6 张动作卡");
 ok(VLOGS.every(v => v.cards.every(c => c.en && c.zh && c.words)), "每张卡都有英文/中文/关键词");
@@ -57,7 +57,7 @@ ok(restVisits.length === 6, "餐厅有 6 轮光顾");
 ok(scene("restaurant").items.length >= 30, "餐厅词汇量 30+");
 
 const cafeVisits = sceneVisits(scene("cafe"));
-ok(cafeVisits.length === 8, "咖啡店有 8 轮光顾");
+ok(cafeVisits.length === 10, "咖啡店有 10 轮光顾");
 ok(scene("cafe").items.length >= 46, "咖啡店词汇量 46+（实际 " + scene("cafe").items.length + "）");
 ok(cafeVisits.every(v => v.steps.every(st => st.options.filter(o => o.ok).length === 1)), "咖啡店每步恰好 1 个正确选项");
 ok(cafeVisits.every(v => v.steps.every(st => st.npcLines && st.npcLines.length >= 2)), "咖啡店每步店员台词有 2+ 个随机变体");

@@ -1,0 +1,11 @@
+// cafe v9-v10 追加词条（职场线新词）
+[
+  { id: "oatmilk",   en: "oat milk",     zh: "燕麦奶",   phon: "/əʊt mɪlk/",     emoji: "🌾", sent: "Oat milk steams beautifully." },
+  { id: "decaf",     en: "decaf",        zh: "低因咖啡", phon: "/ˈdiːkæf/",      emoji: "😴", sent: "Decaf after six p.m., please." },
+  { id: "halfcaf",   en: "half-caf",     zh: "半因咖啡", phon: "/ˌhɑːf ˈkæf/",   emoji: "🌗", sent: "I'll take a half-caf latte." },
+  { id: "noroom",    en: "no room",      zh: "装满不留空间", phon: "/nəʊ ruːm/", emoji: "🫗", sent: "Americano, no room, please." },
+  { id: "repeater",  en: "repeat the order", zh: "复述订单", phon: "/rɪˈpiːt ði ˈɔːdə/", emoji: "🔁", sent: "Always repeat the order back." },
+  { id: "herbaltea", en: "herbal tea",   zh: "花草茶",   phon: "/ˈɜːbl tiː/",    emoji: "🌼", sent: "Herbal tea has no caffeine." },
+  { id: "caffeinefree", en: "caffeine-free", zh: "无咖啡因", phon: "/ˈkæfiːn friː/", emoji: "🚫☕", sent: "This one is completely caffeine-free." },
+  { id: "chamomile", en: "chamomile",    zh: "洋甘菊",   phon: "/ˈkæməmaɪl/",    emoji: "🌼", sent: "Chamomile helps you sleep." },
+]
