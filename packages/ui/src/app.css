@@ -161,7 +161,7 @@ html:root .taro_page {
 }
 
 /* 通用按钮（对齐原站 .btn：min-height 44, padding 8/14, font 14） */
-.btn { min-height: 44px; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); font-size: 14px; font-weight: 500; color: var(--ink); text-align: center; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; }
+.btn { min-height: 44px; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); font-size: 14px; font-weight: 400; color: var(--ink); text-align: center; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; }
 .btn-primary { background: var(--green); border-color: var(--green); color: #fff; }
 .btn-big { font-size: 16px; padding: 12px 26px; border-radius: 12px; }
 
