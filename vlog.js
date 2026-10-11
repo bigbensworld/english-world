@@ -785,7 +785,7 @@ function pgLoadIndex() {
 let pgAudioEl = null;
 // 停掉预生成音频（点单词/再听一次前调用，防整句朗读掩盖单词发音）
 function pgStopAudio() {
-  if (pgAudioEl) { try { pgAudioEl.pause(); } catch (e) { /* ignore */ } pgAudioEl = null; }
+  if (pgAudioEl) { try { pgAudioEl.pause(); pgAudioEl.currentTime = 0; } catch (e) { /* ignore */ } pgAudioEl = null; }
 }
 function pgPlay(key, onWordIndex, onEnd) {
   if (!PG_AUDIO || !PG_AUDIO[key]) return false;
@@ -794,6 +794,7 @@ function pgPlay(key, onWordIndex, onEnd) {
   if (pgAudioEl) { try { pgAudioEl.pause(); } catch (e) {} }
   if (window.__ttsFallback) { try { speechSynthesis.cancel(); } catch (e) {} }
   pgAudioEl = new Audio(src);
+  pgAudioEl.preload = "auto";
   pgAudioEl.play().catch(() => { if (onEnd) onEnd(); return; });
   let raf = null;
   const tick = () => {

@@ -79,8 +79,9 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
   const onWordClick = (raw: string) => {
     const clean = raw.toLowerCase().replace(/[^a-z'-]/g, "");
     if (!clean) return;
-    // 先停整句预生成 mp3（否则单词发音被整句朗读掩盖，用户听不见）
+    // 先停整句预生成 mp3；再听一次使用同一套 TTS 入口
     pgStop();
+    stopSpeak();
     speak(clean, 0.6);
     setWordDef({ word: raw, def: lookupWord(raw) });
   };
@@ -136,7 +137,13 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
               <View className="fp-title" style={{ color: "#2a2620" }}>🔤 {wordDef.word}</View>
               <View className="fp-sub" style={{ color: "#7d766b" }}>{wordDef.def || "📖 暂无内置释义，先听发音跟读吧"}</View>
               <View style={{ marginTop: 12, display: "flex", gap: 10 }}>
-                <View className="btn btn-primary" onClick={() => { pgStop(); speak(wordDef.word.toLowerCase(), 0.6); }}>🔊 再听一次</View>
+                <View className="btn btn-primary" onClick={() => {
+                  const clean = wordDef.word.toLowerCase().replace(/[^a-z'-]/g, "");
+                  if (!clean) return;
+                  pgStop();
+                  stopSpeak();
+                  speak(clean, 0.6);
+                }}>🔊 再听一次</View>
                 <View className="btn" onClick={() => setWordDef(null)}>关闭</View>
               </View>
             </View>

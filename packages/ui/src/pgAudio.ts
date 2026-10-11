@@ -26,7 +26,7 @@ export function pgLoadIndex(): Promise<Record<string, PgEntry> | null> {
 }
 
 export function pgStop() {
-  if (audioEl) { try { audioEl.pause(); } catch (e) { /* ignore */ } audioEl = null; }
+  if (audioEl) { try { audioEl.pause(); audioEl.currentTime = 0; } catch (e) { /* ignore */ } audioEl = null; }
 }
 
 // 播放预生成句子；返回 false = 无预生成（调用方降级 speak()）
@@ -35,6 +35,7 @@ export function pgPlay(key: string, onWordIndex: (i: number) => void, onEnd?: ()
   const entry = PG_INDEX[key];
   pgStop();
   audioEl = new Audio("audio/vlog/" + key + ".mp3");
+  audioEl.preload = "auto";
   audioEl.play().catch(() => { if (onEnd) onEnd(); });
   let raf = 0;
   const tick = () => {
