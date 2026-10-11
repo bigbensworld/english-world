@@ -24,6 +24,13 @@ export default defineConfig(async (merge) => {
     plugins: [],
     framework: "react",
     compiler: "webpack5",
+    // 静态资源：场景卡 Fluent Emoji 3D PNG。Taro 不会自动拷贝 src/static，需显式 copy。
+    copy: {
+      patterns: [
+        { from: "src/static/", to: "dist/static/" },
+      ],
+      options: {},
+    },
     alias: {
       "@english-world/core": path.resolve(CORE_DIR, "src", "index.ts"),
     },
@@ -31,9 +38,21 @@ export default defineConfig(async (merge) => {
       publicPath: "/",
       staticDirectory: "static",
       miniCssExtractPluginOption: { ignoreOrder: true },
+      // 关键：桌面端根字号上限 40px 会把按 375 稿写的样式整体放大 2 倍（原站是固定 px，桌面不缩放）
+      // 把上限压到基准字号 20px —— 桌面/真机一致按 375 稿渲染；宽度约束交给 max-width 容器
       postcss: {
         autoprefixer: { enable: true, config: {} },
         cssModules: { enable: false },
+        pxtransform: {
+          enable: true,
+          config: {
+            designWidth: 375,
+            deviceRatio: { 640: 2.34 / 2, 750: 1, 828: 1.81 / 2, 375: 2 },
+            baseFontSize: 20,
+            maxRootSize: 20,
+            minRootSize: 20,
+          },
+        },
       },
       webpackChain(chain) {
         includeCore(chain);

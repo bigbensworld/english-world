@@ -1,6 +1,6 @@
 // 首页：双 Tab（慢速生活 / 场景冒险）+ 场景地图 + vlog 列表
 import { useState, useMemo } from "react";
-import { View, Text } from "@tarojs/components";
+import { View, Text, Image } from "@tarojs/components";
 import { SCENES, VLOGS, sceneCardStatus, finishedVisits, sceneVisits } from "../../gameStore";
 import type { Scene, Vlog } from "@english-world/core";
 import ScenePage from "./scene";
@@ -38,48 +38,63 @@ export default function Index() {
 
   return (
     <View className="page-pad">
-      {/* 顶部品牌 + 学习进度 */}
+      {/* 顶部品牌栏 */}
       <View className="brand-bar">
-        <View className="brand-mark">🌍 <Text className="brand-zh">英语世界</Text><Text className="brand-en">English World</Text></View>
+        <View className="brand-mark">
+          <Text className="brand-globe">🌍</Text>
+          <Text className="brand-zh">英语世界</Text>
+          <Text className="brand-en">English World</Text>
+        </View>
         <View className="brand-stats">
-          <View className="brand-stat"><Text className="stat-value">{Object.keys(readSaveOnce().collected || {}).length}</Text><Text>词</Text></View>
-          <View className="brand-stat"><Text className="stat-value">{Object.keys(readSaveOnce().phrases || {}).length}</Text><Text>表达</Text></View>
-          <View className="quick-action" onClick={() => setView({ kind: "book" })}>📚</View>
+          <View className="brand-stat"><Text className="stat-ico">📖</Text><Text className="stat-value">{Object.keys(readSaveOnce().collected || {}).length}</Text><Text className="stat-label">词</Text></View>
+          <View className="brand-stat"><Text className="stat-ico">💬</Text><Text className="stat-value">{Object.keys(readSaveOnce().phrases || {}).length}</Text><Text className="stat-label">表达</Text></View>
+          <View className="brand-btn" onClick={() => setView({ kind: "book" })}>
+            <Text className="bb-ico">📚</Text><Text className="bb-text">词汇册</Text>
+          </View>
         </View>
       </View>
 
-      {/* 双 Tab */}
-      <View className="home-tabs">
-        <View className={`home-tab ${tab === "vlog" ? "active" : ""}`} onClick={() => setTab("vlog")}>📺 慢速生活</View>
-        <View className={`home-tab ${tab === "scenes" ? "active" : ""}`} onClick={() => setTab("scenes")}>🗺️ 场景冒险</View>
+      {/* 双 Tab：分段控件 */}
+      <View className="tabs-wrap">
+        <View className="home-tabs">
+          <View className={`home-tab ${tab === "vlog" ? "active" : ""}`} onClick={() => setTab("vlog")}>📺 慢速生活</View>
+          <View className={`home-tab ${tab === "scenes" ? "active" : ""}`} onClick={() => setTab("scenes")}>🗺️ 场景冒险</View>
+        </View>
       </View>
 
       {tab === "vlog" ? (
         <View className="home-pane">
           <View className="hero">
-            <View className="map-title">不敢开口？<br/>先从你每天都会遇到的英语开始</View>
-            <View className="map-sub">像刷视频一样，听懂日常英语。<br/>5 分钟一集，慢速朗读，逐词跟读。</View>
-            <View className="path-steps">
-              <View className="path-step"><Text className="ps-num">1</Text><View><View className="ps-b">先听懂</View><View className="ps-s">慢速 vlog</View></View></View>
-              <View className="path-arrow">→</View>
-              <View className="path-step"><Text className="ps-num">2</Text><View><View className="ps-b">再开口</View><View className="ps-s">场景对话</View></View></View>
-              <View className="path-arrow">→</View>
-              <View className="path-step"><Text className="ps-num">3</Text><View><View className="ps-b">反复练</View><View className="ps-s">词汇册</View></View></View>
+            <View className="map-title">不敢开口？先从你每天都会遇到的英语开始</View>
+            <View className="map-sub">像刷视频一样，听懂日常英语<br/>5 分钟一集，慢速朗读，逐词跟读</View>
+            <View className="learn-path">
+              <View className="lp-step lp-current">① 先听懂</View>
+              <Text className="lp-arrow">→</Text>
+              <View className="lp-step">② 再开口</View>
+              <Text className="lp-arrow">→</Text>
+              <View className="lp-step">③ 反复练</View>
             </View>
           </View>
+
           <View className="vlog-list">
-            {VLOGS.map((v) => (
-              <View key={v.id} className="vlog-set" onClick={() => setView({ kind: "vlog", vlog: v })}>
-                <View className="vs-emoji">{v.emoji}</View>
-                <View className="vs-body">
-                  <View className="vs-title">{v.title} · {v.titleZh}</View>
-                  <View className="vs-desc">{v.desc}</View>
-                  <View className="vs-meta">▶ {v.cards.length} 张卡片</View>
+            {VLOGS.map((v) => {
+              const seen = readSaveOnce().vlogSeen || {};
+              const done = v.cards.filter((_c, i) => seen[`${v.id}:${i}`]).length;
+              const passed = v.cards.every((_c, i) => seen[`${v.id}:${i}`]);
+              return (
+                <View key={v.id} className={`vlog-set ${passed ? "passed" : ""}`} onClick={() => setView({ kind: "vlog", vlog: v })}>
+                  <View className="vs-art"><Text className="vs-emoji">{v.emoji}</Text></View>
+                  <View className="vs-info">
+                    <View className="vs-title">{v.title} · {v.titleZh}</View>
+                    <View className="vs-desc">{v.desc}</View>
+                    <View className="vs-meta">{done > 0 ? `已看 ${done}/${v.cards.length} 张卡片` : `▶ ${v.cards.length} 张卡片`}</View>
+                  </View>
+                  <Text className="vs-chevron">›</Text>
                 </View>
-              </View>
-            ))}
+              );
+            })}
             <View className="path-next">
-              <View className="path-next-text">🎧 听懂之后？去真实场景里说出第一句</View>
+              <View className="path-next-text">🎧 听懂之后？去真实场景里<b>说出第一句</b></View>
               <View className="btn btn-primary btn-big" onClick={() => setTab("scenes")}>🗺️ 进入场景冒险</View>
             </View>
           </View>
@@ -94,16 +109,20 @@ export default function Index() {
           {groups.map((g) => (
             <View key={g.id}>
               <View className="scene-group-head">
-                <View className="scene-group-title">{g.title}</View>
-                <View className="scene-group-sub">{g.sub} · {g.list.length} 个场景</View>
+                <View className="scene-group-title">{g.title}<Text className="scene-group-count">{g.list.length} 个场景</Text></View>
+                <View className="scene-group-sub">{g.sub}</View>
               </View>
               <View className="scene-grid">
                 {g.list.map((sc) => (
                   <View key={sc.id} className="scene-card" onClick={() => setView({ kind: "scene", scene: sc })}>
-                    <View className="sc-cover">{sc.cover || sc.emoji}</View>
+                    <View
+                      className="sc-cover"
+                      style={{ background: sc.accentSoft ? `linear-gradient(165deg, ${sc.accentSoft}, #fdfcfa)` : undefined }}
+                    >
+                      <SceneArt scene={sc} />
+                    </View>
                     <View className="sc-info">
-                      <View className="sc-name">{sc.emoji} {sc.name}</View>
-                      <View className="sc-name-en">{sc.nameEn}</View>
+                      <View className="sc-name">{sc.name} · {sc.nameEn}</View>
                       <View className="sc-status">{sceneCardStatus(stateOf(sc), sc)}</View>
                     </View>
                   </View>
@@ -116,6 +135,29 @@ export default function Index() {
       )}
     </View>
   );
+}
+
+// 场景封面图标：优先 Fluent Emoji 3D PNG（对齐原站 iconHtml），加载失败降级为 emoji
+const ICON_IDS = new Set([
+  "coffee", "menu", "cart", "hotel", "airport", "hospital", "transport",
+  "bank", "barber", "gym", "shopping", "postbox", "books", "paw", "school",
+]);
+
+function SceneArt({ scene }: { scene: Scene }) {
+  const iconId = (scene as any).iconId || scene.id;
+  const [failed, setFailed] = useState(false);
+  const hasIcon = ICON_IDS.has(iconId) && !failed;
+  if (hasIcon) {
+    return (
+      <Image
+        className="sc-img"
+        src={`/static/icons/${iconId}.png`}
+        mode="aspectFit"
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+  return <Text className="sc-art">{scene.emoji}</Text>;
 }
 
 // sceneCardStatus 需要 GameState：走跨端统一读档（不直接依赖 localStorage）
