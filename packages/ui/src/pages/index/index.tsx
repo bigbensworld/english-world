@@ -10,9 +10,9 @@ import VlogPage from "./vlog";
 import BookPage from "./book";
 
 const SCENE_GROUPS = [
-  { id: "daily", title: "🏠 日常高频", sub: "Daily Life · 天天都用得上的英语", scenes: ["cafe", "restaurant", "market", "transport", "barber", "gym", "shopping", "vet", "bookstore", "dryclean", "optician"] },
+  { id: "daily", title: "🏠 日常高频", sub: "Daily Life · 天天都用得上的英语", scenes: ["cafe", "restaurant", "market", "transport", "barber", "gym", "shopping", "vet", "bookstore", "dryclean", "optician", "communitycenter"] },
   { id: "travel", title: "✈️ 旅行出行", sub: "Travel · 机场酒店租车一手搞定", scenes: ["airport", "hotel", "carrental"] },
-  { id: "emergency", title: "🚑 应急保障", sub: "Essentials · 医院药店银行邮局关键时刻", scenes: ["hospital", "drugstore", "bank", "postoffice", "taxoffice", "phonestore"] },
+  { id: "emergency", title: "🚑 应急保障", sub: "Essentials · 医院药店银行邮局关键时刻", scenes: ["hospital", "drugstore", "bank", "postoffice", "taxoffice", "phonestore", "petboarding", "photostudio"] },
   { id: "campus", title: "🎓 校园生活", sub: "Campus · 图书馆学校新生必备", scenes: ["library", "school"] },
 ];
 

@@ -1,0 +1,260 @@
+    {
+      id: "v3",
+      title: "第 3 次光顾 · 接宠汇报",
+      titleEn: "Pickup Debrief",
+      emoji: "📸",
+      desc: "出差回来接 Mochi！听每日报告、结算账单、加购洗护——重逢时刻与接宠流程。",
+      reward: { en: "daily report", zh: "重逢了！Mochi 过得很快乐！📸" },
+      steps: [
+        {
+          npcLines: [
+            "Mochi's human returns! He's been the suite favorite all week — wait till you hear about his week!",
+            "The traveler is back! Mochi ruled the roost here — the debrief is going to be good!",
+            "Welcome home! Your dog became royalty while you were gone — prepare for the full report!",
+          ],
+          npcZh: "Mochi 的主人回来了！他这一周可是套房红人——听我说说他这周的表现吧！",
+          task: "先要狗狗，再听汇报",
+          options: [
+            { text: "Where's my boy?! Okay okay — I'm listening. How was his week?", ok: true,  tip: "先要娃再听汇报——真实家长反应" },
+            { text: "REPORT SECOND! DOG FIRST! WHERE IS HE! SHOW DOG!",              ok: false, tip: "先看后听：Where's my boy — how was his week?" },
+            { text: "Report first. Business mode. No emotions. (Where is he though?)", ok: false, tip: "人之常情：Where's my boy — I'm listening!" },
+          ],
+          phrase: { en: "Where's my boy?", zh: "我家小伙在哪儿？", note: "my boy 我家孩子（宠物家长口吻）；重逢第一句" },
+        },
+        {
+          npcLines: [
+            "He's getting his goodbye belly rub from Maria — one minute! Meanwhile: he played in the big-dog group by day three, napped like a champion, and demanded forty-seven belly rubs total.",
+            "Maria's administering the farewell belly rub — momentarily! Highlights: big-dog group by Wednesday, champion napper, and a final count of forty-seven belly rubs demanded.",
+            "He's saying bye to Maria — belly rub in progress! Weekly report: promoted to big-dog playgroup, elite napper, and forty-seven belly rubs logged!",
+          ],
+          npcZh: "Maria 正给他做告别摸肚——稍等！汇报：第三天就进了大狗组，午睡冠军，总共要求了 47 次摸肚皮。",
+          task: "对 47 次摸肚表示不意外",
+          options: [
+            { text: "Forty-seven?! That sounds exactly like him — at home we lose count by ten.", ok: true,  tip: "we lose count by ten 到十就数不过来——会心一笑的细节" },
+            { text: "Forty-seven! Professional numbers! Belly athlete! Olympic rubbing!",         ok: false, tip: "会心回应：That sounds exactly like him — we lose count at home" },
+            { text: "Only forty-seven? He is lazy. Home is hundred daily. Weak effort.",         ok: false, tip: "亲切共鸣：That sounds exactly like him!" },
+          ],
+          phrase: { en: "That sounds exactly like him.", zh: "这太像他了。", note: "exactly like 一模一样；听汇报时的认同句" },
+        },
+        {
+          npcLines: [
+            "The belly-rub connoisseur! One note from Maria: he was a bit hesitant at bedtime on night one — the blanket helped a lot. By night two, out like a light!",
+            "A true belly scholar! Maria's one note: night-one bedtime wobbles, blanket saved the day. Night two? Sleeping like a rock!",
+            "Belly sommelier! Only note: shaky first bedtime — your blanket worked magic. From night two on, instant lights-out!",
+          ],
+          npcZh: "摸肚品鉴大师！Maria 有条记录：第一晚睡前有点犹豫——毯子帮了大忙。第二晚就秒睡了！",
+          task: "欣慰毯子起作用了",
+          options: [
+            { text: "I'm so glad the blanket helped — thanks for mirroring his home routine. Did he eat well?", ok: true,  tip: "mirror his home routine 呼应之前的交代——闭环确认" },
+            { text: "Blanket power! Smell magic! Home smell wins again!",                                       ok: false, tip: "闭环确认+继续问：Glad the blanket helped — did he eat well?" },
+            { text: "Night one sad? Heart broken! Cancel all future trips! Never leave again!",                ok: false, tip: "专业关切：Did he eat well?" },
+          ],
+          phrase: { en: "I'm so glad it helped.", zh: "真高兴它起作用了。", note: "so glad 非常欣慰；听到好消息的回应" },
+        },
+        {
+          npcLines: [
+            "Ate everything — salmon only, as instructed, zero chicken incidents! Now, the bill: five nights suite at sixty-five is three twenty-five, plus... we added a complimentary bath and brush for his homecoming. On the house!",
+            "Clean plate club every meal — salmon strict, chicken never touched! The total: five suite nights, three twenty-five... plus a complimentary homecoming bath and brush. Our treat!",
+            "Every bowl emptied, salmon protocol maintained, chicken crisis avoided! Bill: five nights, three twenty-five — and the homecoming bath and brush is free. Welcome-home gift!",
+          ],
+          npcZh: "顿顿光盘——严格三文鱼，零鸡肉事故！账单：五晚套房 325，另外……我们送了免费洗护作为回家礼。店里请客！",
+          task: "惊喜于免费洗护，确认无其他费用",
+          options: [
+            { text: "A complimentary bath — he'll come home fluffy! So the total is exactly three twenty-five, no other charges?", ok: true,  tip: "复述总价 + 确认无隐藏费——结账双确认" },
+            { text: "Free bath! Clean dog! Bargain of century! What is catch? Hidden fees? Speak!",                                 ok: false, tip: "结账确认：The total is three twenty-five, no other charges?" },
+            { text: "Three twenty-five?! Discount for handsome dog? Dog discount rate? Ask nicely?",                               ok: false, tip: "常规确认：No other charges beyond three twenty-five?" },
+          ],
+          phrase: { en: "Any other charges?", zh: "还有其他费用吗？", note: "结账防坑的最后一问；charges 费用" },
+          adds: [{ emoji: "🛁", label: "Bath & brush", wordId: "pb-bath2" }],
+        },
+        {
+          npcLines: [
+            "Three twenty-five, that's everything! Here he comes — freshly fluffed and furious about it. Ready?",
+            "Three twenty-five flat, nothing more! And here comes the fluff himself — displeased with the bath, delighted to see you!",
+            "Exactly three twenty-five, sealed and done! Ah — incoming! One freshly fluffed, deeply offended gentleman!",
+          ],
+          npcZh: "就 325，没别的！他来了——刚吹毛完毕还一脸不爽。准备好了吗？",
+          task: "重逢时刻",
+          options: [
+            { text: "Mochi! My boy! Did you demand enough belly rubs this week? Let's go home, buddy.", ok: true,  tip: "对狗说话的语气——英文里的 pet parent talk" },
+            { text: "MY BABY! MY FLUFF! LANGUAGE OF LOVE! HUMAN SPEAKING DOG NOW!",                   ok: false, tip: "自然重逢：My boy! Let's go home, buddy" },
+            { text: "Stay professional. Nod at dog. Handshake with dog. Business dog.",               ok: false, tip: "温柔呼唤：Mochi! Let's go home, buddy" },
+          ],
+          phrase: { en: "Let's go home, buddy.", zh: "我们回家吧，伙计。", note: "buddy 伙计；对宠物说话的高频爱称" },
+        },
+      ],
+    },
+    {
+      id: "v4",
+      title: "第 4 次光顾 · 特殊需求",
+      titleEn: "Special Needs",
+      emoji: "💊",
+      desc: "Mochi 要吃药了！带药寄养、喂药流程、紧急联系——特殊需求的托付不能含糊。",
+      reward: { en: "medication", zh: "你把用药安排得明明白白！💊" },
+      steps: [
+        {
+          npcLines: [
+            "Mochi and his favorite human! What's on the agenda — daycare, boarding, or just visiting friends?",
+            "The dynamic duo returns! Daycare, boarding, or social call today?",
+            "Hello, you two! What's the plan — play day, sleepover, or just saying hi?",
+          ],
+          npcZh: "Mochi 和他最爱的主人！今天安排什么——日托、寄养还是来看朋友？",
+          task: "说明需要寄养三天，但狗狗这次要吃药",
+          options: [
+            { text: "Boarding for three days — but this time there's a twist: he's on medication now. I want to make sure that's handled properly.", ok: true,  tip: "there's a twist 有变数——升级需求的引入" },
+            { text: "Three days! But drugs now! Dog drugs! Legal dog drugs! Handle drugs!",                                                          ok: false, tip: "严肃说明：He's on medication — I want it handled properly" },
+            { text: "Boarding plus medicine situation. Dog now pharmaceutical dog. Complex dog.",                                                    ok: false, tip: "清晰提出：He's on medication — can you handle that?" },
+          ],
+          phrase: { en: "He's on medication.", zh: "他在服药。", note: "on medication 在服药中；be on + 药物是固定搭配" },
+        },
+        {
+          npcLines: [
+            "Medication is no problem — we administer meds daily! What's he taking, and what's the schedule?",
+            "We handle meds all the time! What are we giving, and when?",
+            "Medication is bread and butter for us! Details please — what and when?",
+          ],
+          npcZh: "药物完全没问题——我们每天都在喂药！他在吃什么药，什么时间？",
+          task: "说明药物细节（早晚餐后各一片）",
+          options: [
+            { text: "It's one tablet after breakfast and one after dinner — the vet said with food, never on an empty stomach.", ok: true,  tip: "with food 随餐 + on an empty stomach 空腹——喂药关键细节" },
+            { text: "Morning pill! Night pill! Food required! Empty stomach forbidden! Pill rules!",                             ok: false, tip: "细节交代：One after breakfast, one after dinner — always with food" },
+            { text: "Pills? He hides pills. Pill ninja. Check dog mouth carefully.",                                            ok: false, tip: "核心信息：One tablet twice a day, always with food" },
+          ],
+          phrase: { en: "With food, never on an empty stomach.", zh: "随餐服，绝不空腹。", note: "empty stomach 空腹；喂药/服药的双向规则" },
+          adds: [{ emoji: "💊", label: "Meds routine", wordId: "pb-medication" }],
+        },
+        {
+          npcLines: [
+            "Noted — twice daily with meals. Now the important part: who's your emergency contact if something comes up? Vet first, or you?",
+            "Twice daily, with food, locked in! Critical next step: emergency contact order — vet first or you first?",
+            "Twice a day with meals — perfect clarity! Now the big question: in an emergency, do we call you or the vet first?",
+          ],
+          npcZh: "记下——每天两次随餐。重要的部分：紧急情况联系谁？先找兽医还是先找你？",
+          task: "给出明确的紧急联系顺序",
+          options: [
+            { text: "Call me first — I'm reachable anytime. If you can't reach me within ten minutes, go straight to the vet, and here's the vet's number.", ok: true, tip: "call me first + 时间阈值 + 兜底方案——应急预案范本" },
+            { text: "Vet first! No wait, me first! No, vet! You decide! Panic hierarchy!",                                                                    ok: false, tip: "预案清晰：Call me first — if unreachable in ten minutes, go to the vet" },
+            { text: "Emergency? No emergencies. Positive vibes only. Dog immortal.",                                                                         ok: false, tip: "明确预案：Me first, then the vet — here's the number" },
+          ],
+          phrase: { en: "Call me first.", zh: "先打给我。", note: "emergency contact 紧急联系人；预案顺序要明确" },
+        },
+        {
+          npcLines: [
+            "Perfect protocol — you're a pro. I'll note it all on his chart. Do you have the medication with you, in the original bottle?",
+            "Textbook emergency planning! Chart's getting updated. Meds with you? Original packaging is ideal.",
+            "A professional pet parent! Chart updated! Now — the medication itself? Original bottle, please!",
+          ],
+          npcZh: "预案完美——你是行家。我都记到他的档案上。药带了吗？要原装药瓶。",
+          task: "出示原装药瓶并问记录方式",
+          options: [
+            { text: "Original bottle right here, with the label. Will you log each dose you give him?", ok: true,  tip: "log each dose 记录每次剂量——用药追踪意识" },
+            { text: "Bottle! Original! Label intact! Fancy pill home! Log doses yes?",                  ok: false, tip: "专业追问：Will you log each dose you give?" },
+            { text: "No logging needed. Trust the system. Blind faith pharmaceutical care.",            ok: false, tip: "用药追踪：Will you log each dose?" },
+          ],
+          phrase: { en: "Will you log each dose?", zh: "每次给药都会记录吗？", note: "log 记录；dose 剂量——药物安全的关键词" },
+        },
+        {
+          npcLines: [
+            "Every dose, logged and initialed — you'll see it all in the pickup report. Now, is there anything else that would make his stay easier?",
+            "Dose log, initialed, included in the report! Anything else to make his stay smoother?",
+            "Logged and initialed per dose, all in the report! Final requests for his comfort?",
+          ],
+          npcZh: "每次都记录并签名——接宠报告里全都有。还有什么能让他住得更舒服的吗？",
+          task: "交代分离焦虑的安抚技巧",
+          options: [
+            { text: "One more: he has mild separation anxiety at night. The blanket helps, and Maria's belly rubs — you know his weaknesses!", ok: true,  tip: "you know his weaknesses 你们懂他的软肋——熟悉的信任感" },
+            { text: "Night sadness! Blanket medicine! Maria belly magic! You know drill!",                                                   ok: false, tip: "信任委托：The blanket helps, and you know his weaknesses!" },
+            { text: "Anxiety? Which dog? Not my dog. My dog perfect. (Blanket though.)",                                                     ok: false, tip: "如实交代：Mild separation anxiety — the blanket and belly rubs help" },
+          ],
+          phrase: { en: "You know his weaknesses.", zh: "你们懂他的软肋。", note: "weakness 弱点；老客户的默契表达" },
+        },
+      ],
+    },
+    {
+      id: "v5",
+      title: "第 5 次光顾 · 长期寄养",
+      titleEn: "The Long Stay",
+      emoji: "🏕️",
+      desc: "要回国两个月！狗狗夏令营长期寄养：折扣方案、探视安排、回国接宠——最长情的托付。",
+      reward: { en: "camp", zh: "两个月的安排妥妥的！🏕️" },
+      steps: [
+        {
+          npcLines: [
+            "You've got that serious-face on again. Big trip? How can we help?",
+            "The planning face is back! What's the occasion — and how long this time?",
+            "Serious face detected! Big plans brewing? Talk to us!",
+          ],
+          npcZh: "你又是那副严肃脸。大行程？我们怎么帮你？",
+          task: "说明要回国两个月",
+          options: [
+            { text: "Big one this time — I'm going home to China for two months. Mochi needs a long stay.", ok: true,  tip: "a long stay 长住——寄养的终极形态" },
+            { text: "Two months! Home country! Dog situation! Long dog situation!",                         ok: false, tip: "正式说明：I'm going home for two months — he needs a long stay" },
+            { text: "Short question. Two months. Dog. Go. Now panic together.",                            ok: false, tip: "清晰陈述：He needs a long stay — two months" },
+          ],
+          phrase: { en: "He needs a long stay.", zh: "他需要长住。", note: "long stay 长期寄养；时间跨度决定方案" },
+        },
+        {
+          npcLines: [
+            "Two months — that's our summer camp package! Long-stay guests get ten percent off, plus weekly photo updates and one free grooming. Interested in the details?",
+            "Two months is camp territory! Long-stay perks: ten percent discount, weekly photo digests, one complimentary grooming. Want the full breakdown?",
+            "That's a summer-camp-length stay! Long-term perks kick in: ten percent off, weekly photo albums, free grooming session. Details?",
+          ],
+          npcZh: "两个月——那是我们的夏令营套餐！长住客人享九折，每周照片更新，免费美容一次。要听详情吗？",
+          task: "询问折扣后总价和能否探视",
+          options: [
+            { text: "Yes to details! And one big question — can I visit him before I leave, and video-call during the two months?", ok: true,  tip: "visit + video-call 探视双保险——长期分离的刚需" },
+            { text: "Discount math! Visit yes! Video yes! All yes! Numbers now!",                                                   ok: false, tip: "探视询问：Can I visit before I leave, and video-call during the stay?" },
+            { text: "Visit dog? See dog face? Dog screen time? Need dog FaceTime!",                                                 ok: false, tip: "关键需求：Can I visit, and video-call during the two months?" },
+          ],
+          phrase: { en: "Can I visit him?", zh: "我能来看他吗？", note: "visit 探视；长期寄养的情感刚需" },
+        },
+        {
+          npcLines: [
+            "Visits and video calls — absolutely! Weekends are visiting hours, and we can schedule a video call with Maria any time. The camp rate comes to about fifty-two dollars a night after the discount.",
+            "Both allowed, always! Weekend visiting hours, and Maria video calls on request! Camp rate: roughly fifty-two nightly, discount applied.",
+            "Visit anytime on weekends, video calls whenever you miss him! Camp pricing: about fifty-two a night, ten percent already off!",
+          ],
+          npcZh: "探视和视频都可以！周末是探视时间，随时可以约 Maria 视频。折扣后营地价约每晚 52 美元。",
+          task: "算总账并确认预订",
+          options: [
+            { text: "Two months at fifty-two — that's about three thousand one hundred. A big number, but he's worth every penny. Let's book it.", ok: true,  tip: "算总账 + worth every penny 值每一分钱——价值确认" },
+            { text: "Three thousand?! Dog is gold dog! Golden investment! Dog stock rising!",                                                      ok: false, tip: "算账+拍板：About three thousand — he's worth every penny. Let's book it" },
+            { text: "Cheaper? Dog sleeps outside? Tent dog? Backyard budget option?",                                                             ok: false, tip: "价值判断：Worth every penny — let's book it" },
+          ],
+          phrase: { en: "He's worth every penny.", zh: "他值每一分钱。", note: "worth every penny 一分钱都不亏；为爱消费的宣言" },
+          adds: [{ emoji: "🏕️", label: "Summer camp", wordId: "pb-cam" }],
+        },
+        {
+          npcLines: [
+            "He really is! Now, since it's two months — mid-stay, we'd suggest a vet checkup around week four, just to keep everything documented. Can we take him to your vet on file?",
+            "Agreed, priceless! For two-month stays, we recommend a week-four vet visit — documentation matters. Shall we use his regular vet?",
+            "Priceless indeed! Protocol for long stays: a week-four vet check, all documented. His usual vet on file?",
+          ],
+          npcZh: "他确实是！既然是两个月——中途第 4 周左右我们建议做一次兽医体检，做好记录。可以去他档案里的常驻兽医吗？",
+          task: "同意并补充细节",
+          options: [
+            { text: "Yes, use our regular vet — and if anything comes up, big or small, just call me. Time zones are no excuse, I'll answer.", ok: true,  tip: "time zones are no excuse 时区不是借口——责任心金句" },
+            { text: "Vet yes! Call always! China hours awake! Dog emergency radar on!",                                                       ok: false, tip: "郑重交代：Call me anytime — time zones are no excuse" },
+            { text: "Vet visit? Week four? Calendar precision. Impressive operation. Approved.",                                              ok: false, tip: "关键交代：Call me for anything — I'll answer any hour" },
+          ],
+          phrase: { en: "Time zones are no excuse.", zh: "时区不是借口。", note: "no excuse 不构成理由；跨国托付的责任宣言" },
+        },
+        {
+          npcLines: [
+            "That's dedication! Everything's set: suite, camp rate, med schedule, vet check, video calls. You've thought of everything — he's lucky to have you.",
+            "Now that's a pet parent! Suite, camp rate, meds, week-four vet visit, video calls — airtight planning. He's one lucky pup!",
+            "Dedication level: maximum! Suite booked, rate locked, meds logged, vet scheduled, calls arranged. You've left nothing to chance — lucky dog!",
+          ],
+          npcZh: "这叫尽心尽力！全部安排好了：套房、营地价、喂药、兽医体检、视频通话。你什么都想到了——他很幸运有你。",
+          task: "谦虚回应并约定回国第一件事",
+          options: [
+            { text: "We're lucky to have each other. See you in two months — the first thing I do off the plane is picking him up!", ok: true,  tip: "the first thing I do off the plane 落地第一件事——爱的收尾" },
+            { text: "Airport to dog! Direct route! No home stop! Dog priority landing!",                                             ok: false, tip: "温情收尾：The first thing off the plane is picking him up!" },
+            { text: "Two months. Dog math: fourteen dog months. Guilt exponential. Missing starts now.",                             ok: false, tip: "爱的承诺：See you in two months — picking him up first!" },
+          ],
+          phrase: { en: "The first thing I'll do is ___.", zh: "我要做的第一件事是……", note: "the first thing... 优先级宣言；表达重视的句式" },
+        },
+      ],
+    },
+  ],
+},

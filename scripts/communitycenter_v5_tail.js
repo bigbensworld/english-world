@@ -1,0 +1,260 @@
+    {
+      id: "v3",
+      title: "第 3 次光顾 · 订场风波",
+      titleEn: "Court Booking Trouble",
+      emoji: "🏸",
+      desc: "约朋友打羽毛球，到了却发现场地被人占了！订场系统、冲突处理、取消政策——场地纠纷现场课。",
+      reward: { en: "book a court", zh: "你解决了场地纠纷拿下球场！🏸" },
+      steps: [
+        {
+          npcLines: [
+            "Oh — hi! You look confused. Court three is yours, right? There's... a situation.",
+            "Hey! You've got the confused face. Court three booking, yes? There's a small... situation.",
+            "Ah, good timing actually — sort of. Court three? Yours? So, there's a situation brewing.",
+          ],
+          npcZh: "哦——你好！你看起来很困惑。3 号场是你的对吧？现在有个……情况。",
+          task: "询问什么情况",
+          options: [
+            { text: "What kind of situation? I booked this court for six p.m. — I have the confirmation.", ok: true,  tip: "I have the confirmation 我有确认凭证——纠纷第一张牌" },
+            { text: "Situation bad? Situation scary? Call situation police!",                             ok: false, tip: "亮出凭证：I booked this court — I have the confirmation" },
+            { text: "My court! My precious court! Give court! Rawr!",                                      ok: false, tip: "冷静出示：What kind of situation? I have the booking confirmation" },
+          ],
+          phrase: { en: "I have the confirmation.", zh: "我有预约确认。", note: "confirmation 确认凭证；一切预订纠纷的底牌" },
+        },
+        {
+          npcLines: [
+            "The badminton group before you ran over — they're in a tournament playoff and refusing to leave. The system shows your booking, but they won't budge.",
+            "The group ahead is running long — mid-playoff, they say, and refusing to wrap up. Your booking is in the system, but they're not moving.",
+            "Previous group overstayed — some playoff thing, and they're digging in. The court's legally yours, but they're planted like trees.",
+          ],
+          npcZh: "前一组的羽毛球团体超时了——他们在打锦标赛决赛不肯走。系统显示是你的预订，但他们不让。",
+          task: "要求工作人员去协调",
+          options: [
+            { text: "Can you talk to them? My friends and I booked this slot, and we'd like our full hour.", ok: true,  tip: "请求协调 + 强调完整权益——礼貌而坚定" },
+            { text: "You talk. I hide. Conflict scary. You brave staff person.",                           ok: false, tip: "礼貌施压：Can you talk to them? We'd like our full hour" },
+            { text: "I fight them! Racket duel! Winner takes court! Old ways!",                            ok: false, tip: "正规途径：Can you talk to them for us?" },
+          ],
+          phrase: { en: "We'd like our full hour.", zh: "我们想要完整的（预订）时间。", note: "would like 委婉但坚定；维权时不含糊" },
+        },
+        {
+          npcLines: [
+            "Absolutely — this is exactly what I'm here for. Give me two minutes... [later] They're finishing this rally and clearing out. Apologies for the delay!",
+            "On it — that's my whole job! Two minutes, please... [later] They'll finish this point and pack up. Sorry for the holdup!",
+            "Say no more — supervisor mode activated! [two minutes later] Final rally, then they're gone. My apologies for the wait!",
+          ],
+          npcZh: "当然——这正是我的工作。给我两分钟……（稍后）他们打完这个球就撤。抱歉耽误了！",
+          task: "感谢处理，询问损失的时间怎么算",
+          options: [
+            { text: "Thank you! Since we lost fifteen minutes, could our booking be extended accordingly?", ok: true, tip: "extended accordingly 相应延长——损失补偿的标准句" },
+            { text: "Fifteen minutes gone! Refund fifteen minutes! Time money! Pay me!",                   ok: false, tip: "请求补偿：Could our booking be extended accordingly?" },
+            { text: "It's fine! Free time gift to badminton strangers! Charity hour!",                     ok: false, tip: "合理诉求：Could we be extended for the lost time?" },
+          ],
+          phrase: { en: "Could our booking be extended?", zh: "我们的预订能延长吗？", note: "extend 延长；损失时间补偿的万能句" },
+        },
+        {
+          npcLines: [
+            "Already done — I pushed your slot to seven-thirty, no charge. And for the inconvenience: two guest passes for your friends, so they don't need day passes next time.",
+            "Handled — your court now runs till seven-thirty, free. Plus, two guest passes for your group — future visits on the house!",
+            "Beat you to it — extended to seven-thirty, zero fees. And here: two guest passes, because inconvenience deserves compensation!",
+          ],
+          npcZh: "已经办了——你的场地延长到 7 点半，不收费。为表歉意：送你朋友两张访客券，下次不用买日票了。",
+          task: "对补偿方案表示满意",
+          options: [
+            { text: "Extended time plus guest passes — that's more than fair. Thank you for handling it so smoothly!", ok: true,  tip: "more than fair 超出公平——对补偿的认可" },
+            { text: "Guest passes! Free passes! Compensations rain! Nature is healing!",                             ok: false, tip: "满意确认：That's more than fair — thank you!" },
+            { text: "Also compensation for feelings. Emotional invoice. Pain and suffering.",                        ok: false, tip: "体面接受：Thank you for handling it so smoothly!" },
+          ],
+          phrase: { en: "That's more than fair.", zh: "这不止是公平了。", note: "more than 超出；对超额补偿的欣赏" },
+          adds: [{ emoji: "🏸", label: "Court secured", wordId: "cc-court" }],
+        },
+        {
+          npcLines: [
+            "Enjoy your game! Oh — one more thing: you can book two weeks ahead in the app. The weekend courts vanish by Wednesday!",
+            "Have a great match! Quick pro tip: the app opens bookings two weeks out — weekend slots are history by Wednesday!",
+            "Game on! Pro tip: app bookings unlock two weeks early. Weekends? Gone by hump day!",
+          ],
+          npcZh: "享受比赛！对了——你可以在 App 里提前两周订场。周末的场地到周三就没了！",
+          task: "记下建议，顺便了解取消政策",
+          options: [
+            { text: "Good to know — and what's the cancellation policy, in case something comes up?", ok: true,  tip: "in case something comes up 万一有事——取消政策前置了解" },
+            { text: "Cancel policy? I never cancel! I am booking machine! Cancel never!",            ok: false, tip: "未雨绸缪：What's the cancellation policy?" },
+            { text: "Wednesday deadline noted. Calendar alarm set. Panic scheduling achieved.",      ok: false, tip: "问取消规则：What's the cancellation policy?" },
+          ],
+          phrase: { en: "What's the cancellation policy?", zh: "取消政策是什么？", note: "cancellation policy 取消政策；订场订课订酒店通用" },
+        },
+      ],
+    },
+    {
+      id: "v4",
+      title: "第 4 次光顾 · 农夫市集之夜",
+      titleEn: "Farmers Market",
+      emoji: "🥕",
+      desc: "周六社区中心变身农夫市集！认识摊主、买有机蔬菜、听现场音乐——社区生活最鲜活的一面。",
+      reward: { en: "farmers market", zh: "你逛透了社区农夫市集！🥕" },
+      steps: [
+        {
+          npcLines: [
+            "Welcome to the Saturday farmers market! First time? The tomatoes alone are worth the trip!",
+            "Happy Saturday! Farmers market day! New here? Fair warning — the tomatoes will ruin supermarket tomatoes for you forever!",
+            "Good morning! It's market day at the center! First visit? The produce speaks for itself!",
+          ],
+          npcZh: "欢迎来到周六农夫市集！第一次来吗？光西红柿就值回票价！",
+          task: "表示第一次来，问怎么逛最好",
+          options: [
+            { text: "First time! Any tips — should I walk the whole market first before buying?", ok: true,  tip: "walk the whole market first 先整体逛再买——市集老手的策略" },
+            { text: "Tips! Give all tips! Maximum tips! Tip overload!",                          ok: false, tip: "策略请教：Should I walk around first before buying?" },
+            { text: "I buy first thing I see. Impulse is lifestyle. Regret is spice.",          ok: false, tip: "聪明逛法：Any tips — walk the whole market first?" },
+          ],
+          phrase: { en: "Any tips?", zh: "有什么建议吗？", note: "tip 建议；新场景万能问句" },
+        },
+        {
+          npcLines: [
+            "Smart shopper! Do one loop first — see who has what. Then buy. The tomato lady is at stall four, the honey guy at stall nine. Go!",
+            "A strategist — I love it! One full loop, scout everything, then strike. Tomatoes: stall four. Honey: stall nine. Fly, you fool!",
+            "Circle first, purchase second — the ancient market wisdom! Tomatoes live at four, honey at nine. Godspeed!",
+          ],
+          npcZh: "聪明的 shopper！先绕一圈看谁家有什么，再买。西红柿大姐在 4 号摊，蜂蜜大哥在 9 号摊。去吧！",
+          task: "逛到西红柿摊，开启对话",
+          options: [
+            { text: "Hi! These tomatoes look incredible — are they heirloom varieties?", ok: true,  tip: "heirloom 遗传原种——市集行话，一开口就懂行" },
+            { text: "Tomato red! Red good! Big red circle fruit! Buy!",                 ok: false, tip: "懂行提问：Are these heirloom varieties?" },
+            { text: "Why your tomatoes better? Supermarket also has tomato. Same red.", ok: false, tip: "行家开场：These look incredible — heirloom varieties?" },
+          ],
+          phrase: { en: "They look incredible.", zh: "它们看起来太棒了。", note: "heirloom tomatoes 原种番茄——市集的品质担当" },
+        },
+        {
+          npcLines: [
+            "All heirloom, all picked yesterday! Try this one — the sungolds are candy, I swear. What else is on your list today?",
+            "Heirloom everything, picked at dawn yesterday! Taste a sungold — nature's candy, promise! What else are you hunting for?",
+            "Yesterday's harvest, heirloom through and through! Sample the sungold — it's basically dessert! What's on your shopping list?",
+          ],
+          npcZh: "全是原种，全是昨天摘的！尝尝这个——金太阳番茄就是糖果，我发誓。你今天还想买什么？",
+          task: "试吃后问蜂蜜摊的事",
+          options: [
+            { text: "You're right — that IS candy! Someone mentioned a honey guy at stall nine?", ok: true,  tip: "认可推荐 + 顺藤摸瓜——市集情报网" },
+            { text: "Candy accusation confirmed! Sugar tomato! Now honey! Where honey?!",         ok: false, tip: "自然追问：Someone mentioned the honey guy at stall nine?" },
+            { text: "Too sweet. Tomato suspicious. Tomato dessert imposter.",                     ok: false, tip: "顺势而为：That IS candy — where's the honey stall?" },
+          ],
+          phrase: { en: "You're right!", zh: "你说得对！", note: "试吃后认可推荐；摊主最爱的回应" },
+          adds: [{ emoji: "🍅", label: "Heirlooms", wordId: "cc-market" }],
+        },
+        {
+          npcLines: [
+            "That's Old Sam — tell him Rosa sent you and he'll give you the whipped honey sample!",
+            "Sam's the man! Tell him Rosa says hi — the whipped honey sample is yours!",
+            "Old Sam at nine! Drop my name — 'Rosa sent me' — and whipped honey appears like magic!",
+          ],
+          npcZh: "那是老 Sam——告诉他 Rosa 介绍的，他会给你打发的蜂蜜试吃！",
+          task: "到 9 号摊用暗号",
+          options: [
+            { text: "Hi Sam — Rosa sent me! I heard something about whipped honey?", ok: true,  tip: "X sent me 某某介绍的——市集社交货币" },
+            { text: "Rosa! Rosa name! Honey now! Secret honey code!",                ok: false, tip: "自然传递：Rosa sent me — I heard about whipped honey?" },
+            { text: "I know nothing of Rosa. I am honey stranger. Random honey man.", ok: false, tip: "传递引荐：Rosa sent me!" },
+          ],
+          phrase: { en: "___ sent me.", zh: "……介绍我来的。", note: "sent me 介绍我来；熟人网络的开门咒" },
+        },
+        {
+          npcLines: [
+            "Rosa's friend! Welcome! Here's the whipped cinnamon honey — tell me that's not life-changing. The blueberry's good too!",
+            "A friend of Rosa! Step right up! Whipped cinnamon honey — prepare for a transformation. Blueberry is nothing to sneeze at either!",
+            "Rosa's recommendation carries weight! Whipped cinnamon honey, coming at you — and don't sleep on the blueberry!",
+          ],
+          npcZh: "Rosa 的朋友！欢迎！这是肉桂打发蜂蜜——跟我说它不改变人生。蓝莓的也很棒！",
+          task: "两罐都买，完成市集首秀",
+          options: [
+            { text: "Life-changing confirmed — I'll take the cinnamon and the blueberry. What a first market day!", ok: true,  tip: "两罐决策 + 总结今日——市集圆满收官" },
+            { text: "Both honeys! Honey hoarder awakening! All the honey!",                                       ok: false, tip: "痛快下单：I'll take the cinnamon and the blueberry!" },
+            { text: "One jar enough. Honey moderation. Boring honey person.",                                     ok: false, tip: "果断双杀：I'll take both!" },
+          ],
+          phrase: { en: "I'll take both.", zh: "两样我都要了。", note: "take 购买；爽快决策的短句" },
+        },
+      ],
+    },
+    {
+      id: "v5",
+      title: "第 5 次光顾 · 当志愿者",
+      titleEn: "Volunteering",
+      emoji: "🙋",
+      desc: "回报社区的时候到了！注册志愿者、领第一次班、认识团队——从受益者到贡献者的身份转变。",
+      reward: { en: "volunteer", zh: "你完成了第一次志愿服务！🙋" },
+      steps: [
+        {
+          npcLines: [
+            "Well, if it isn't our pottery-class-success story! Wait — are you here about the volunteer sign-up sheet?",
+            "Hey hey, the waitlist champion! Are my eyes right — you're checking out the volunteer sheet?",
+            "Oh! The person who conquered the pottery waitlist! And now... the volunteer sign-up sheet has your attention?",
+          ],
+          npcZh: "哟，这不是我们陶艺课候补转正的成功案例吗！等等——你是来看志愿者报名表的？",
+          task: "确认想当志愿者",
+          options: [
+            { text: "You got me! This center has given me a lot — I'd like to give back. How does volunteering work here?", ok: true,  tip: "give back 回馈——志愿精神的核心理解" },
+            { text: "Yes! Free labor! I work for nothing! Exploit me kindly!",                                            ok: false, tip: "表达初心：I'd like to give back — how does volunteering work?" },
+            { text: "Volunteering? I am just reading sheet. Coincidental reading. Reading hobby.",                        ok: false, tip: "坦然说明：I'd like to give back to the community" },
+          ],
+          phrase: { en: "I'd like to give back.", zh: "我想要回馈。", note: "give back 回馈；社区参与的高级动机表达" },
+        },
+        {
+          npcLines: [
+            "That's the spirit! We need help at the Saturday food bank and with the seniors' lunch program. Any preference?",
+            "Now that's community! Two needs: Saturday food bank, or the seniors' lunch program. Which calls to you?",
+            "The best kind of member! Openings at the food bank Saturdays, or seniors' lunches. Your heart's preference?",
+          ],
+          npcZh: "就是这个精神！我们周六食物银行和老年午餐项目需要人手。你有偏好吗？",
+          task: "选择老年午餐项目（想多和人说话）",
+          options: [
+            { text: "The seniors' lunch program, please — I'd love the conversation as much as the work.", ok: true,  tip: "as much as 与……一样——说明动机的加分句" },
+            { text: "Seniors! Old wise people! Story machines! I choose story machines!",                 ok: false, tip: "真诚表达：I'd love the conversation as much as the work" },
+            { text: "Food bank. Cans don't talk. Cans easy. Cans never complain.",                       ok: false, tip: "按心愿选：The seniors' lunch program, please" },
+          ],
+          phrase: { en: "I'd love the conversation as much as the work.", zh: "我既喜欢这份工作，也喜欢和人聊天。", note: "A as much as B 两者皆爱；动机说明句式" },
+        },
+        {
+          npcLines: [
+            "Perfect fit — the seniors adore young company! Shifts are Wednesdays and Fridays, eleven to one. Which day works?",
+            "You'll be beloved — fresh faces make their week! Shifts: Wednesday or Friday, eleven to one. Pick your day!",
+            "The seniors will adore you! Wednesday and Friday shifts, eleven to one. Which one's yours?",
+          ],
+          npcZh: "完美匹配——老人们超爱年轻人的陪伴！班次是周三和周五 11 点到 1 点。哪天合适？",
+          task: "选周五，问第一天要带什么",
+          options: [
+            { text: "Fridays work for me. What should I bring or prepare for my first shift?", ok: true,  tip: "第一天准备问题——认真的志愿者" },
+            { text: "Friday! What to bring? Snacks? Gifts? Bribes of love?",                  ok: false, tip: "岗前询问：What should I bring for my first shift?" },
+            { text: "Prepare? I am ready now. Born ready. Ask others to prepare.",            ok: false, tip: "尽责提问：What should I bring or prepare?" },
+          ],
+          phrase: { en: "What should I bring?", zh: "我该带什么？", note: "first shift 第一班；岗前准备的万能问句" },
+        },
+        {
+          npcLines: [
+            "Just yourself and comfy shoes! You'll serve meals, refill coffee, and mainly — chat. The stories those seniors tell are pure gold.",
+            "Comfy shoes and a smile! Your job: serve, refill, and listen. The stories you'll hear? Better than television!",
+            "Bring your comfortable shoes and your listening ears! Serving, refilling, chatting — and the stories are the real paycheck!",
+          ],
+          npcZh: "带上你自己和舒服的鞋！你会打饭、续咖啡，主要的是——聊天。老人家讲的故事都是纯金。",
+          task: "表示期待，完成注册",
+          options: [
+            { text: "Serve, refill, chat — sounds perfect. Where do I sign up?", ok: true,  tip: "复述职责确认 + 落笔报名" },
+            { text: "Story payment! Rich in stories! Story salary!",             ok: false, tip: "复述+报名：Serve, refill, chat — where do I sign?" },
+            { text: "Chat is the job? Dream job! Talking career!",              ok: false, tip: "确认职责：Serve, refill, and chat — where do I sign up?" },
+          ],
+          phrase: { en: "Where do I sign up?", zh: "我在哪儿登记？", note: "sign up 报名；行动落实的收尾句" },
+          adds: [{ emoji: "🧓", label: "Lunch shift", wordId: "cc-shift" }],
+        },
+        {
+          npcLines: [
+            "Right here! ...Welcome to the team, officially! Oh — one of our seniors, Mr. Chen, has been asking for a Mandarin-speaking lunch buddy. Friday just got even better!",
+            "This form right here! ...And done — you're official! Big news: Mr. Chen, one of our regulars, wants a Mandarin lunch companion. Your Fridays just upgraded!",
+            "Signature here... and you're on the roster! Oh, wonderful coincidence — Mr. Chen has been requesting a Mandarin-speaking buddy for lunches. Friday destiny!",
+          ],
+          npcZh: "这儿！……正式欢迎入队！对了——我们有位陈先生一直想要个会说中文的午餐伙伴。你的周五更有意义了！",
+          task: "惊喜接受这个安排",
+          options: [
+            { text: "That's a perfect match — I'll make sure Mr. Chen has a great lunch companion every Friday!", ok: true,  tip: "perfect match 完美匹配——使命感满满的承诺" },
+            { text: "Mr. Chen! My new best friend! Destiny meeting! Chen Friday forever!",                        ok: false, tip: "温暖承诺：I'll make sure Mr. Chen has a great lunch companion" },
+            { text: "Mandarin buddy? Is this in my job description? Renegotiate pay.",                           ok: false, tip: "欣然应允：That's a perfect match!" },
+          ],
+          phrase: { en: "That's a perfect match!", zh: "这是完美的匹配！", note: "perfect match 完美契合；志愿者与需求对上号的惊喜" },
+        },
+      ],
+    },
+  ],
+},
