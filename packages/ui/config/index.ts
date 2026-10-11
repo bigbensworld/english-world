@@ -24,7 +24,9 @@ export default defineConfig(async (merge) => {
     plugins: [],
     framework: "react",
     compiler: "webpack5",
-    // 静态资源：场景卡 Fluent Emoji 3D PNG。Taro 不会自动拷贝 src/static，需显式 copy。
+    // 静态资源：场景卡 Fluent Emoji 3D PNG（24 张，Fluent Emoji MIT）。
+    // ⚠️ 坑：from 指向项目外绝对路径（../../../assets/icons）会让 copy 卡死（实测 7 分钟不结束）。
+    //    必须放在项目内 src/static/icons 再拷贝。
     copy: {
       patterns: [
         { from: "src/static/", to: "dist/static/" },
