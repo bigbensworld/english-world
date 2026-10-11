@@ -724,6 +724,8 @@ function onVlogWordClick(evt) {
   const raw = span.textContent;
   const clean = raw.toLowerCase().replace(/[^a-z'-]/g, "");
   if (!clean) return;
+  // 先停整句预生成 mp3（否则单词发音被整句朗读掩盖，用户听不见）
+  pgStopAudio();
   speakSlow(clean, 0.6);
   const def = lookupWord(raw);
   const card = $("wordCard");
@@ -737,7 +739,7 @@ function onVlogWordClick(evt) {
     </div>
   `;
   $("wordOverlay").classList.remove("hidden");
-  $("wcSpeak").onclick = () => speakSlow(clean, 0.6);
+  $("wcSpeak").onclick = () => { pgStopAudio(); speakSlow(clean, 0.6); };
   $("wcClose").onclick = () => $("wordOverlay").classList.add("hidden");
 }
 
@@ -781,6 +783,10 @@ function pgLoadIndex() {
 // 播放一条预生成句子；返回 false 表示无预生成（调用方降级）
 // 与 highlightWordByChar 协作：预生成音频用词序高亮（onWordIndex），旧 TTS 用 charIndex
 let pgAudioEl = null;
+// 停掉预生成音频（点单词/再听一次前调用，防整句朗读掩盖单词发音）
+function pgStopAudio() {
+  if (pgAudioEl) { try { pgAudioEl.pause(); } catch (e) { /* ignore */ } pgAudioEl = null; }
+}
 function pgPlay(key, onWordIndex, onEnd) {
   if (!PG_AUDIO || !PG_AUDIO[key]) return false;
   const entry = PG_AUDIO[key];
