@@ -332,3 +332,104 @@ html:root .taro_page {
 .anim-spin .vlog-emoji { animation: spinRound 2.2s linear 3; }
 .anim-fold .vlog-emoji { animation: foldFlatten 1.6s ease-in-out 2; }
 .anim-sweep .vlog-emoji { animation: sweepSlide 1.1s ease-in-out 4; }
+
+/* ===== 吉祥物（悬浮球）：对齐原站 style.css 506-563 + 570-577 + 587 =====
+   原站 appen 到 document.body；Taro 版挂在 app.tsx（.taro_page 之外）常驻。 */
+.mascot {
+  position: fixed; right: 16px; bottom: 16px; z-index: 60;
+  width: 84px; height: 84px; cursor: pointer; user-select: none;
+  display: flex; align-items: center; justify-content: center;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .18));
+}
+.mascot .body {
+  width: 74px; height: 74px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #b9e48f, #639922 68%);
+  border: 3px solid var(--green);
+  position: relative;
+  animation: breathe 3.2s ease-in-out infinite;
+  transition: filter .2s ease;
+}
+.mascot.state-happy .body { animation: mascotHappy .62s var(--bounce); filter: saturate(1.15); }
+.mascot.state-thinking .body { animation: mascotThinking .62s ease-in-out infinite alternate; }
+.mascot.state-sad .body { animation: mascotSad .55s ease-in-out; filter: saturate(.72); }
+.mascot.state-happy .cheek { opacity: .95; }
+.mascot.state-happy .mouth { height: 13px; }
+.mascot.state-sad .mouth { height: 5px; border-radius: 18px 18px 0 0; top: 48px; }
+.mascot .eye {
+  position: absolute; top: 26px; width: 9px; height: 12px; border-radius: 50%;
+  background: #26215c; animation: blink 4.2s infinite;
+}
+.mascot .eye.l { left: 22px; }
+.mascot .eye.r { right: 22px; }
+.mascot .mouth {
+  position: absolute; top: 44px; left: 50%; transform: translateX(-50%);
+  width: 18px; height: 9px; border-radius: 0 0 18px 18px;
+  background: #26215c; opacity: .85;
+}
+.mascot .cheek {
+  position: absolute; top: 40px; width: 10px; height: 6px; border-radius: 50%;
+  background: #f0997b; opacity: .55;
+}
+.mascot .cheek.l { left: 13px; }
+.mascot .cheek.r { right: 13px; }
+.mascot .leaf {
+  position: absolute; top: -7px; left: 50%;
+  font-size: 20px; transform: translateX(-50%) rotate(-14deg);
+}
+.mascot:hover .body { animation: wiggle .5s ease; }
+.mascot .bubble {
+  position: absolute; bottom: 92px; right: 0; white-space: nowrap;
+  background: var(--card); border: 1.5px solid var(--green);
+  color: var(--ink); border-radius: 14px 14px 4px 14px;
+  padding: 8px 14px; font-size: 13px; font-weight: 600;
+  animation: bounceIn .3s var(--bounce);
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(.08); }
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-6deg); }
+  40% { transform: rotate(5deg); }
+  60% { transform: rotate(-3deg); }
+  80% { transform: rotate(2deg); }
+}
+@keyframes mascotHappy {
+  0%, 100% { transform: translateY(0) scale(1); }
+  45% { transform: translateY(-10px) scale(1.08); }
+}
+@keyframes mascotThinking {
+  from { transform: rotate(-3deg) translateY(0); }
+  to { transform: rotate(3deg) translateY(-3px); }
+}
+@keyframes mascotSad {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  35% { transform: translateY(5px) rotate(-5deg); }
+  70% { transform: translateY(4px) rotate(5deg); }
+}
+/* 移动端缩小（对齐原站 @media max-width:560px） */
+@media (max-width: 560px) {
+  .mascot { width: 68px; height: 68px; }
+  .mascot .body { width: 58px; height: 58px; }
+  .mascot .eye { top: 20px; width: 7px; height: 10px; }
+  .mascot .eye.l { left: 16px; }
+  .mascot .eye.r { right: 16px; }
+  .mascot .mouth { top: 34px; width: 14px; height: 7px; }
+  .mascot .cheek { top: 32px; width: 8px; }
+  .mascot .bubble { right: -4px; max-width: 190px; white-space: normal; }
+}
+/* 底部安全区：避免悬浮球被 iPhone 横条压住 */
+@supports (padding: max(0px)) {
+  .mascot { bottom: calc(16px + constant(safe-area-inset-bottom)); bottom: calc(16px + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot .body,
+  .mascot.state-happy .body,
+  .mascot.state-thinking .body,
+  .mascot.state-sad .body { animation: none; }
+}

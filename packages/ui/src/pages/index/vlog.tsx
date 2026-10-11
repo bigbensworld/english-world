@@ -2,6 +2,9 @@
 import { useMemo, useState, useEffect } from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
 import { useGame, speak, stopSpeak, VLOG_DICT } from "../../gameStore";
+// 吉祥物状态：对齐原站 vlog.js 调用点
+//   764 happy 1200（打开某一集）、906 happy 800（Quiz 答对）、733 idle（返回频道列表）
+import { setMascotState } from "../../mascotStore";
 import type { Vlog, VlogCard } from "@english-world/core";
 
 // 词形还原查词（与原站 lookupWord 同款逻辑）
@@ -28,6 +31,14 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
   const [mode, setMode] = useState<"cards" | "quiz">("cards");
   const card = vlog.cards[idx];
   const isFact = card.type === "fun-fact";
+
+  // 打开某一集 → happy 1200（对齐原站 vlog.js:764 openVlog）；
+  // 返回频道列表 → idle（对齐 vlog.js:733 openVlogChannel）
+  useEffect(() => {
+    setMascotState("happy", 1200);
+    return () => setMascotState("idle");
+  }, [vlog.id]);
+  const backToHome = () => { setMascotState("idle"); stopSpeak(); onBack(); };
 
   // 卡片进入自动慢速播放 + 标记已看
   useEffect(() => {
@@ -66,7 +77,7 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
   return (
     <View className="page-pad">
       <View className="top-bar">
-        <View className="btn" onClick={() => { stopSpeak(); onBack(); }}>← 返回</View>
+        <View className="btn" onClick={backToHome}>← 返回</View>
         <View className="tb-title">{vlog.emoji} {vlog.title} · {vlog.titleZh}</View>
       </View>
 
@@ -170,7 +181,8 @@ function VlogQuiz({ vlog, onFinish }: { vlog: Vlog; onFinish: () => void }) {
     if (picked) return;
     const ok = c === target;
     setPicked({ ok, target });
-    if (ok) setCorrect((n) => n + 1);
+    // Quiz 答对 → happy 800（对齐原站 vlog.js:906；答错原站不切状态，保持一致）
+    if (ok) { setCorrect((n) => n + 1); setMascotState("happy", 800); }
     setTimeout(() => {
       setPicked(null);
       if (qIdx + 1 >= total) setDone(true);

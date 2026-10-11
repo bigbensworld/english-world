@@ -137,7 +137,9 @@ export function useAdventure(scene: Scene, visit: SceneVisit, save: SaveData, up
   const start = useCallback(() => { runStepFlow(adv); }, [adv, runStepFlow]);
 
   const choose = useCallback((optIdx: number) => {
-    if (adv.phase !== "task") return;
+    // ⚠️ 允许 retry 阶段重答：原站答错后会解锁选项让玩家重选（game.js:534 adv.lock=false），
+    //    迁移时只放行 task 阶段 → 答错即锁死、无法继续（教学闭环断裂，且悬浮球再也等不到 happy）。
+    if (adv.phase !== "task" && adv.phase !== "retry") return;
     const step: VisitStep = steps[adv.step];
     const opt = step.options[optIdx];
     if (!opt.ok) {

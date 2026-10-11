@@ -6,6 +6,10 @@ import {
   sceneVisits, visitKey, unlockedVisitIndex, finishedVisits, sceneCardStatus,
 } from "../../gameStore";
 import type { Scene, SceneVisit } from "@english-world/core";
+// 吉祥物状态：对齐原站 game.js 调用点
+//   348/451 thinking（进入剧情 / 选项就绪）、486 happy 700（答对）、
+//   516 sad 700（答错）、569 happy 2000（完成）、204/620 idle（进入场景 / 返回地图）
+import { setMascotState } from "../../mascotStore";
 
 export default function ScenePage({ scene, onBack, onOpenBook }: { scene: Scene; onBack: () => void; onOpenBook: () => void }) {
   const game = useGame();
@@ -16,6 +20,8 @@ export default function ScenePage({ scene, onBack, onOpenBook }: { scene: Scene;
   const [finished, setFinished] = useState(false);
   const [started, setStarted] = useState(false);
   const [toast, setToast] = useState("");
+  // retry 阶段已选错的选项下标：保持禁用（对齐原站答错后 el.disabled = true）
+  const [triedWrong, setTriedWrong] = useState<number[]>([]);
   const tapCount = useRef(0);
   const tapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const advRef = useRef<any>(null);
@@ -37,6 +43,11 @@ export default function ScenePage({ scene, onBack, onOpenBook }: { scene: Scene;
   const adv = useAdventure(scene, visit, game.save, game.update);
   advRef.current = adv;
 
+  // 进入场景 → idle（对齐原站 game.js:204 enterScene）
+  useEffect(() => {
+    setMascotState("idle");
+  }, [scene.id]);
+
   const vk = visitKey(scene, visit);
   const savedStep = game.save.progress[vk] || 0;
   const total = visit.steps.length;
@@ -53,6 +64,11 @@ export default function ScenePage({ scene, onBack, onOpenBook }: { scene: Scene;
         return [...prev, { role: "npc", text: a.npcLine, zh: stepData?.npcZh }];
       });
     }
+    // 选项就绪、等玩家作答 → thinking（对齐原站 game.js:451 renderStep 末尾）。
+    // ⚠️ 只在 task 阶段置位：若在 typing/npc 阶段也置位，会立刻覆盖刚刚设置的
+    //    happy/sad（chooseOpt 同步调用后 adv.choose 马上切 phase），导致答对/答错动画看不到。
+    //    原站同样是「答完 happy 700 → 回落 idle → 下一轮 renderStep 才 thinking」。
+    if (a.phase === "task") setMascotState("thinking");
     if (a.phase === "finish" && !finished) {
       setFinished(true);
       const r = adv.settle();
@@ -65,31 +81,51 @@ export default function ScenePage({ scene, onBack, onOpenBook }: { scene: Scene;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adv.adv.phase, adv.adv.npcLine, adv.adv.step]);
 
+  // 完成本轮 → happy 2000（对齐原站 game.js:569 finishAdventure）
+  useEffect(() => {
+    if (finished) setMascotState("happy", 2000);
+  }, [finished]);
+
   const startRun = () => {
     setStarted(true); setFinished(false); setChat([]);
+    // 开始剧情 → thinking（对齐原站 game.js:348 startAdventure）
+    setMascotState("thinking");
     adv.start();
   };
 
   const chooseOpt = (i: number) => {
     const a = adv.adv;
-    if (a.phase !== "task") return;
+    // ⚠️ 允许 retry 阶段重答（对齐原站 game.js:534 adv.lock=false）：
+    //    原站答错后解锁选项、仅禁用已选错的那一项，玩家可再选；迁移时只放行 task 阶段，
+    //    导致答错即卡死、无法完成剧情，悬浮球也再等不到 happy。
+    if (a.phase !== "task" && a.phase !== "retry") return;
+    if (a.phase === "retry" && triedWrong.includes(i)) return;
     const step = visit.steps[a.step];
     const opt = step.options[i];
+    // 答对 → happy 700 / 答错 → sad 700（对齐原站 game.js:486 / 516）
+    setMascotState(opt.ok ? "happy" : "sad", 700);
     if (opt.ok) {
+      setTriedWrong([]);
       setChat((prev) => [...prev, { role: "me", text: opt.text }]);
       if (step.phrase) {
         setChat((prev) => [...prev, { role: "phrase", text: "", zh: "" } as any]);
       }
+    } else {
+      // 记录已选错的项，保持禁用（对齐原站 el.disabled = true）
+      setTriedWrong((prev) => (prev.includes(i) ? prev : [...prev, i]));
     }
     adv.choose(i);
   };
+
+  // 返回地图 → idle（对齐原站 game.js:620 backToMap）
+  const backToHome = () => { setMascotState("idle"); onBack(); };
 
   const correctIdx = adv.adv.phase === "retry" ? visit.steps[adv.adv.step].options.findIndex((o) => o.ok) : -1;
 
   return (
     <View className="page-pad">
       <View className="top-bar">
-        <View className="btn" onClick={onBack}>← 返回</View>
+        <View className="btn" onClick={backToHome}>← 返回</View>
         <View className="tb-title" onClick={onTitleTap}>{scene.emoji} {scene.name} · {scene.nameEn}</View>
         <View className="btn" onClick={onOpenBook}>📖</View>
       </View>
@@ -149,7 +185,7 @@ export default function ScenePage({ scene, onBack, onOpenBook }: { scene: Scene;
             <View className="btn btn-big" style={{ flex: 1 }} onClick={() => { adv.restart(); setChat([]); setFinished(false); }}>再玩一次</View>
           </View>
           <View style={{ marginTop: 10 }}>
-            <View className="btn" onClick={onBack}>返回地图</View>
+            <View className="btn" onClick={backToHome}>返回地图</View>
           </View>
         </View>
       ) : (
@@ -189,16 +225,22 @@ export default function ScenePage({ scene, onBack, onOpenBook }: { scene: Scene;
           )}
           {(adv.adv.phase === "task" || adv.adv.phase === "retry") && (
             <View className="options">
-              {visit.steps[adv.adv.step].options.map((o, i) => (
-                <View
-                  key={i}
-                  className={`option ${adv.adv.phase === "retry" ? (i === correctIdx ? "ok" : "") : ""}`}
-                  onClick={() => adv.adv.phase === "task" && chooseOpt(i)}
-                >
-                  {o.text}
-                  {adv.adv.phase === "retry" && i === correctIdx && o.tip ? <View className="option-tip">{o.tip}</View> : null}
-                </View>
-              ))}
+              {visit.steps[adv.adv.step].options.map((o, i) => {
+                const wrongPicked = adv.adv.phase === "retry" && triedWrong.includes(i);
+                const cls = adv.adv.phase === "retry"
+                  ? (i === correctIdx ? "ok" : (wrongPicked ? "wrong" : ""))
+                  : "";
+                return (
+                  <View
+                    key={i}
+                    className={`option ${cls}`}
+                    onClick={() => chooseOpt(i)}
+                  >
+                    {o.text}
+                    {adv.adv.phase === "retry" && i === correctIdx && o.tip ? <View className="option-tip">{o.tip}</View> : null}
+                  </View>
+                );
+              })}
             </View>
           )}
         </View>

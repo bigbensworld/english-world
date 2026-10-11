@@ -3,6 +3,8 @@ import { useState, useMemo } from "react";
 import { View, Text, Image } from "@tarojs/components";
 import { SCENES, VLOGS, sceneCardStatus, finishedVisits, sceneVisits } from "../../gameStore";
 import type { Scene, Vlog } from "@english-world/core";
+// 回到地图/频道列表 → idle（对齐原站 game.js:620 backToMap、vlog.js:733 openVlogChannel）
+import { setMascotState } from "../../mascotStore";
 import ScenePage from "./scene";
 import VlogPage from "./vlog";
 import BookPage from "./book";
@@ -24,6 +26,10 @@ export default function Index() {
   const [tab, setTab] = useState<"vlog" | "scenes">("vlog");
   const [view, setView] = useState<View2>({ kind: "home" });
 
+  // 回到顶层（地图 / 频道列表）→ 吉祥物回 idle
+  const backToHome = () => { setMascotState("idle"); setView({ kind: "home" }); };
+  const switchTab = (t: "vlog" | "scenes") => { setMascotState("idle"); setTab(t); };
+
   const groups = useMemo(() => {
     const grouped = new Set(SCENE_GROUPS.flatMap((g) => g.scenes));
     const rest = SCENES.filter((s) => !grouped.has(s.id)).map((s) => s.id);
@@ -32,9 +38,9 @@ export default function Index() {
     return gs;
   }, []);
 
-  if (view.kind === "scene") return <ScenePage scene={view.scene} onBack={() => setView({ kind: "home" })} onOpenBook={() => setView({ kind: "book" })} />;
-  if (view.kind === "vlog") return <VlogPage vlog={view.vlog} onBack={() => setView({ kind: "home" })} />;
-  if (view.kind === "book") return <BookPage onBack={() => setView({ kind: "home" })} />;
+  if (view.kind === "scene") return <ScenePage scene={view.scene} onBack={backToHome} onOpenBook={() => setView({ kind: "book" })} />;
+  if (view.kind === "vlog") return <VlogPage vlog={view.vlog} onBack={backToHome} />;
+  if (view.kind === "book") return <BookPage onBack={backToHome} />;
 
   return (
     <View className="page-pad">
@@ -57,8 +63,8 @@ export default function Index() {
       {/* 双 Tab：分段控件 */}
       <View className="tabs-wrap">
         <View className="home-tabs">
-          <View className={`home-tab ${tab === "vlog" ? "active" : ""}`} onClick={() => setTab("vlog")}>📺 慢速生活</View>
-          <View className={`home-tab ${tab === "scenes" ? "active" : ""}`} onClick={() => setTab("scenes")}>🗺️ 场景冒险</View>
+          <View className={`home-tab ${tab === "vlog" ? "active" : ""}`} onClick={() => switchTab("vlog")}>📺 慢速生活</View>
+          <View className={`home-tab ${tab === "scenes" ? "active" : ""}`} onClick={() => switchTab("scenes")}>🗺️ 场景冒险</View>
         </View>
       </View>
 
