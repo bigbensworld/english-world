@@ -44,20 +44,23 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
   const backToHome = () => { setMascotState("idle"); stopSpeak(); pgStop(); onBack(); };
 
   // 统一播放入口：预生成音频优先（词序高亮），降级 Web Speech（charIndex → 词序）
+  // 注意：索引是异步加载的——先等 pgLoadIndex() 完成再 pgPlay，否则首张卡永远走降级
   const playCard = (text: string, rate: number, cardIdx: number) => {
     const key = vlog.id + "_" + cardIdx;
-    const ok = pgPlay(key, (wi) => setHi(wi));
-    if (!ok) {
-      speak(text, rate, (ci) => {
-        const words = text.split(/\s+/);
-        let pos = 0, wi = -1;
-        for (let i = 0; i < words.length; i++) {
-          if (ci >= pos && ci < pos + words[i].length) { wi = i; break; }
-          pos += words[i].length + 1;
-        }
-        setHi(wi);
-      });
-    }
+    pgLoadIndex().then(() => {
+      const ok = pgPlay(key, (wi) => setHi(wi));
+      if (!ok) {
+        speak(text, rate, (ci) => {
+          const words = text.split(/\s+/);
+          let pos = 0, wi = -1;
+          for (let i = 0; i < words.length; i++) {
+            if (ci >= pos && ci < pos + words[i].length) { wi = i; break; }
+            pos += words[i].length + 1;
+          }
+          setHi(wi);
+        });
+      }
+    });
   };
 
   // 卡片进入自动慢速播放 + 标记已看（预生成优先）
@@ -182,12 +185,14 @@ function VlogQuiz({ vlog, onFinish }: { vlog: Vlog; onFinish: () => void }) {
     return [target, ...others].sort(() => Math.random() - 0.5);
   }, [qIdx, target]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 播放目标句（预生成优先：需找回卡片索引作 key）
+  // 播放目标句（预生成优先：需找回卡片索引作 key；等索引就绪防竞态）
   useEffect(() => {
     if (!target || done) return;
     const cardIdx = vlog.cards.indexOf(target);
     const t = setTimeout(() => {
-      if (!pgPlay(vlog.id + "_" + cardIdx, () => {})) speak(target.en, 0.55);
+      pgLoadIndex().then(() => {
+        if (!pgPlay(vlog.id + "_" + cardIdx, () => {})) speak(target.en, 0.55);
+      });
     }, 900);
     return () => clearTimeout(t);
   }, [qIdx, target, done]);
@@ -238,7 +243,7 @@ function VlogQuiz({ vlog, onFinish }: { vlog: Vlog; onFinish: () => void }) {
     <View className="vlog-stage">
       <View className="vlog-count">🎬 QUIZ TIME · {qIdx + 1}/{total}</View>
       <View style={{ fontSize: 17, fontWeight: 700, margin: "12px 0" }}>🔊 听声音——刚才是哪个动作？</View>
-      <View className="btn btn-primary" style={{ maxWidth: 220, margin: "0 auto 14px" }} onClick={() => target && (pgPlay(vlog.id + "_" + vlog.cards.indexOf(target), () => {}) || speak(target.en, 0.55))}>🔊 再听一次</View>
+      <View className="btn btn-primary" style={{ maxWidth: 220, margin: "0 auto 14px" }} onClick={() => target && pgLoadIndex().then(() => { if (!pgPlay(vlog.id + "_" + vlog.cards.indexOf(target), () => {})) speak(target.en, 0.55); })}>🔊 再听一次</View>
       <View style={{ display: "flex", gap: 10 }}>
         {opts.map((c, i) => {
           const cls = picked ? (c === picked.target ? "option ok" : "option wrong") : "option";

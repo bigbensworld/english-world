@@ -7,7 +7,12 @@ let PG_INDEX: Record<string, PgEntry> | null = null;
 let pgLoading: Promise<Record<string, PgEntry> | null> | null = null;
 let audioEl: HTMLAudioElement | null = null;
 
-const IS_H5 = typeof process !== "undefined" && process.env && process.env.TARO_ENV === "h5";
+// 运行时特性检测（不要用 process.env.TARO_ENV——H5 浏览器运行时 process 未定义，
+// webpack 只对 process.env.NODE_ENV 做文本替换，typeof process 检查会残留 → 恒 false）：
+// H5 有 fetch + Audio；weapp 两者皆无 → 自动降级
+const IS_H5 = typeof window !== "undefined"
+  && typeof window.fetch === "function"
+  && typeof Audio !== "undefined";
 
 export function pgLoadIndex(): Promise<Record<string, PgEntry> | null> {
   if (!IS_H5) return Promise.resolve(null);
