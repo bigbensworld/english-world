@@ -1,6 +1,6 @@
 # english-world 项目状态（STATE）
 
-> 更新时间：2026-10-10 晚（第五批内容上线）· 最新 commit 见第七节
+> 更新时间：2026-10-11 深夜（点词 mp3 掩盖修复）· 最新 commit 见第七节
 > 新会话冷启动指南：读完本文即可继续开发，无需翻历史对话。
 
 ## 一、项目是什么
@@ -119,13 +119,14 @@
   - **场景卡接入 Fluent Emoji 3D PNG 图标**：新增 `SceneArt` 组件（iconId 命中渲染 `<Image src=/static/icons/x.png>`，失败降级 emoji）；图标源 `assets/icons/*.png` 复制到 `packages/ui/src/static/icons/`（24 张），Taro config 加 copy 规则。**⚠️ copy.from 指向项目外绝对路径会让构建卡死**（实测 7 分钟不结束、只拷 9 个）——必须放项目内 `src/static/`。
   - **验证（CDP 实测）**：`.taro_page` 背景 `rgb(246,244,238)`、body 同色、变量均有值；190/190 border-box；vlog 卡 560=560；mapTitle 26px=26px；btn-primary big 16px/w400/h52 与原站完全一致；场景卡 15 张、图标 IMG 88x88(natural 256x256, HTTP 200)；**320/360/375/390/414 五档无横向溢出**、控制台 0 错误；test.js 92/92。
   - 新增可复用脚本：`scripts/measure_sites.py`（两站尺寸对比）、`check_scroll.py`（滚动容器）、`inspect_taro_dom.py`（DOM dump）。
-- **吉祥物（悬浮球）还原 + 答错无法重选修 bug（2026-10-11，5a1fe95，部署 https://226f96c2.english-world-taro.pages.dev）**：用户反馈「悬浮球没了」——原站 `.mascot` 挂在 `document.body` 常驻，Taro 迁移时整体没做。
   - **实现（复刻语义而非重写）**：新增 `src/mascotStore.ts`（模块级单例，复刻原站 `setMascotState(next,duration)`/`initMascot()`：4 状态 idle/happy/thinking/sad、时长自动回落 idle、`MASCOT_LINES` 五句台词、`pokeMascot()` = happy650 + 随机气泡 2600ms + TTS；用 `useSyncExternalStore` 订阅）+ `src/components/Mascot.tsx`（复刻 `.body(.eye/.cheek/.mouth/.leaf)` + `.bubble`）+ app.css 迁移 `.mascot` 全量样式与 `breathe/blink/wiggle/mascotHappy/mascotThinking/mascotSad` 关键帧 + 560px 缩小 + 底部安全区 + reduced-motion。
   - **⚠️ 新坑①：Taro 路由页转场带 `transform`，会为后代 `position:fixed` 建立新包含块** → 悬浮球必须渲染在 `{children}`（`.taro_page`）**之外**，否则 fixed 失效/错位。
   - **⚠️ 新坑②：构建间歇性挂起 8-10 分钟 = dist 残留 + `safe-delete-bulk-guard`**。copy 插件要覆盖已存在的 `dist/static/icons/*.png` → 触发批量删除确认 → 挂起（`ps` 可见 guard 子进程）。**解法：构建前把 `dist/` `mv` 走（不能 `rm -rf`，会被拦）**，干净构建 4-5s。
   - **接线（对齐原站调用点）**：scene 进场景/返回→idle、开始剧情/选项就绪→thinking、答对→happy700、答错→sad700、完成→happy2000；vlog 打开集→happy1200、Quiz 答对→happy800、返回→idle；index 切 tab/返回顶层→idle。
   - **顺带修真 bug：答错后无法重选**。原站 `game.js:534` 答错后 `adv.lock=false` 解锁、仅禁用已错项，玩家可重选；Taro 迁移只放行 `phase==="task"`，`retry` 直接 return → **答错即卡死、剧情无法完成**。修复：放行 `task|retry` + `triedWrong` 记录已错项（`.option.wrong` 不可再点）、答对清空、retry 高亮 `.option.ok`。
   - **验证**：`scripts/verify_mascot.py`（27 项全绿：定位/尺寸 84×84、body 74×74、4 状态 class+动画名+嘴高 13/9/5px、700ms 回落、点击气泡属 MASCOT_LINES、2.8s 消失、移动端 68×68 无溢出、0 错误）+ `scripts/verify_mascot_flow.py`（真实链路：答错 sad → retry 重选 → 答对 happy → 返回 idle）；线上生产站复验通过；原站 test.js 92/92 无回归。
+- **点单词/「再听一次」被整句 mp3 掩盖（2026-10-11 深夜修复，本地 32752bf / 远端 API 362280a，两站已部署）**：用户反馈「点单词后再听一次无效」。CDP 逐层排查（JS 调用链 → 真实坐标 hit-test → 有头 Chrome 音频栈 → **monkeypatch Audio 构造器**）实锤根因：点词/再听一次时卡片整句预生成 mp3 **继续播放不停**（paused=false、currentTime 持续涨），单词 TTS 与整句朗读同时出声被盖住——JS 调用链本身全通，纯「双音源掩盖」问题，DOM/console 断言全发现不了。修复：vanilla `vlog.js` 新增 `pgStopAudio()`（onVlogWordClick + wcSpeak 先停 mp3）；Taro `vlog.tsx` onWordClick + 词卡再听一次先 `pgStop()`（再听一次并统一用 clean 小写词）。验证：test.js 92/92；两站线上 CDP 实测点词后 mp3 paused=true + TTS onstart 触发。
+  - **验证方法论新坑**：①「音源掩盖」类 bug 必须用 `window.Audio = function(...)` monkeypatch 抓实例状态（paused/currentTime），DOM 查询和 console 断言全无效；②vanilla 站首卡自动播放存在 index.json 异步竞态（首卡走 TTS 降级、第二卡起 mp3 生效）——验证 mp3 行为要在第二张卡测（Taro 版已修此竞态，cdb855d）；③TTS headless 下 voices=0 也能正常出事件流，voices 数量不是「能否发声」的判据。
 - **内容生产标准流程**：改 data.js/vlogs.js/vlog.js → `node scripts/extract_core_data.mjs` → 三组测试全过（core.test.ts + sync-guard.test.ts + test.js）。
 - 路线：Phase 1 ✅ + **Phase 1.5 ✅（f523b3f）** → **移动端适配修复 ✅（0e13e4c）** → **视觉根因修复 ✅（70df5db/5182de8/ad6da61：变量作用域 + box-sizing + 布局对齐 + Fluent 图标，CDP 全档验证）** → **吉祥物还原 ✅（5a1fe95）** → **待办：用户浏览器/真机验收 Taro 版 → 拍板切换生产站** → Phase 2 预生成音频 mp3+时间戳 → Phase 3 小程序 MVP + Capacitor App + 云同步。
 
@@ -169,6 +170,7 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 ## 七、近期 commit 索引（倒序）
 
 ```
+362280a 修复: 点单词/再听一次被整句mp3掩盖（Git Data API 同步，对应本地 32752bf）
 c082af0 Phase 2 预生成音频: vlog 15 集 120 句 mp3 + 词级时间戳，三端统一逐词高亮
 988630a 内容扩展第九批: 新增社区中心/宠物寄养/摄影工作室场景（25 场景 132 轮 877 步 817 词条）
 0ff4641 merge: 远端 API sync 合并（第四次分叉，ours 策略）
