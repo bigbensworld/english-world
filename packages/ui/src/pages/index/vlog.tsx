@@ -224,20 +224,25 @@ function VlogQuiz({ vlog, onFinish }: { vlog: Vlog; onFinish: () => void }) {
     }, ok ? 1000 : 1600);
   };
 
-  if (done) {
+  // 毕业收集：必须在渲染外调用（render 中调 game.update 会触发父组件 setState → 无限重渲染 → React 整树崩溃白屏）
+  useEffect(() => {
+    if (!done) return;
     const passed = correct >= total;
-    if (passed) {
-      // 毕业收集（只跑一次：利用 done 状态切换的时机）
-      game.update((d) => {
-        d.vlogQuiz[vlog.id] = true;
-        vlog.cards.forEach((c) => {
-          (c.words || []).forEach((w) => {
-            const key = "vlog:" + vlog.id + ":" + w;
-            if (!d.collected[key]) d.collected[key] = { en: w, zh: "", vlog: vlog.titleZh };
-          });
+    if (!passed) return;
+    game.update((d) => {
+      d.vlogQuiz[vlog.id] = true;
+      vlog.cards.forEach((c) => {
+        (c.words || []).forEach((w) => {
+          const key = "vlog:" + vlog.id + ":" + w;
+          if (!d.collected[key]) d.collected[key] = { en: w, zh: "", vlog: vlog.titleZh };
         });
       });
-    }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
+
+  if (done) {
+    const passed = correct >= total;
     return (
       <View className="vlog-stage">
         <View style={{ fontSize: 48, margin: "12px 0" }}>{passed ? "🎓" : "💪"}</View>
