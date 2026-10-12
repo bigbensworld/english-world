@@ -231,26 +231,54 @@ function renderDetectiveQ(q) {
   // bad 可为 null（无错陷阱题）；多词错误（如 "you are"）拆成 token 匹配
   const badWords = q.bad ? q.bad.split(" ") : [];
   body.innerHTML = `
-    <div class="gq-type-tag">🔍 语法侦探 · 句子里${q.bad ? "藏着 1 处错误" : "可能没有错误"}，点击你认为错的词</div>
+    <div class="gq-type-tag">🔍 语法侦探 · 点击你认为错的词，没有错就点下面的按钮</div>
     <div class="gq-sentence" id="gqSentence"></div>
+    <div class="factory-btns" style="margin-top:12px">
+      <button class="btn" id="detNoError">✨ 这句话没有错误</button>
+    </div>
   `;
   const sentEl = $("gqSentence");
   const tokens = q.sentence.split(" ");
   let answered = false;
+  function answer(isCorrect, el, feedback) {
+    if (answered) return;
+    answered = true;
+    if (isCorrect) {
+      grammarState.correct++;
+      setMascotState("happy", 700);
+      if (el) el.classList.add("right");
+      const spoken = q.bad ? q.sentence.replace(q.bad, q.fix || "") : q.sentence;
+      if (q.bad) speak(spoken);
+      feedback.innerHTML = `<div class="gq-ok">${q.bad ? `✅ 揪到了！<b>${q.bad}</b>${q.fix ? " → <b>" + q.fix + "</b>" : " → 直接删掉"}。` : "✅ 好眼力！"}${q.tip || ""}</div>`;
+      setTimeout(nextGrammarQuestion, 2000);
+    } else {
+      grammarState.wrongSet[grammarState.qIdx] = true;
+      setMascotState("sad", 700);
+      if (el) { el.classList.add("wrong"); el.disabled = true; }
+      const hint = q.bad === null
+        ? `🤔 其实这句话没有错误，别被骗啦。${q.tip || ""}`
+        : el
+          ? `🤔 这个词没问题，错词还藏在句子里。`
+          : `🤔 这句话里确实有错误，再找找。`;
+      feedback.innerHTML = `<div class="gq-no">${hint}</div>`;
+      // 答错重试：重渲染本题（保留 wrongSet 记录，计入成绩）
+      setTimeout(() => { renderGrammarQuestion(); }, 1600);
+    }
+  }
+  const fb = $("grammarFeedback");
   tokens.forEach((tok) => {
     const el = document.createElement("button");
     el.type = "button";
     el.className = "detective-word";
     el.textContent = tok;
     el.onclick = () => {
-      if (answered) return;
-      answered = true;
       const clean = tok.replace(/[.,!?]/g, "");
       const isBad = badWords.includes(clean);
-      handleGrammarDetective(isBad, q, el);
+      answer(isBad, el, fb);
     };
     sentEl.appendChild(el);
   });
+  $("detNoError").onclick = () => answer(q.bad === null, null, fb);
 }
 
 // ---------- 判分与推进 ----------
@@ -272,36 +300,6 @@ function handleGrammarAnswer(ok, tip, el, optsBox, spokenText) {
     if (el) { el.classList.add("wrong"); el.disabled = true; }
     fb.innerHTML = `<div class="gq-no">💡 ${tip || "再想想！"}</div>`;
     setTimeout(() => { fb.innerHTML = ""; if (el) el.disabled = false; }, 1600);
-  }
-}
-
-function handleGrammarDetective(isBad, q, el) {
-  const fb = $("grammarFeedback");
-  const qIdx = grammarState.qIdx;
-  if (isBad || q.bad === null) {
-    // 点对了错词，或这是无错陷阱题且用户需要看到真相
-    if (q.bad === null) {
-      // 陷阱题：只有点「没有错误」按钮才对——这里简化为：点任意词都提示真相，但不算对
-      fb.innerHTML = `<div class="gq-no">🔍 这句话其实没有错误！${q.tip || ""}</div>`;
-      setMascotState("thinking", 700);
-      setTimeout(() => { nextGrammarQuestion(); }, 1800);
-      return;
-    }
-    grammarState.correct++;
-    setMascotState("happy", 700);
-    el.classList.add("right");
-    speak(q.sentence.replace(q.bad, q.fix));
-    fb.innerHTML = `<div class="gq-ok">✅ 揪到了！<b>${q.bad}</b> → <b>${q.fix}</b>。${q.tip || ""}</div>`;
-    setTimeout(nextGrammarQuestion, 2000);
-  } else {
-    grammarState.wrongSet[qIdx] = true;
-    setMascotState("sad", 700);
-    el.classList.add("wrong");
-    fb.innerHTML = `<div class="gq-no">🤔 这个词没问题，再找找。${q.bad ? "错词藏在这句里。" : ""}</div>`;
-    setTimeout(() => { fb.innerHTML = ""; el.classList.remove("wrong"); el.disabled = false; answered = false; }, 1200);
-    // 重新允许点击（renderDetectiveQ 的 answered 是局部变量，这里靠 disabled 翻转）
-    // 注：answered 局部变量已锁死——为支持重试，这里重渲染本题
-    setTimeout(() => { renderGrammarQuestion(); }, 1200);
   }
 }
 
