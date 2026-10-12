@@ -5,6 +5,8 @@ sys.path.insert(0, "/Users/alice/.workbuddy/skills/cdp-live-web-verify/scripts")
 from cdp_client import Chrome
 
 BASE = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8741/"
+# 线上站不能用 block_external（会把线上域名劫持成 chrome-error）；本地站用它防外域干扰
+IS_LOCAL = BASE.startswith("http://localhost") or BASE.startswith("http://127.0.0.1")
 
 results = []
 def check(name, cond, extra=""):
@@ -18,7 +20,7 @@ def click_text(c, sel, kw):
       if (el) {{ el.click(); return true; }} return false;
     }})()""")
 
-with Chrome(block_external=True) as c:
+with Chrome(block_external=IS_LOCAL) as c:
     c.install_console_capture()
     c.navigate(BASE, settle=3)
 
