@@ -875,7 +875,7 @@ function initHomeTabs() {
   // 恢复上次选择的 tab（新访客默认「慢速生活」：先听懂，再开口）
   let active = "vlog";
   try { active = sessionStorage.getItem("ewHomeTab") || "vlog"; } catch (e) {}
-  if (active !== "vlog" && active !== "scenes") active = "vlog";
+  if (active !== "vlog" && active !== "scenes" && active !== "grammar") active = "vlog";
   function switchTo(tab) {
     active = tab;
     try { sessionStorage.setItem("ewHomeTab", tab); } catch (e) {}
@@ -884,6 +884,11 @@ function initHomeTabs() {
     });
     $("paneVlog").classList.toggle("hidden", tab !== "vlog");
     $("paneScenes").classList.toggle("hidden", tab !== "scenes");
+    const paneG = $("paneGrammar");
+    if (paneG) {
+      paneG.classList.toggle("hidden", tab !== "grammar");
+      if (tab === "grammar" && typeof renderGrammarEntry === "function") renderGrammarEntry();
+    }
     if (tab === "vlog") renderVlogSetsInto($("homeVlogSets"));
   }
   tabs.querySelectorAll(".home-tab").forEach((b) => {

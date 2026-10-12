@@ -23,6 +23,7 @@
     <div class="home-tabs" id="homeTabs">
       <button type="button" class="home-tab" data-tab="vlog">📺 慢速生活</button>
       <button type="button" class="home-tab" data-tab="scenes">🗺️ 场景冒险</button>
+      <button type="button" class="home-tab" data-tab="grammar">🎓 语法闯关</button>
     </div>
     <div class="home-pane" id="paneVlog">
       <h1 class="map-title">不敢开口？先从你每天都会遇到的英语开始</h1>
@@ -44,6 +45,11 @@
       <h1 class="map-title">去哪儿冒险？</h1>
       <p class="map-sub">Pick a place. Chat with real people. Learn step by step.</p>
       <div class="scene-grid" id="sceneGrid"></div>
+    </div>
+    <div class="home-pane hidden" id="paneGrammar">
+      <h1 class="map-title">语法也能闯关玩</h1>
+      <p class="map-sub">修句师 · 句子工厂 · 语法侦探 + 发音辨音，把最磨人的语法变成 8 关小游戏。</p>
+      <div class="grammar-entry-grid" id="grammarEntry"></div>
     </div>
   </section>
 
@@ -86,5 +92,8 @@
 <script src="vlogs.js"></script>
 <script src="game.js"></script>
 <script src="vlog.js"></script>
+<script src="grammar-data.js"></script>
+<script src="sound-data.js"></script>
+<script src="grammar.js"></script>
 </body>
 </html>

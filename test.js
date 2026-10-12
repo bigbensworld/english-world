@@ -258,6 +258,37 @@ save();
 ok(Object.keys(state.collected).filter(k => k.startsWith("vlog:morning:")).length >= 10, "毕业集词汇入册（与场景共享收集）");
 ok(state.progress["cafe:v1"] === 10, "vlog 不影响场景对话进度");
 
+console.log("== 12. 语法闯关 ==");
+ok(typeof GRAMMAR_LEVELS !== "undefined" && GRAMMAR_LEVELS.length === 8, "语法闯关 8 关");
+ok(GRAMMAR_LEVELS.every(l => l.qs.length >= 8), "每关至少 8 题");
+ok(GRAMMAR_LEVELS.every(l => l.qs.every(q => ["fix","factory","detective"].includes(q.type))), "题型只允许 fix/factory/detective");
+ok(GRAMMAR_LEVELS.every(l => l.qs.filter(q => q.type === "fix").every(q => q.options.filter(o => o.ok).length === 1)), "fix 题恰好 1 个正确选项");
+ok(GRAMMAR_LEVELS.every(l => l.qs.filter(q => q.type === "factory").every(q => q.answer && q.answer.split(" ").length >= 3)), "factory 题有 answer 且至少 3 词");
+ok(GRAMMAR_LEVELS.every(l => l.qs.filter(q => q.type === "factory").every(q => (q.extra || []).every(w => !q.answer.split(" ").includes(w) || q.answer.split(" ").filter(x => x === w).length > q.extra.filter(x => x === w).length))), "factory 干扰词数量校验");
+ok(GRAMMAR_LEVELS.every(l => l.qs.filter(q => q.type === "detective").every(q => q.sentence && q.tip)), "detective 题有句子和讲解");
+ok(GRAMMAR_LEVELS.filter(l => l.id === "questions")[0].qs.some(q => q.type === "detective" && q.bad === null), "疑问句关含无错陷阱题");
+// 侦探题：bad 词必须出现在句子里
+const badFound = (q) => q.sentence.split(" ").some((t) => {
+  const clean = t.replace(/[.,!?]/g, "");
+  return clean === q.bad || q.bad.split(" ").every((bw) => q.sentence.includes(bw));
+});
+ok(GRAMMAR_LEVELS.every((l) => l.qs.filter((q) => q.type === "detective" && q.bad).every(badFound)), "detective 错词能在句中找到");
+// 模拟通关一关
+grammarState.levelDone["be-verbs"] = true;
+grammarSave();
+ok(JSON.parse(localStorage.getItem("englishWorldV2")).grammarDone["be-verbs"] === true, "语法通关进度持久化");
+// 模拟辨音毕业
+grammarState.soundDone["ih-ee"] = true;
+grammarSave();
+ok(JSON.parse(localStorage.getItem("englishWorldV2")).soundDone["ih-ee"] === true, "辨音毕业进度持久化");
+ok(Object.keys(JSON.parse(localStorage.getItem("englishWorldV2"))).includes("progress"), "合并式存储不破坏其他模块数据");
+
+console.log("== 13. 发音辨音 ==");
+ok(typeof SOUND_PAIRS !== "undefined" && SOUND_PAIRS.length === 4, "辨音 4 组音对");
+ok(SOUND_PAIRS.every(g => g.pairs.length === 6), "每组 6 题");
+ok(SOUND_PAIRS.every(g => g.pairs.every(p => p.a && p.b && p.a !== p.b && p.zhA && p.zhB)), "每题两词+中文释义齐全");
+ok(SOUND_PAIRS.every(g => g.tip), "每组都有发音要领提示");
+
 console.log("");
 console.log("结果: " + pass + " 通过 / " + fail + " 失败");
 if (fail > 0) throw new Error("测试失败");
@@ -270,6 +301,9 @@ const code = [
   fs.readFileSync(path.join(base, "vlogs.js"), "utf8"),
   fs.readFileSync(path.join(base, "game.js"), "utf8").replace(/vlogLoad\(\);|initHomeTabs\(\);/g, ""),
   fs.readFileSync(path.join(base, "vlog.js"), "utf8"),
+  fs.readFileSync(path.join(base, "grammar-data.js"), "utf8"),
+  fs.readFileSync(path.join(base, "sound-data.js"), "utf8"),
+  fs.readFileSync(path.join(base, "grammar.js"), "utf8").replace(/grammarLoad\(\);/g, ""),
   TEST_BODY,
 ].join("\n;\n");
 
