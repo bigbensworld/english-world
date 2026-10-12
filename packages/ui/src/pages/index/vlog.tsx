@@ -80,7 +80,7 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
   const onWordClick = (raw: string) => {
     const clean = raw.toLowerCase().replace(/[^a-z'-]/g, "");
     if (!clean) return;
-    // 先停整句预生成 mp3；再听一次使用同一套 TTS 入口
+    // 先停整句预生成 mp3；清除旧 TTS 后重新触发当前词
     pgStop();
     stopSpeak();
     speak(clean, 0.6);

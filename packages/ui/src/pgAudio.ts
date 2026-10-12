@@ -34,9 +34,12 @@ export function pgPlay(key: string, onWordIndex: (i: number) => void, onEnd?: ()
   if (!IS_H5 || !PG_INDEX || !PG_INDEX[key]) return false;
   const entry = PG_INDEX[key];
   pgStop();
-  audioEl = new Audio("audio/vlog/" + key + ".mp3");
-  audioEl.preload = "auto";
-  audioEl.play().catch(() => { if (onEnd) onEnd(); });
+  const el = new Audio("audio/vlog/" + key + ".mp3");
+  audioEl = el;
+  el.preload = "auto";
+  el.volume = 1;
+  el.oncanplay = () => { void el.play().catch(() => { if (audioEl === el) audioEl = null; if (onEnd) onEnd(); }); };
+  el.onerror = () => { if (audioEl === el) { audioEl = null; if (onEnd) onEnd(); } };
   let raf = 0;
   const tick = () => {
     if (!audioEl) return;
