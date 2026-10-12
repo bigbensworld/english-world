@@ -105,9 +105,10 @@
     - **语法 20 关**（一：be 动词/冠词/单复数/三单/进行时/过去时/介词/疑问句；二：情态动词/比较级最高级/代词/there be/可数不可数/频率副词；**三：被动语态/动名词不定式/现在完成时/定语从句/宾语从句/虚拟语气**），每关 8 题三题型混编：🔧 修句师 · 🏭 句子工厂 · 🔍 语法侦探；关卡解锁制，75% 正确率通关
     - **发音辨音 8 组**（ɪ/iː·æ/e·s/θ·l/r·s/ʃ·v/w·**tʃ/ʃ·æ/ʌ**）各 6 题，答错双词对比播放；75% 毕业
     - **侦探题引擎（第三期升级）**：新增「✨ 没有错误」按钮——陷阱题（bad:null）点它=答对算分，有错题点它=答错重试，点词于陷阱题=答错重试；renderDetectiveQ 重构为局部 answer()（修复旧 answered 引用 bug），旧 handleGrammarDetective 已删
-    - 存储：englishWorldV2（grammarDone/grammarBest/soundDone）；vlog.js initHomeTabs 支持第三 tab
-    - 验证：test.js 112/112；CDP 本地 12/12（含陷阱正误双路径）；线上 8/8 console 0 错误
-    - ⚠️ 坑：① factory 干扰词不得与答案词相同（Tuesdays bug，断言防护）；② 部署后 CDN 传播延迟，等 1-2 分钟再线上验证；③ 验证陷阱题时注意题型顺序——detNoError 按钮只在 detective 题渲染（断言别拿 fix 题找按钮）
+    - **错题轮换池（第四批，commit c630975）**：简化遗忘曲线——答题自动记账（答错入池 miss+1/hit 清零，答对 hit+1，连对 2 次出池）；🔥错题重刷模式（drill 会话：按 miss 降序跨关混合，复用三题型渲染，标题/进度覆写）；UI：语法世界页入口卡（空池/有池两态）+ 首页第三张入口卡 + 关卡 meta 🔥n 待重刷数；存储 englishWorldV2.grammarWrongPool
+    - 存储：englishWorldV2（grammarDone/grammarBest/soundDone/wrongPool）；vlog.js initHomeTabs 支持第三 tab
+    - 验证：test.js 122/122；CDP 本地 14/14（错题池全生命周期：入池→显示→drill→hit=1→出池→刷新保留）；线上 6/6 console 0 错误
+    - ⚠️ 坑：① factory 干扰词不得与答案词相同（Tuesdays bug，断言防护）；② 部署后 CDN 传播延迟，等 1-2 分钟再线上验证；③ 验证陷阱题时注意题型顺序——detNoError 按钮只在 detective 题渲染；④ **JS 函数重复定义会被后者静默覆盖**（nextGrammarQuestion 插入新定义时旧定义残留 → drill 分流失效且无任何报错，靠 CDP 全链路测试抓到）
 26. ⬜ 候选：场景对话 877 步的语音生成（量大，需评估分批）、小程序音频适配、用户浏览器验收 Taro 版后拍板切换生产站、发音跟读打分层（Web Speech Recognition，Chrome/Edge 可用+其他端降级自评）、Taro 版同步语法模块、语法内容轮换池（20 关后按遗忘曲线重刷错题）
 
 **跨端架构（2026-10-10 拍板，Phase 0 + Phase 1(H5) 已落地）**：
@@ -177,6 +178,7 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 ## 七、近期 commit 索引（倒序）
 
 ```
+c630975 语法错题轮换池: 简化遗忘曲线(错题入池, 连对2次出池) + 错题重刷模式
 e8c6636 语法第三期: 6 新关(被动/动名词不定式/完成时/定从/宾从/虚拟) + 辨音 2 组(tʃ/ʃ, æ/ʌ) + 侦探题引擎升级
 92a0f46 语法第二期: 6 新关(情态/比较级/代词/there be/可数不可数/频率副词) + 辨音 2 组(s/ʃ, v/w)
 467f09f 文档: STATE.md 同步语法闯关+发音辨音模块
