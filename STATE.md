@@ -1,6 +1,6 @@
 # english-world 项目状态（STATE）
 
-> 更新时间：2026-10-12 上午（语法三批 20 关 + 辨音 8 组全部上线）· 最新 commit 见第七节
+> 更新时间：2026-10-12 上午（Taro 版语法模块同步完成，双站内容对齐）· 最新 commit 见第七节
 > 新会话冷启动指南：读完本文即可继续开发，无需翻历史对话。
 
 ## 一、项目是什么
@@ -109,12 +109,17 @@
     - 存储：englishWorldV2（grammarDone/grammarBest/soundDone/wrongPool）；vlog.js initHomeTabs 支持第三 tab
     - 验证：test.js 122/122；CDP 本地 14/14（错题池全生命周期：入池→显示→drill→hit=1→出池→刷新保留）；线上 6/6 console 0 错误
     - ⚠️ 坑：① factory 干扰词不得与答案词相同（Tuesdays bug，断言防护）；② 部署后 CDN 传播延迟，等 1-2 分钟再线上验证；③ 验证陷阱题时注意题型顺序——detNoError 按钮只在 detective 题渲染；④ **JS 函数重复定义会被后者静默覆盖**（nextGrammarQuestion 插入新定义时旧定义残留 → drill 分流失效且无任何报错，靠 CDP 全链路测试抓到）
-26. ⬜ 候选：场景对话 877 步的语音生成（量大，需评估分批）、小程序音频适配、用户浏览器验收 Taro 版后拍板切换生产站、发音跟读打分层（Web Speech Recognition，Chrome/Edge 可用+其他端降级自评）、Taro 版同步语法模块、语法内容轮换池（20 关后按遗忘曲线重刷错题）
+26. ✅ **Taro 版同步语法模块（2026-10-12，commit c30d660 + a9520dd，部署 https://english-world-taro.pages.dev）**：
+    - core：extract 管线接入 grammar-data.js/sound-data.js（_raw.js 增 GRAMMAR_LEVELS/SOUND_PAIRS 出口）；types.ts 补 GrammarQuestion（三题型判别联合）/GrammarLevel/SoundGroup/WrongPoolEntry；SaveData 增 grammarDone/grammarBest/soundDone/grammarWrongPool 四键；新增 engine/grammar.ts（recordWrongResult/wrongPoolCount/buildWrongPoolDrill 纯逻辑，三端共用）；core.test.ts +11 断言（75/75）
+    - ui：新增 pages/index/grammar.tsx（世界地图 + 修句师/句子工厂/语法侦探 + 陷阱题「✨ 没有错误」+ 错题池 drill + 辨音 SoundView/SoundQ）；首页第三 Tab「🎓 语法闯关」+ 三张入口卡；app.css 迁移原站 779-997 行语法样式（变量名映射 surface→card/muted→sub，补 amber/error-red/radius/shadow 变量 + squish 关键帧）
+    - **修复 2 个真 bug**：①SaveService.load() 只回填旧字段——语法四键写档后在任何 re-render 重新 load 时全被丢弃（新增字段必须同步补进 load() 的回填表）；②nextQuestion 的 setTimeout 闭包捕获旧 phase——改用 phaseRef.current 读最新状态
+    - 验证：test.js 122/122（宾从关 9 题断言修正）+ core 75/75 + sync-guard 4/4 + 本地 CDP 17/17 + 线上 CDP 18/18 + 线上全链路 7/7（通关/解锁/存档/错题池入池→两轮 drill 出池→清空结算），console 0 错误
+    - ⚠️ 坑：①verify_grammar_taro.py 验证线上站**不能加 block_external**（会把线上域名劫持到 127.0.0.1 → ERR_CONNECTION_REFUSED，之前 2/17 假失败就是它）；②错题池「连对 2 次出池」语义：关内答错后重试答对只算 hit=1，需再 drill 答对一次才出池——验证脚本要按此设计两轮
 
 **跨端架构（2026-10-10 拍板，Phase 0 + Phase 1(H5) 已落地）**：
 - 目标：一套架构同时支持网站/微信小程序/App；三端统一**静态离线优先**（网站纯静态 CF Pages、小程序全资源分包零网络请求、App Capacitor 全本地）。
 - `packages/core/` 共享内核（TS）：types + 数据（_raw.js 从源提取）+ 场景引擎（去 DOM 纯逻辑）+ Storage/TTS 适配器接口。方案详见 `docs/cross-platform-architecture.md`。
-- **`packages/ui/` Taro UI 层（Phase 1，commit 917620b）**：Taro 4.0.9 + React 18，核心页面全移植（双 Tab/分组地图/对话/答错教学/订单托盘/vlog 逐词高亮查词/词汇册）；gameStore.ts hook 封装 core 引擎。构建：`scripts/taro-build.sh build --type h5`。**预览站 https://english-world-taro.pages.dev**（生产站仍是 vanilla 版，切换需拍板）。
+- **`packages/ui/` Taro UI 层（Phase 1，commit 917620b）**：Taro 4.0.9 + React 18，核心页面全移植（三 Tab/分组地图/对话/答错教学/订单托盘/vlog 逐词高亮查词/词汇册/**语法闯关三题型+错题池+辨音**）；gameStore.ts hook 封装 core 引擎。构建：`scripts/taro-build.sh build --type h5`。**预览站 https://english-world-taro.pages.dev**（生产站仍是 vanilla 版，切换需拍板）。
 - **Phase 1 构建坑（重要）**：①Taro H5 的 webpack script rule 默认只编译项目 src——外部 core 包必须在 `h5.webpackChain` 里 `chain.module.rules.get('script').include.add(coreDir)`（webpack-chain 的 include 是 ChainedSet，用 `.add()` 不是赋值）；顶层 webpackChain 配置项在 h5 段内才稳定执行；②`src/index.html` 模板必填（含 `<%= htmlWebpackPlugin.options.script %>`），否则 dist 无 html；③Taro CLI 靠 process.cwd() 定位项目，WorkBuddy shell 不能 `cd`，用 `scripts/taro-build.sh` wrapper；④mini.postcss.pxtransform 不允许 selectorBlackList 属性；⑤需要额外装 @babel/preset-react + babel-preset-react-app。
 - **移动端适配坑（2026-10-10 晚修复，0e13e4c）**：①**designWidth 必须 375**——app.css 的 px 按 375 视觉稿（原站 web 实际像素）编写；750 会让真机所有尺寸减半（根字号 20px 时 16px 只渲染 8px），桌面预览因根字号 clamp 40px 看不出问题；②**weapp 构建会覆盖同一个 dist/**——曾导致 H5 部署拿到小程序文件（线上 404），现 wrapper 自动把 weapp 产物移至 `dist-weapp/`，H5 留 `dist/`；③weapp 端 storage 用 `TaroStorageAdapter`（Taro.setStorageSync，gameStore.ts 按 `process.env.TARO_ENV` 分流），TTS 在 weapp 无 speechSynthesis 时优雅降级静音（音频属 Phase 2）；④headless Chrome 验证移动端 viewport 要用 CDP `Emulation.setDeviceMetricsOverride`（--window-size 有约 500px 最小窗口限制）；⑤GitHub API sync 逐文件追加曾把 app.css 写坏（动画块重复 15 次 + `--bounce` 变量丢失）——大文件 sync 后务必检查重复块。
 - **视觉根因修复（2026-10-11，70df5db + 5182de8 + ad6da61，部署 https://bb9766fe.english-world-taro.pages.dev）**：多轮「背景/字号/布局/图标都不对」打补丁无效后，改用 CDP **实测元素尺寸**定位真凶，一次性解决三个根因：
@@ -178,6 +183,8 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 ## 七、近期 commit 索引（倒序）
 
 ```
+a9520dd 验证脚本修正: verify_grammar_taro 线上跑不加 block_external(会劫持线上域名)
+c30d660 Taro 版同步语法闯关模块: 语法20关三题型+错题池drill+发音辨音8组
 c630975 语法错题轮换池: 简化遗忘曲线(错题入池, 连对2次出池) + 错题重刷模式
 e8c6636 语法第三期: 6 新关(被动/动名词不定式/完成时/定从/宾从/虚拟) + 辨音 2 组(tʃ/ʃ, æ/ʌ) + 侦探题引擎升级
 92a0f46 语法第二期: 6 新关(情态/比较级/代词/there be/可数不可数/频率副词) + 辨音 2 组(s/ʃ, v/w)
