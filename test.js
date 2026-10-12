@@ -259,7 +259,9 @@ ok(Object.keys(state.collected).filter(k => k.startsWith("vlog:morning:")).lengt
 ok(state.progress["cafe:v1"] === 10, "vlog 不影响场景对话进度");
 
 console.log("== 12. 语法闯关 ==");
-ok(typeof GRAMMAR_LEVELS !== "undefined" && GRAMMAR_LEVELS.length === 8, "语法闯关 8 关");
+ok(typeof GRAMMAR_LEVELS !== "undefined" && GRAMMAR_LEVELS.length === 14, "语法闯关 14 关");
+ok(GRAMMAR_LEVELS.slice(0, 8).every(l => l.qs.length === 8), "第一批 8 关每关 8 题");
+ok(GRAMMAR_LEVELS.slice(8).every(l => l.qs.length === 8), "第二批 6 关每关 8 题");
 ok(GRAMMAR_LEVELS.every(l => l.qs.length >= 8), "每关至少 8 题");
 ok(GRAMMAR_LEVELS.every(l => l.qs.every(q => ["fix","factory","detective"].includes(q.type))), "题型只允许 fix/factory/detective");
 ok(GRAMMAR_LEVELS.every(l => l.qs.filter(q => q.type === "fix").every(q => q.options.filter(o => o.ok).length === 1)), "fix 题恰好 1 个正确选项");
@@ -284,7 +286,8 @@ ok(JSON.parse(localStorage.getItem("englishWorldV2")).soundDone["ih-ee"] === tru
 ok(Object.keys(JSON.parse(localStorage.getItem("englishWorldV2"))).includes("progress"), "合并式存储不破坏其他模块数据");
 
 console.log("== 13. 发音辨音 ==");
-ok(typeof SOUND_PAIRS !== "undefined" && SOUND_PAIRS.length === 4, "辨音 4 组音对");
+ok(typeof SOUND_PAIRS !== "undefined" && SOUND_PAIRS.length === 6, "辨音 6 组音对");
+ok(SOUND_PAIRS.slice(4).every(g => g.pairs.length === 6), "新增 2 组各 6 题");
 ok(SOUND_PAIRS.every(g => g.pairs.length === 6), "每组 6 题");
 ok(SOUND_PAIRS.every(g => g.pairs.every(p => p.a && p.b && p.a !== p.b && p.zhA && p.zhB)), "每题两词+中文释义齐全");
 ok(SOUND_PAIRS.every(g => g.tip), "每组都有发音要领提示");

@@ -482,7 +482,7 @@ function renderGrammarEntry() {
       <div class="ge-emoji">🎓</div>
       <div class="ge-info">
         <div class="ge-title">语法闯关</div>
-        <div class="ge-desc">修句师 · 句子工厂 · 语法侦探，8 关循序渐进</div>
+        <div class="ge-desc">修句师 · 句子工厂 · 语法侦探，${GRAMMAR_LEVELS.length} 关循序渐进</div>
         <div class="ge-meta">${doneCount}/${GRAMMAR_LEVELS.length} 关已通关</div>
       </div>
     </button>
