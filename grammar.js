@@ -84,7 +84,7 @@ function openGrammarWorld() {
     <div class="adv-head">
       <div class="adv-title">🎓 语法闯关</div>
     </div>
-    <div class="adv-intro">三大题型打通语法关：🔧 修句师选对句 → 🏭 句子工厂拼语序 → 🔍 语法侦探揪错词。每关 8 题，通关解锁下一关。</div>
+    <div class="adv-intro">三大题型打通语法关：🔧 修句师选对句 → 🏭 句子工厂拼语序 → 🔍 语法侦探揪错词。每关 8-9 题，通关解锁下一关。</div>
     <button type="button" class="grammar-drill-entry${poolN ? " has-pool" : ""}" id="drillEntry">
       <div class="gl-num">🔥</div>
       <div class="gl-info">

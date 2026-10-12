@@ -71,6 +71,11 @@ export class SaveService {
       unlockedVisits: d?.unlockedVisits || {},
       vlogSeen: (d as any)?.vlogSeen || {},
       vlogQuiz: (d as any)?.vlogQuiz || {},
+      // 语法闯关 + 发音辨音四键（2026-10-12 加入；老存档缺省为空）
+      grammarDone: (d as any)?.grammarDone || {},
+      grammarBest: (d as any)?.grammarBest || {},
+      soundDone: (d as any)?.soundDone || {},
+      grammarWrongPool: (d as any)?.grammarWrongPool || {},
     };
   }
 

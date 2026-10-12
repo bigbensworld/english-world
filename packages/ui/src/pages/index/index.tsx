@@ -1,13 +1,14 @@
-// 首页：双 Tab（慢速生活 / 场景冒险）+ 场景地图 + vlog 列表
+// 首页：三 Tab（慢速生活 / 场景冒险 / 语法闯关）+ 场景地图 + vlog 列表 + 语法世界
 import { useState, useMemo } from "react";
 import { View, Text, Image } from "@tarojs/components";
-import { SCENES, VLOGS, sceneCardStatus, finishedVisits, sceneVisits } from "../../gameStore";
+import { SCENES, VLOGS, GRAMMAR_LEVELS, SOUND_PAIRS, sceneCardStatus, finishedVisits, sceneVisits, readSaveOnce, wrongPoolCount } from "../../gameStore";
 import type { Scene, Vlog } from "@english-world/core";
 // 回到地图/频道列表 → idle（对齐原站 game.js:620 backToMap、vlog.js:733 openVlogChannel）
 import { setMascotState } from "../../mascotStore";
 import ScenePage from "./scene";
 import VlogPage from "./vlog";
 import BookPage from "./book";
+import GrammarPage from "./grammar";
 
 const SCENE_GROUPS = [
   { id: "daily", title: "🏠 日常高频", sub: "Daily Life · 天天都用得上的英语", scenes: ["cafe", "restaurant", "market", "transport", "barber", "gym", "shopping", "vet", "bookstore", "dryclean", "optician", "communitycenter"] },
@@ -20,15 +21,16 @@ type View2 =
   | { kind: "home" }
   | { kind: "scene"; scene: Scene }
   | { kind: "vlog"; vlog: Vlog }
-  | { kind: "book" };
+  | { kind: "book" }
+  | { kind: "grammar" };
 
 export default function Index() {
-  const [tab, setTab] = useState<"vlog" | "scenes">("vlog");
+  const [tab, setTab] = useState<"vlog" | "scenes" | "grammar">("vlog");
   const [view, setView] = useState<View2>({ kind: "home" });
 
   // 回到顶层（地图 / 频道列表）→ 吉祥物回 idle
   const backToHome = () => { setMascotState("idle"); setView({ kind: "home" }); };
-  const switchTab = (t: "vlog" | "scenes") => { setMascotState("idle"); setTab(t); };
+  const switchTab = (t: "vlog" | "scenes" | "grammar") => { setMascotState("idle"); setTab(t); };
 
   const groups = useMemo(() => {
     const grouped = new Set(SCENE_GROUPS.flatMap((g) => g.scenes));
@@ -41,6 +43,7 @@ export default function Index() {
   if (view.kind === "scene") return <ScenePage scene={view.scene} onBack={backToHome} onOpenBook={() => setView({ kind: "book" })} />;
   if (view.kind === "vlog") return <VlogPage vlog={view.vlog} onBack={backToHome} />;
   if (view.kind === "book") return <BookPage onBack={backToHome} />;
+  if (view.kind === "grammar") return <GrammarPage onBack={backToHome} />;
 
   return (
     <View className="page-pad">
@@ -60,11 +63,12 @@ export default function Index() {
         </View>
       </View>
 
-      {/* 双 Tab：分段控件 */}
+      {/* 三 Tab：分段控件 */}
       <View className="tabs-wrap">
         <View className="home-tabs">
           <View className={`home-tab ${tab === "vlog" ? "active" : ""}`} onClick={() => switchTab("vlog")}>📺 慢速生活</View>
           <View className={`home-tab ${tab === "scenes" ? "active" : ""}`} onClick={() => switchTab("scenes")}>🗺️ 场景冒险</View>
+          <View className={`home-tab ${tab === "grammar" ? "active" : ""}`} onClick={() => switchTab("grammar")}>🎓 语法闯关</View>
         </View>
       </View>
 
@@ -103,6 +107,49 @@ export default function Index() {
               <View className="path-next-text">🎧 听懂之后？去真实场景里<b>说出第一句</b></View>
               <View className="btn btn-primary btn-big" onClick={() => setTab("scenes")}>🗺️ 进入场景冒险</View>
             </View>
+          </View>
+        </View>
+      ) : tab === "grammar" ? (
+        <View className="home-pane">
+          <View className="hero">
+            <View className="map-title">语法也能闯关玩</View>
+            <View className="map-sub">修句师 · 句子工厂 · 语法侦探 + 发音辨音，把最磨人的语法变成闯关小游戏。</View>
+          </View>
+          <View className="grammar-entry-grid">
+            {(() => {
+              const save = readSaveOnce();
+              const doneCount = GRAMMAR_LEVELS.filter((l) => (save.grammarDone || {})[l.id]).length;
+              const soundDoneCount = SOUND_PAIRS.filter((g) => (save.soundDone || {})[g.id]).length;
+              const poolN = wrongPoolCount(save.grammarWrongPool || {});
+              return (
+                <>
+                  <View className="grammar-entry-card" onClick={() => setView({ kind: "grammar" })}>
+                    <View className="ge-emoji">🎓</View>
+                    <View className="ge-info">
+                      <View className="ge-title">语法闯关</View>
+                      <View className="ge-desc">修句师 · 句子工厂 · 语法侦探，{GRAMMAR_LEVELS.length} 关循序渐进</View>
+                      <View className="ge-meta">{doneCount}/{GRAMMAR_LEVELS.length} 关已通关</View>
+                    </View>
+                  </View>
+                  <View className="grammar-entry-card" onClick={() => setView({ kind: "grammar" })}>
+                    <View className="ge-emoji">🎧</View>
+                    <View className="ge-info">
+                      <View className="ge-title">发音辨音</View>
+                      <View className="ge-desc">ship 还是 sheep？磨出母语耳朵</View>
+                      <View className="ge-meta">{soundDoneCount}/{SOUND_PAIRS.length} 组已毕业</View>
+                    </View>
+                  </View>
+                  <View className="grammar-entry-card" onClick={() => { setView({ kind: "grammar" }); }}>
+                    <View className="ge-emoji">🔥</View>
+                    <View className="ge-info">
+                      <View className="ge-title">错题重刷</View>
+                      <View className="ge-desc">答错的题自动入池，连对 2 次出池</View>
+                      <View className="ge-meta">{poolN ? `🔥 池中 ${poolN} 题` : "✅ 池子空空的"}</View>
+                    </View>
+                  </View>
+                </>
+              );
+            })()}
           </View>
         </View>
       ) : (
@@ -167,7 +214,6 @@ function SceneArt({ scene }: { scene: Scene }) {
 }
 
 // sceneCardStatus 需要 GameState：走跨端统一读档（不直接依赖 localStorage）
-import { useGame, readSaveOnce } from "../../gameStore";
 function stateOf(_sc: Scene) {
   try {
     return readSaveOnce();

@@ -1,7 +1,7 @@
 // 英语世界 · 共享内核出口
 // 数据 + 类型 + 引擎 + 平台接口。UI 层（H5/小程序/App）只 import 这里。
 
-export { SCENES, VLOGS, VLOG_DICT, findScene, findVlog } from "./data/index.ts";
+export { SCENES, VLOGS, VLOG_DICT, GRAMMAR_LEVELS, SOUND_PAIRS, findScene, findVlog } from "./data/index.ts";
 export {
   sceneVisits,
   visitKey,
@@ -14,6 +14,12 @@ export {
   sceneCardStatus,
 } from "./engine/scene.ts";
 export type { AnswerResult } from "./engine/scene.ts";
+export {
+  recordWrongResult,
+  wrongPoolCount,
+  buildWrongPoolDrill,
+} from "./engine/grammar.ts";
+export type { WrongPool, DrillItem } from "./engine/grammar.ts";
 export {
   SAVE_KEY,
   WebStorageAdapter,
@@ -38,4 +44,10 @@ export type {
   SaveData,
   AdventureSession,
   FinishResult,
+  GrammarFixOption,
+  GrammarQuestion,
+  GrammarLevel,
+  SoundPair,
+  SoundGroup,
+  WrongPoolEntry,
 } from "./types.ts";

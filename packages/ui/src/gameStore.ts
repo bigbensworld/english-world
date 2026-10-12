@@ -1,17 +1,22 @@
 // 全局状态：core 引擎 + 存档服务的 React 封装（H5 端注入 Web 适配器）
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  SCENES, VLOGS, VLOG_DICT,
+  SCENES, VLOGS, VLOG_DICT, GRAMMAR_LEVELS, SOUND_PAIRS,
   WebStorageAdapter, SaveService, SAVE_KEY,
   sceneVisits, visitKey, unlockedVisitIndex, finishedVisits,
   pickNpcLine, applyAnswer, applyFinish, resumeOrder, sceneCardStatus,
+  recordWrongResult, wrongPoolCount, buildWrongPoolDrill,
 } from "@english-world/core";
 import type {
   Scene, SceneVisit, VisitStep, GameState, SaveData, OrderAdd, StorageAdapter,
 } from "@english-world/core";
 
 export function emptySave(): SaveData {
-  return { collected: {}, phrases: {}, npcLastLines: {}, progress: {}, unlockedVisits: {}, vlogSeen: {}, vlogQuiz: {} };
+  return {
+    collected: {}, phrases: {}, npcLastLines: {}, progress: {}, unlockedVisits: {},
+    vlogSeen: {}, vlogQuiz: {},
+    grammarDone: {}, grammarBest: {}, soundDone: {}, grammarWrongPool: {},
+  };
 }
 
 // ---------- TTS（H5：Web Speech） ----------
@@ -198,4 +203,4 @@ export function useAdventure(scene: Scene, visit: SceneVisit, save: SaveData, up
   return { adv, start, choose, restart, settle, runStepFlow };
 }
 
-export { SCENES, VLOGS, VLOG_DICT, SAVE_KEY, sceneVisits, visitKey, unlockedVisitIndex, finishedVisits, sceneCardStatus, pickNpcLine, applyAnswer, applyFinish, resumeOrder };
+export { SCENES, VLOGS, VLOG_DICT, GRAMMAR_LEVELS, SOUND_PAIRS, SAVE_KEY, sceneVisits, visitKey, unlockedVisitIndex, finishedVisits, sceneCardStatus, pickNpcLine, applyAnswer, applyFinish, resumeOrder, recordWrongResult, wrongPoolCount, buildWrongPoolDrill };

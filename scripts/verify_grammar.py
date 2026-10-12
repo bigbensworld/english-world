@@ -31,7 +31,7 @@ def main():
         txt = c.text()
         check("语法面板渲染入口卡", "语法闯关" in txt and "发音辨音" in txt)
         check("入口卡显示进度 0/8", "0/8" in txt)
-        check("辨音进度 0/4", "0/4" in txt)
+        check("辨音进度 0/8 组", "0/8 组已毕业" in txt)
 
         print("== 2. 进入语法世界 ==")
         c.evaluate("document.getElementById('geGrammar').click()")

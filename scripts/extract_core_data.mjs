@@ -10,13 +10,18 @@ const base = dirname(dirname(fileURLToPath(import.meta.url)));
 const data = readFileSync(join(base, "data.js"), "utf8");
 const vlogs = readFileSync(join(base, "vlogs.js"), "utf8");
 const vlogJs = readFileSync(join(base, "vlog.js"), "utf8");
+const grammarData = readFileSync(join(base, "grammar-data.js"), "utf8");
+const soundData = readFileSync(join(base, "sound-data.js"), "utf8");
 
 const scenesCode = data.replace(/^\/\/.*$/gm, "").trim();
 const vlogsCode = vlogs.replace(/^\/\/.*$/gm, "").trim();
 const dictMatch = vlogJs.match(/const VLOG_DICT = \{[\s\S]*?\n\};/);
 if (!dictMatch) { console.error("VLOG_DICT not found in vlog.js"); process.exit(1); }
+// 语法/辨音数据：去掉注释后整段拼接（const GRAMMAR_LEVELS = [...]; / const SOUND_PAIRS = [...];）
+const grammarCode = grammarData.replace(/^\/\/.*$/gm, "").trim();
+const soundCode = soundData.replace(/^\/\/.*$/gm, "").trim();
 
 const out = join(base, "packages/core/src/data/_raw.js");
-writeFileSync(out, scenesCode + "\n\n" + vlogsCode + "\n\n" + dictMatch[0] + "\nexport { SCENES, VLOGS, VLOG_DICT };\n");
+writeFileSync(out, scenesCode + "\n\n" + vlogsCode + "\n\n" + dictMatch[0] + "\n\n" + grammarCode + "\n\n" + soundCode + "\nexport { SCENES, VLOGS, VLOG_DICT, GRAMMAR_LEVELS, SOUND_PAIRS };\n");
 console.log("extracted ->", out, "(" + readFileSync(out).size + " bytes)");
 console.log("remember to run: node packages/core/test/sync-guard.test.ts");

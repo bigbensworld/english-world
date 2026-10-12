@@ -166,6 +166,37 @@ console.log("== 9. 场景卡状态文案 ==");
   ok(sceneCardStatus(state, scene("cafe")).includes("📖"), "进行中显示继续文案");
 }
 
+console.log("== 10. 语法闯关 + 发音辨音数据 ==");
+{
+  const { GRAMMAR_LEVELS, SOUND_PAIRS, recordWrongResult, wrongPoolCount, buildWrongPoolDrill } =
+    await import("../src/index.ts");
+  ok(GRAMMAR_LEVELS.length === 20, "语法 20 关");
+  ok(GRAMMAR_LEVELS.every(l => l.qs.length >= 8), "每关至少 8 题");
+  ok(GRAMMAR_LEVELS.every(l => l.qs.every(q => q.type === "fix" || q.type === "factory" || q.type === "detective")), "题型全部合法");
+  // factory 干扰词不得与答案词相同（Tuesdays bug 防回归）
+  const factoryBad = GRAMMAR_LEVELS.flatMap(l =>
+    l.qs.filter(q => q.type === "factory" && (q.extra || []).some(e => q.answer.split(" ").includes(e))));
+  ok(factoryBad.length === 0, "factory 干扰词与答案词无重叠");
+  ok(SOUND_PAIRS.length === 8, "辨音 8 组");
+  ok(SOUND_PAIRS.every(g => g.pairs.length === 6), "每组 6 题最小对立对");
+
+  // 错题池引擎：入池 → hit 累计 → 连对 2 次出池
+  let pool: Record<string, any> = {};
+  pool = recordWrongResult(pool, "be-verbs", 0, false);
+  ok(wrongPoolCount(pool) === 1 && pool["be-verbs:0"].miss === 1, "答错入池 miss=1");
+  pool = recordWrongResult(pool, "be-verbs", 0, true);
+  ok(pool["be-verbs:0"].hit === 1, "答对 hit=1 仍在池");
+  pool = recordWrongResult(pool, "be-verbs", 0, true);
+  ok(wrongPoolCount(pool) === 0, "连对 2 次出池");
+  // miss 降序
+  pool = recordWrongResult(pool, "articles", 1, false);
+  pool = recordWrongResult(pool, "articles", 1, false);
+  pool = recordWrongResult(pool, "be-verbs", 2, false);
+  const drill = buildWrongPoolDrill(pool);
+  ok(drill.length === 2 && drill[0].lv.id === "articles", "drill 按 miss 降序");
+  ok(drill.every(x => x.q && x.lv), "drill 项都解析出题目");
+}
+
 console.log("");
 console.log("结果: " + pass + " 通过 / " + fail + " 失败");
 if (fail > 0) process.exit(1);

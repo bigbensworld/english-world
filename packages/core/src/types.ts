@@ -97,6 +97,39 @@ export interface VlogCollectedEntry {
   vlog: string;
 }
 
+// ---------- 语法闯关 + 发音辨音（grammar-data.js / sound-data.js） ----------
+
+// 三题型：fix 修句师（三选一）/ factory 句子工厂（拼词卡）/ detective 语法侦探（点错词，bad:null 为无错陷阱题）
+export interface GrammarFixOption { text: string; ok: boolean; tip?: string; }
+export type GrammarQuestion =
+  | { type: "fix"; task: string; options: GrammarFixOption[] }
+  | { type: "factory"; task: string; answer: string; extra?: string[]; tip?: string }
+  | { type: "detective"; sentence: string; bad: string | null; fix?: string; tip?: string };
+
+export interface GrammarLevel {
+  id: string;
+  name: string;
+  emoji: string;
+  desc: string;
+  color?: string;
+  qs: GrammarQuestion[];
+}
+
+// 最小对立对听音选词
+export interface SoundPair { a: string; b: string; zhA: string; zhB: string; }
+export interface SoundGroup {
+  id: string;
+  name: string;
+  emoji: string;
+  desc: string;
+  color?: string;
+  pairs: SoundPair[];
+  tip: string;
+}
+
+// 错题池条目：qKey = levelId + ":" + 题号；miss 累计答错、hit 连续答对（连对 2 次出池）
+export interface WrongPoolEntry { lvId: string; miss: number; hit: number; }
+
 // ---------- 游戏状态（对应 localStorage key englishWorldV2 的 JSON 结构） ----------
 
 export interface GameState {
@@ -115,6 +148,10 @@ export interface VlogState {
 export interface SaveData extends GameState {
   vlogSeen: Record<string, boolean>;
   vlogQuiz: Record<string, boolean>;
+  grammarDone: Record<string, boolean>;
+  grammarBest: Record<string, number>;
+  soundDone: Record<string, boolean>;
+  grammarWrongPool: Record<string, WrongPoolEntry>;
 }
 
 // ---------- 剧情会话（UI 层持有，驱动进度） ----------

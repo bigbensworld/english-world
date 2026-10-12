@@ -261,7 +261,7 @@ ok(state.progress["cafe:v1"] === 10, "vlog 不影响场景对话进度");
 console.log("== 12. 语法闯关 ==");
 ok(typeof GRAMMAR_LEVELS !== "undefined" && GRAMMAR_LEVELS.length === 20, "语法闯关 20 关");
 ok(GRAMMAR_LEVELS.slice(0, 14).every(l => l.qs.length === 8), "第一二批 14 关每关 8 题");
-ok(GRAMMAR_LEVELS.slice(14).every(l => l.qs.length === 8), "第三批 6 关每关 8 题");
+ok(GRAMMAR_LEVELS.slice(14).every(l => l.qs.length >= 8 && l.qs.length <= 9), "第三批 6 关每关 8-9 题（宾从关审查后 9 题）");
 ok(GRAMMAR_LEVELS.slice(14).every(l => l.qs.some(q => q.type === "detective" && q.bad === null)), "第三批每关含无错陷阱题");
 ok(GRAMMAR_LEVELS.every(l => l.qs.length >= 8), "每关至少 8 题");
 ok(GRAMMAR_LEVELS.every(l => l.qs.every(q => ["fix","factory","detective"].includes(q.type))), "题型只允许 fix/factory/detective");
