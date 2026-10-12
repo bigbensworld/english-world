@@ -102,7 +102,7 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
       </View>
 
       {mode === "quiz" ? (
-        <VlogQuiz vlog={vlog} onFinish={() => setMode("cards")} />
+        <VlogQuiz vlog={vlog} onFinish={() => { setIdx(0); setMode("cards"); }} />
       ) : (
         <View>
           <View className="vlog-stage">
