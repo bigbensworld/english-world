@@ -280,6 +280,40 @@ ok(GRAMMAR_LEVELS.every((l) => l.qs.filter((q) => q.type === "detective" && q.ba
 grammarState.levelDone["be-verbs"] = true;
 grammarSave();
 ok(JSON.parse(localStorage.getItem("englishWorldV2")).grammarDone["be-verbs"] === true, "语法通关进度持久化");
+
+console.log("== 12b. 错题池（简化遗忘曲线） ==");
+// 清池重测
+grammarState.wrongPool = {};
+// 第 1 关第 0 题答错 → 入池
+recordWrongResult("be-verbs", 0, false);
+ok(grammarState.wrongPool["be-verbs:0"] && grammarState.wrongPool["be-verbs:0"].miss === 1, "答错 1 次入池 miss=1");
+// 再错一次 → miss=2
+recordWrongResult("be-verbs", 0, false);
+ok(grammarState.wrongPool["be-verbs:0"].miss === 2, "再错 miss=2");
+// 对 1 次 → hit=1 仍在池
+recordWrongResult("be-verbs", 0, true);
+ok(grammarState.wrongPool["be-verbs:0"] && grammarState.wrongPool["be-verbs:0"].hit === 1, "连对第 1 次仍在池");
+// 又错 → hit 归零
+recordWrongResult("be-verbs", 0, false);
+ok(grammarState.wrongPool["be-verbs:0"].hit === 0 && grammarState.wrongPool["be-verbs:0"].miss === 3, "答错重置连对计数");
+// 连对 2 次 → 出池
+recordWrongResult("be-verbs", 0, true);
+recordWrongResult("be-verbs", 0, true);
+ok(grammarState.wrongPool["be-verbs:0"] === undefined, "连对 2 次出池");
+// 从没错过就答对 → 不入池
+recordWrongResult("be-verbs", 3, true);
+ok(grammarState.wrongPool["be-verbs:3"] === undefined, "没错过就答对不入池");
+// drill 序列构造 + miss 降序
+recordWrongResult("articles", 2, false);
+recordWrongResult("articles", 2, false);
+recordWrongResult("plurals", 5, false);
+grammarSave();
+const drillList = buildWrongPoolDrill();
+ok(drillList.length === 2, "池中 2 题构造 drill 序列");
+ok(drillList[0].lv.id === "articles" && drillList[0].qIdx === 2, "miss 高的（articles miss=2）排前面");
+ok(drillList.every((x) => x.q && x.lv), "drill 每项都有题和关卡");
+ok(JSON.parse(localStorage.getItem("englishWorldV2")).grammarWrongPool["plurals:5"] !== undefined, "错题池持久化");
+grammarState.wrongPool = {}; grammarSave();
 // 模拟辨音毕业
 grammarState.soundDone["ih-ee"] = true;
 grammarSave();

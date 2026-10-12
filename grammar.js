@@ -8,6 +8,9 @@ const grammarState = {
   levelDone: {},   // levelId -> true（通关）
   levelBest: {},   // levelId -> 本次最好成绩 n/total（重刷用，不影响通关标记）
   soundDone: {},   // soundGroupId -> true（毕业）
+  // 错题池（简化遗忘曲线）：qKey -> { lvId, miss, hit }
+  // qKey = levelId + ":" + 题号；miss = 累计答错次数；hit = 连续答对次数（连对 2 次出池）
+  wrongPool: {},
 };
 
 function grammarSave() {
@@ -15,6 +18,7 @@ function grammarSave() {
   d.grammarDone = grammarState.levelDone;
   d.grammarBest = grammarState.levelBest;
   d.soundDone = grammarState.soundDone;
+  d.grammarWrongPool = grammarState.wrongPool;
   localStorage.setItem("englishWorldV2", JSON.stringify(d));
 }
 function grammarLoad() {
@@ -24,8 +28,43 @@ function grammarLoad() {
       grammarState.levelDone = d.grammarDone || {};
       grammarState.levelBest = d.grammarBest || {};
       grammarState.soundDone = d.soundDone || {};
+      grammarState.wrongPool = d.grammarWrongPool || {};
     }
   } catch (e) { /* fresh */ }
+}
+
+// ---------- 错题池（简化遗忘曲线） ----------
+// 在关卡内答题时记录：qKey = lvId:qIdx
+function recordWrongResult(lvId, qIdx, ok) {
+  const key = lvId + ":" + qIdx;
+  const entry = grammarState.wrongPool[key];
+  if (ok) {
+    if (!entry) return; // 从没错过：不入池
+    entry.hit = (entry.hit || 0) + 1;
+    if (entry.hit >= 2) {
+      delete grammarState.wrongPool[key]; // 连对 2 次：出池
+    }
+  } else {
+    grammarState.wrongPool[key] = {
+      lvId, miss: (entry ? entry.miss : 0) + 1, hit: 0,
+    };
+  }
+  grammarSave();
+}
+function wrongPoolCount() {
+  return Object.keys(grammarState.wrongPool).length;
+}
+// 构造错题重刷序列：按 miss 降序（错得最多的先来），跨关混合
+function buildWrongPoolDrill() {
+  return Object.entries(grammarState.wrongPool)
+    .map(([key, e]) => ({ key, ...e }))
+    .sort((a, b) => b.miss - a.miss)
+    .map((e) => {
+      const lv = GRAMMAR_LEVELS.find((l) => l.id === e.lvId);
+      const qIdx = Number(e.key.split(":")[1]);
+      return { lv, q: lv && lv.qs[qIdx], qIdx };
+    })
+    .filter((x) => x.q); // 防御：关卡数据变动后找不到的题跳过
 }
 
 // ---------- 页面路由（复用 sceneView 舞台） ----------
@@ -40,11 +79,20 @@ function openGrammarWorld() {
 
   const box = document.createElement("div");
   box.className = "adventure-box grammar-map";
+  const poolN = wrongPoolCount();
   box.innerHTML = `
     <div class="adv-head">
       <div class="adv-title">🎓 语法闯关</div>
     </div>
     <div class="adv-intro">三大题型打通语法关：🔧 修句师选对句 → 🏭 句子工厂拼语序 → 🔍 语法侦探揪错词。每关 8 题，通关解锁下一关。</div>
+    <button type="button" class="grammar-drill-entry${poolN ? " has-pool" : ""}" id="drillEntry">
+      <div class="gl-num">🔥</div>
+      <div class="gl-info">
+        <div class="gl-name">错题重刷</div>
+        <div class="gl-desc">答错的题自动入池，连对 2 次出池——磨到彻底掌握</div>
+        <div class="gl-meta">${poolN ? "🔥 池中 " + poolN + " 题，错得多的先刷" : "✅ 池子是空的，去闯关积累吧"}</div>
+      </div>
+    </button>
     <div class="grammar-levels" id="grammarLevels"></div>
     <div class="sound-section" id="soundSection"></div>
     <button class="btn btn-big" id="grammarBack">⬅ 返回地图</button>
@@ -52,6 +100,10 @@ function openGrammarWorld() {
   stage.appendChild(box);
   renderGrammarLevels();
   renderSoundGroups();
+  $("drillEntry").onclick = () => {
+    if (!poolN) { toast("错题池是空的，先去闯关吧！🎉"); return; }
+    startWrongPoolDrill();
+  };
   $("grammarBack").onclick = backToMap;
 
   $("mapView").classList.add("hidden");
@@ -67,6 +119,8 @@ function renderGrammarLevels() {
     const prevDone = i === 0 || !!grammarState.levelDone[GRAMMAR_LEVELS[i - 1].id];
     const locked = !prevDone;
     const best = grammarState.levelBest[lv.id];
+    // 该关在错题池中的题数
+    const lvWrong = Object.values(grammarState.wrongPool).filter((e) => e.lvId === lv.id).length;
     const el = document.createElement("button");
     el.type = "button";
     el.className = "grammar-level" + (done ? " done" : "") + (locked ? " locked" : "");
@@ -76,7 +130,7 @@ function renderGrammarLevels() {
       <div class="gl-info">
         <div class="gl-name">${lv.emoji} ${lv.name}</div>
         <div class="gl-desc">${lv.desc}</div>
-        <div class="gl-meta">${locked ? "🔒 通关上一关解锁" : done ? "🎓 已通关" + (best ? " · 最佳 " + best : "") : "▶ " + lv.qs.length + " 题"}</div>
+        <div class="gl-meta">${locked ? "🔒 通关上一关解锁" : done ? "🎓 已通关" + (best ? " · 最佳 " + best : "") + (lvWrong ? " · 🔥" + lvWrong : "") : "▶ " + lv.qs.length + " 题" + (lvWrong ? " · 🔥" + lvWrong : "")}</div>
       </div>
     `;
     if (!locked) el.onclick = () => startGrammarLevel(lv);
@@ -114,6 +168,7 @@ function renderSoundGroups() {
 
 // ---------- 进入一关 ----------
 function startGrammarLevel(lv) {
+  grammarState.drill = null; // 进入正常关卡时清掉 drill 会话
   grammarState.currentLevel = lv;
   grammarState.qIdx = 0;
   grammarState.correct = 0;
@@ -243,6 +298,12 @@ function renderDetectiveQ(q) {
   function answer(isCorrect, el, feedback) {
     if (answered) return;
     answered = true;
+    // 错题池记账（drill 或关卡内）
+    if (grammarState.drill) {
+      recordWrongResult(lvIdForPool(), grammarState.drill.list[grammarState.drill.idx].qIdx, isCorrect);
+    } else {
+      recordWrongResult(grammarState.currentLevel.id, grammarState.qIdx, isCorrect);
+    }
     if (isCorrect) {
       grammarState.correct++;
       setMascotState("happy", 700);
@@ -282,10 +343,93 @@ function renderDetectiveQ(q) {
 }
 
 // ---------- 判分与推进 ----------
+// drill 模式下 nextGrammarQuestion 推进 drill 序列，而不是关卡内 qIdx
+function nextGrammarQuestion() {
+  if (grammarState.drill) return nextDrillQuestion();
+  const lv = grammarState.currentLevel;
+  grammarState.qIdx++;
+  if (grammarState.qIdx >= lv.qs.length) return finishGrammarLevel();
+  renderGrammarQuestion();
+}
+
+// drill 模式下取当前题所属关卡 id（错题池记账用）
+function lvIdForPool() {
+  if (grammarState.drill) {
+    const item = grammarState.drill.list[grammarState.drill.idx];
+    return item ? item.lv.id : grammarState.currentLevel.id;
+  }
+  return grammarState.currentLevel.id;
+}
+
+// ---------- 错题重刷（drill）模式 ----------
+// drill 会话：{ list: [{lv, q, qIdx}], idx, correct, exited }
+function startWrongPoolDrill() {
+  const list = buildWrongPoolDrill();
+  if (!list.length) { toast("错题池是空的，先去闯关吧！🎉"); return; }
+  grammarState.drill = { list, idx: 0, correct: 0 };
+  setMascotState("thinking");
+  renderDrillQuestion();
+}
+
+function renderDrillQuestion() {
+  const d = grammarState.drill;
+  const item = d.list[d.idx];
+  if (!item) return finishDrill();
+  // 借用关卡答题渲染：临时把 currentLevel/qIdx 指到该题，题型渲染函数直接复用
+  grammarState.currentLevel = item.lv;
+  grammarState.qIdx = item.qIdx;
+  renderGrammarQuestion();
+  // 覆盖标题与进度行：显示 drill 语境
+  const advTitle = document.querySelector(".grammar-play .adv-title");
+  if (advTitle) advTitle.innerHTML = `🔥 错题重刷 · ${item.lv.name}`;
+  const prog = document.querySelector(".grammar-play .adv-progress");
+  if (prog) prog.innerHTML = `<span class="gq-type-tag">第 ${d.idx + 1}/${d.list.length} 题 · 连对 2 次自动出池</span>`;
+}
+
+function nextDrillQuestion() {
+  const d = grammarState.drill;
+  d.idx++;
+  if (d.idx >= d.list.length) return finishDrill();
+  renderDrillQuestion();
+}
+
+function finishDrill() {
+  const d = grammarState.drill;
+  const remaining = wrongPoolCount();
+  grammarState.drill = null;
+  setMascotState(remaining === 0 ? "happy" : "idle", 2000);
+  const stage = $("stage");
+  stage.innerHTML = "";
+  const box = document.createElement("div");
+  box.className = "adventure-box grammar-play";
+  box.innerHTML = `
+    <div class="vlog-card quiz-card">
+      <div class="finish-big">${remaining === 0 ? "🎉" : "🔥"}</div>
+      <h3>${remaining === 0 ? "错题池清空！" : "本轮重刷完！"}</h3>
+      <p>${remaining === 0 ? "连对 2 次的题都已出池，全部消灭！" : "还有 " + remaining + " 题在池子里，继续加油！"}</p>
+      <div class="finish-btns">
+        ${remaining > 0 ? '<button class="btn btn-big btn-primary" id="drillAgain">🔥 继续重刷</button>' : ""}
+        <button class="btn btn-big" id="drillBack">🎓 返回闯关地图</button>
+      </div>
+    </div>
+  `;
+  stage.appendChild(box);
+  const again = $("drillAgain");
+  if (again) again.onclick = () => startWrongPoolDrill();
+  $("drillBack").onclick = openGrammarWorld;
+  if (remaining === 0) toast("🎉 错题池已清空！");
+}
+
 function handleGrammarAnswer(ok, tip, el, optsBox, spokenText) {
   const fb = $("grammarFeedback");
   const lv = grammarState.currentLevel;
   const qIdx = grammarState.qIdx;
+  // 错题池记账（非 drill 模式才入池；drill 模式记出池进度）
+  if (grammarState.drill) {
+    recordWrongResult(lv.id, grammarState.drill.list[grammarState.drill.idx].qIdx, ok);
+  } else {
+    recordWrongResult(lv.id, qIdx, ok);
+  }
   if (ok) {
     grammarState.correct++;
     setMascotState("happy", 700);
@@ -303,14 +447,8 @@ function handleGrammarAnswer(ok, tip, el, optsBox, spokenText) {
   }
 }
 
-function nextGrammarQuestion() {
-  const lv = grammarState.currentLevel;
-  grammarState.qIdx++;
-  if (grammarState.qIdx >= lv.qs.length) return finishGrammarLevel();
-  renderGrammarQuestion();
-}
-
 function finishGrammarLevel() {
+  if (grammarState.drill) return finishDrill();
   const lv = grammarState.currentLevel;
   const total = lv.qs.length;
   const correct = grammarState.correct;
@@ -475,6 +613,7 @@ function renderGrammarEntry() {
   if (!box) return;
   const doneCount = GRAMMAR_LEVELS.filter((l) => grammarState.levelDone[l.id]).length;
   const soundDoneCount = SOUND_PAIRS.filter((g) => grammarState.soundDone[g.id]).length;
+  const poolN = wrongPoolCount();
   box.innerHTML = `
     <button type="button" class="grammar-entry-card" id="geGrammar">
       <div class="ge-emoji">🎓</div>
@@ -492,9 +631,22 @@ function renderGrammarEntry() {
         <div class="ge-meta">${soundDoneCount}/${SOUND_PAIRS.length} 组已毕业</div>
       </div>
     </button>
+    <button type="button" class="grammar-entry-card" id="geDrill">
+      <div class="ge-emoji">🔥</div>
+      <div class="ge-info">
+        <div class="ge-title">错题重刷</div>
+        <div class="ge-desc">答错的题自动入池，连对 2 次出池</div>
+        <div class="ge-meta">${poolN ? "🔥 池中 " + poolN + " 题" : "✅ 池子空空的"}</div>
+      </div>
+    </button>
   `;
   $("geGrammar").onclick = openGrammarWorld;
   $("geSound").onclick = openGrammarWorld; // 都进语法世界页，向下滚动可见辨音区
+  $("geDrill").onclick = () => {
+    if (!poolN) { openGrammarWorld(); toast("错题池是空的，先去闯关吧！🎉"); return; }
+    openGrammarWorld();
+    startWrongPoolDrill();
+  };
 }
 
 // ---------- 初始化（grammar.js 最后加载） ----------
