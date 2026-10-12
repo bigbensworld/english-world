@@ -2,7 +2,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
 import { useGame, speak, stopSpeak, VLOG_DICT } from "../../gameStore";
-import { pgLoadIndex, pgPlay, pgStop } from "../../pgAudio";
+import { pgLoadIndex, pgPlay, pgStop, pgPlayWord } from "../../pgAudio";
 // 吉祥物状态：对齐原站 vlog.js 调用点
 //   764 happy 1200（打开某一集）、906 happy 800（Quiz 答对）、733 idle（返回频道列表）
 import { setMascotState } from "../../mascotStore";
@@ -83,7 +83,7 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
     // 先停整句预生成 mp3；清除旧 TTS 后重新触发当前词
     pgStop();
     stopSpeak();
-    speak(clean, 0.6);
+    if (!pgPlayWord(clean)) speak(clean, 0.6);
     setReplayBusy(false);
     setWordDef({ word: raw, def: lookupWord(raw) });
   };
@@ -145,7 +145,9 @@ export default function VlogPage({ vlog, onBack }: { vlog: Vlog; onBack: () => v
                   setReplayBusy(true);
                   pgStop();
                   stopSpeak();
-                  speak(clean, 0.6, undefined, () => setReplayBusy(false));
+                  if (!pgPlayWord(clean, () => setReplayBusy(false))) {
+                    speak(clean, 0.6, undefined, () => setReplayBusy(false));
+                  }
                 }}>{replayBusy ? "🔊 播放中…" : "🔊 再听一次"}</View>
                 <View className="btn" onClick={() => setWordDef(null)}>关闭</View>
               </View>

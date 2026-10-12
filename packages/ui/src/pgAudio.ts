@@ -29,6 +29,22 @@ export function pgStop() {
   if (audioEl) { try { audioEl.pause(); audioEl.currentTime = 0; } catch (e) { /* ignore */ } audioEl = null; }
 }
 
+// 直接播放独立词汇 mp3，绕开设备上的 Web Speech 无声问题。
+export function pgPlayWord(word: string, onEnd?: () => void): boolean {
+  if (!IS_H5) return false;
+  const clean = word.toLowerCase().replace(/[^a-z'-]/g, "");
+  if (!clean) return false;
+  pgStop();
+  const el = new Audio("audio/words/" + encodeURIComponent(clean) + ".mp3");
+  audioEl = el;
+  el.preload = "auto";
+  el.volume = 1;
+  el.oncanplay = () => { void el.play().catch(() => onEnd?.()); };
+  el.onended = () => { if (audioEl === el) audioEl = null; onEnd?.(); };
+  el.onerror = () => { if (audioEl === el) audioEl = null; onEnd?.(); };
+  return true;
+}
+
 // 播放预生成句子；返回 false = 无预生成（调用方降级 speak()）
 export function pgPlay(key: string, onWordIndex: (i: number) => void, onEnd?: () => void): boolean {
   if (!IS_H5 || !PG_INDEX || !PG_INDEX[key]) return false;

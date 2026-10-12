@@ -9,6 +9,7 @@ import json, os, re, subprocess, sys, time
 
 ROOT = '/Users/alice/WorkBuddy/3/english-world'
 OUT_DIR = f'{ROOT}/audio/vlog'
+WORD_DIR = f'{ROOT}/audio/words'
 FFMPEG = '/Users/alice/.homebrew/bin/ffmpeg'
 WHISPER = os.path.expanduser('~/Movies/work/venv/bin/mlx_whisper')
 PY = '/Users/alice/.workbuddy/binaries/python/versions/3.13.12/bin/python3'
@@ -16,6 +17,7 @@ VOICE = 'Samantha'
 SAY_RATE = '[[slnc 100]] '  # 句首微停顿，提高 whisper 首词对齐率
 
 os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(WORD_DIR, exist_ok=True)
 
 # 1. 解析 VLOGS（JS 对象字面量 → Python eval：key 加引号 + JS true/false/null 转换）
 src = open(f'{ROOT}/vlogs.js', encoding='utf8').read()
@@ -26,6 +28,31 @@ py_expr = _re.sub(r'([{,]\s*)([A-Za-z_$][\w$]*)\s*:', r'\1"\2":', js)
 py_expr = _re.sub(r'\btrue\b', 'True', py_expr).replace('false', 'False').replace('null', 'None')
 VLOGS = eval(py_expr)
 print(f'vlogs: {len(VLOGS)}')
+
+def norm_word(w):
+    return re.sub(r"[^a-z'-]", '', w.lower())
+
+# 独立词音频：从所有卡片文本收集唯一词，使用 macOS say 生成一次并复用。
+all_words = sorted({norm_word(tok) for v in VLOGS for card in v['cards'] for tok in card['en'].split() if norm_word(tok)})
+word_tasks = [w for w in all_words if not os.path.exists(f'{WORD_DIR}/{w}.mp3')]
+print(f'word audio tasks: {len(word_tasks)} (total {len(all_words)})')
+for n, word in enumerate(word_tasks, 1):
+    aiff = f'/tmp/word_{word}.aiff'
+    mp3 = f'{WORD_DIR}/{word}.mp3'
+    r = subprocess.run(['say', '-v', VOICE, '-o', aiff, word], capture_output=True)
+    if r.returncode != 0:
+        print(f'word say failed: {word}', file=sys.stderr)
+        continue
+    r = subprocess.run([FFMPEG, '-y', '-i', aiff, '-codec:a', 'libmp3lame', '-b:a', '32k', '-ar', '22050', '-ac', '1', mp3], capture_output=True)
+    if r.returncode != 0:
+        print(f'word ffmpeg failed: {word}', file=sys.stderr)
+    if os.path.exists(aiff): os.remove(aiff)
+    if n % 50 == 0: print(f'  words {n}/{len(word_tasks)}')
+
+# 3. 逐句生成
+
+def norm_word(w):
+    return re.sub(r"[^a-z'-]", '', w.lower())
 
 # 2. 收集任务（跳过已完成的——幂等）
 index = {}
@@ -42,9 +69,6 @@ for v in VLOGS:
             continue  # 幂等跳过
         tasks.append((key, v['id'], i, card['en']))
 print(f'tasks: {len(tasks)} (skipped {sum(len(v["cards"]) for v in VLOGS) - len(tasks)} existing)')
-
-def norm_word(w):
-    return re.sub(r"[^a-z'-]", '', w.lower())
 
 # 3. 逐句生成
 t0 = time.time()

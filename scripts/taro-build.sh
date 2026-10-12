@@ -23,6 +23,6 @@ rc=$?
 if [[ $rc -eq 0 && -d ../../audio/vlog ]]; then
   rm -rf dist/audio
   cp -R ../../audio dist/audio
-  echo "[taro-build] 预生成音频已拷入 dist/audio（$(ls dist/audio/vlog/*.mp3 | wc -l | tr -d ' ') 个 mp3）"
+  echo "[taro-build] 预生成音频已拷入 dist/audio（$(ls dist/audio/vlog/*.mp3 | wc -l | tr -d ' ') 句子 mp3 + $(ls dist/audio/words/*.mp3 | wc -l | tr -d ' ') 单词 mp3）"
 fi
 exit $rc
